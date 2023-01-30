@@ -12,7 +12,7 @@ SwerveDrive swerveDrive = SwerveParser.fromJSONDirectory(new File(Filesystem.get
 ```
 
 # Images
-![Field Shuffleboard](.\imgaes\field.png)
-![Simulation](.\imgaes\simulation.png)
-![Dashbaord as dials](.\imgaes\dashboard_dials.png)
-![Dashboard as graphs](.\imgaes\dashboard_graph.png)
+![Field Shuffleboard](./imgaes/field.png)
+![Simulation](./imgaes/simulation.png)
+![Dashbaord as dials](./imgaes/dashboard_dials.png)
+![Dashboard as graphs](./imgaes/dashboard_graph.png)
