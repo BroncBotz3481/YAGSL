@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -184,6 +185,13 @@ public class SwerveParser
     MotorController driveMotor = createMotor(moduleJson.get("Motor").get("Drive")),
         steerMotor = createMotor(moduleJson.get("Motor").get("Steer"));
     Object encoder = createEncoder(moduleJson.get("AbsoluteEncoder"));
+    if (encoder == null)
+    {
+      if (moduleJson.get("IntegratedAbsoluteEncoder").asBoolean() && (steerMotor instanceof CANSparkMax))
+      {
+        encoder = ((CANSparkMax) steerMotor).getAbsoluteEncoder(Type.kDutyCycle);
+      }
+    }
 
     SwerveModule<?, ?, ?> module = new SwerveModule<>(driveMotor,
                                                       steerMotor,
