@@ -1,0 +1,37 @@
+{
+  "WheelBase": 23.75,
+  "TrackWidth": 23.75,
+  "WheelDiameter": 4,
+  "Speed": {
+    "MetersPerSecond": 1.25,
+    "PhysicalMetersPerSecond": 5,
+    "RadianPerSecond": 1
+  },
+  "Acceleration": {
+    "MetersPerSecond": 1,
+    "RadianPerSecond": 1
+  },
+  "Drive": {
+    "Inverted": true,
+    "GearRatio": 6.75,
+    "MaxPower": 0.6,
+    "CurrentLimit": 40
+  },
+  "Steer": {
+    "Inverted": false,
+    "GearRatio": 12.8,
+    "MaxPower": 0.4,
+    "CurrentLimit": 20
+  },
+  "Gyro": {
+    "Inverted": false,
+    "Type": "Pigeon2",
+    "ID": 13,
+    "CANBus": "canivore"
+  },
+  "Initial Pose": {
+    "X": 0,
+    "Y": 0,
+    "Rotation": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "IntegratedAbsoluteEncoder": false,
+  "AbsoluteEncoder": {
+    "Type": "CANCoder",
+    "ID": 10,
+    "Offset": -173.320
+  },
+  "Motor": {
+    "Drive": {
+      "Type": "Neo",
+      "ID": 2
+    },
+    "Steer": {
+      "Type": "Neo",
+      "ID": 1,
+      "FreeSpeedRPM": 5676
+    }
+  }
+}
