@@ -1,4 +1,4 @@
-# Yet Another General Swerve Library
+# Yet Another Generic Swerve Library
 * In early 2023 `swerve-lib` created by SwerveDriveSpecialties officially became unmaintained after not being updated in 2022.
 * This library aims to simplify Swerve Drive implementations while not sacrificing speed or processing power.
 
