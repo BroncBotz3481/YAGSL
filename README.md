@@ -11,6 +11,9 @@
 SwerveDrive swerveDrive = SwerveParser.fromJSONDirectory(new File(Filesystem.getDeployDirectory(), "swerve"));
 ```
 
+# Library Information
+* The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [swerve-deploy](./swerve-deploy).
+
 # Images
 ![Field Shuffleboard](./imgaes/field.png)
 ![Simulation](./imgaes/simulation.png)
