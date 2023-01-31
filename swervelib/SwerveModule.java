@@ -72,7 +72,7 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
   /**
    * Drive feedforward for PID when driving by velocity.
    */
-  private final SimpleMotorFeedforward        driveFeedforward;
+  public        SimpleMotorFeedforward        driveFeedforward;
   /**
    * kV for steering feedforward.
    */
