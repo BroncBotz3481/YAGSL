@@ -15,6 +15,7 @@ SwerveDrive swerveDrive = SwerveParser.fromJSONDirectory(new File(Filesystem.get
 * The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [deploy](./deploy).
 
 # Check out the [Wiki](https://github.com/BroncBotz3481/YAGSL/wiki)
+# Java docs is [here](https://broncbotz3481.github.io/YAGSL/).
 
 # Images
 ![Field Shuffleboard](./imgaes/field.png)
