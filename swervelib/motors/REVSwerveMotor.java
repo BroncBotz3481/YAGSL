@@ -237,6 +237,17 @@ public class REVSwerveMotor extends SwerveMotor
   }
 
   /**
+   * Set the voltage of the motor.
+   *
+   * @param voltage Voltage to output.
+   */
+  @Override
+  public void setVoltage(double voltage)
+  {
+    m_motor.setVoltage(voltage);
+  }
+
+  /**
    * Get the current value of the encoder corresponding to the PID.
    *
    * @return Current value of the encoder.

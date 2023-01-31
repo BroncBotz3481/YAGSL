@@ -5,8 +5,8 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -26,7 +26,7 @@ public class CTRESwerveMotor extends SwerveMotor
   private final int              m_mainPIDSlotId;
   private final int              m_mainPidId;
   private final Supplier<Double> m_encoderRet;
-  private final TalonFX          m_motor;
+  private final WPI_TalonFX      m_motor;
 
   /**
    * kV feed forward for PID
@@ -34,7 +34,7 @@ public class CTRESwerveMotor extends SwerveMotor
   private final double m_moduleRadkV;
 
   // TODO: Finish this based off of BaseFalconSwerve
-  public CTRESwerveMotor(TalonFX motor, SwerveEncoder<?> encoder, ModuleMotorType type, double gearRatio,
+  public CTRESwerveMotor(WPI_TalonFX motor, SwerveEncoder<?> encoder, ModuleMotorType type, double gearRatio,
                          double wheelDiameter,
                          double freeSpeedRPM, double powerLimit)
   {
@@ -195,6 +195,17 @@ public class CTRESwerveMotor extends SwerveMotor
   public void set(double speed)
   {
     m_motor.set(ControlMode.PercentOutput, speed);
+  }
+
+  /**
+   * Set the voltage of the motor.
+   *
+   * @param voltage Voltage to output.
+   */
+  @Override
+  public void setVoltage(double voltage)
+  {
+    m_motor.setVoltage(voltage);
   }
 
   /**

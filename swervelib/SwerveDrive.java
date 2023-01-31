@@ -63,17 +63,17 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
    */
   public final double                m_driverMaxSpeedMPS, m_driverMaxAngularVelocity, m_physicalMaxSpeedMPS;
   /**
-   * Swerve drive kinematics.
-   */
-  private final SwerveDriveKinematics2   m_swerveKinematics;
-  /**
    * Swerve drive pose estimator for attempting to figure out our current position.
    */
-  private final SwerveDrivePoseEstimator m_swervePoseEstimator;
+  public final  SwerveDrivePoseEstimator m_swervePoseEstimator;
   /**
    * Pigeon 2.0 centered on the robot.
    */
-  private final WPI_Pigeon2              m_pigeonIMU;
+  public final  WPI_Pigeon2              m_pigeonIMU;
+  /**
+   * Swerve drive kinematics.
+   */
+  private final SwerveDriveKinematics2   m_swerveKinematics;
   /**
    * Field2d displayed on shuffleboard with current position.
    */
@@ -87,8 +87,17 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
    * Invert the gyro reading.
    */
   private       boolean       m_gyroInverted;
+  /**
+   * Robot desired angle in degrees.
+   */
   private       double        m_angle;
+  /**
+   * Previous chassis speeds for state-space modeling.
+   */
   private       ChassisSpeeds m_prevChassisSpeed = new ChassisSpeeds(0, 0, 0);
+  /**
+   * Previous timer value for state-space modeling.
+   */
   private       double        m_timerPrev;
 
   /**
@@ -168,19 +177,6 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
   }
 
   /**
-   * Enable voltage compensation to the current battery voltage on all modules.
-   */
-  public void setVoltageCompensation()
-  {
-    double currentVoltage = RobotController.getBatteryVoltage();
-    m_frontLeft.setVoltageCompensation(currentVoltage);
-    m_frontRight.setVoltageCompensation(currentVoltage);
-    m_backLeft.setVoltageCompensation(currentVoltage);
-    m_backRight.setVoltageCompensation(currentVoltage);
-  }
-
-
-  /**
    * Create swerve drive modules
    *
    * @param driveGearRatio            Drive gear ratio in form of (rotation:1 AKA rotations/1) to get the encoder ticks
@@ -231,6 +227,18 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
                                              maxDriveAcceleration, steeringMotorInverted, drivingMotorInverted);
     }
     return modules;
+  }
+
+  /**
+   * Enable voltage compensation to the current battery voltage on all modules.
+   */
+  public void setVoltageCompensation()
+  {
+    double currentVoltage = RobotController.getBatteryVoltage();
+    m_frontLeft.setVoltageCompensation(currentVoltage);
+    m_frontRight.setVoltageCompensation(currentVoltage);
+    m_backLeft.setVoltageCompensation(currentVoltage);
+    m_backRight.setVoltageCompensation(currentVoltage);
   }
 
   /**

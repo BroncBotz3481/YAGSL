@@ -1,6 +1,6 @@
 package frc.robot.subsystems.swervedrive.swerve;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import frc.robot.subsystems.swervedrive.swerve.motors.CTRESwerveMotor;
@@ -54,9 +54,9 @@ public abstract class SwerveMotor
                                 freeSpeedRPM,
                                 powerLimit);
     }
-    if (motor instanceof TalonFX)
+    if (motor instanceof WPI_TalonFX)
     {
-      return new CTRESwerveMotor((TalonFX) motor,
+      return new CTRESwerveMotor((WPI_TalonFX) motor,
                                  absoluteEncoder,
                                  type,
                                  gearRatio,
@@ -119,6 +119,13 @@ public abstract class SwerveMotor
    * @param speed Speed from -1 to 1.
    */
   public abstract void set(double speed);
+
+  /**
+   * Set the voltage of the motor.
+   *
+   * @param voltage Voltage to output.
+   */
+  public abstract void setVoltage(double voltage);
 
   /**
    * Get the current value of the encoder corresponding to the PID.

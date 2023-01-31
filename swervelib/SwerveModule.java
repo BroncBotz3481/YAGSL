@@ -2,7 +2,7 @@ package frc.robot.subsystems.swervedrive.swerve;
 
 import static java.util.Objects.requireNonNull;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.MagnetFieldStrength;
 import com.revrobotics.AbsoluteEncoder;
@@ -166,8 +166,8 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
     this.wheelBase = wheelBaseMeters;
     this.driveTrainWidth = driveTrainWidthMeters;
 
-    assert mainMotor instanceof CANSparkMax || mainMotor instanceof TalonFX;
-    assert angleMotor instanceof CANSparkMax || angleMotor instanceof TalonFX;
+    assert mainMotor instanceof CANSparkMax || mainMotor instanceof WPI_TalonFX;
+    assert angleMotor instanceof CANSparkMax || angleMotor instanceof WPI_TalonFX;
     assert encoder instanceof DutyCycleEncoder || encoder instanceof AnalogEncoder || encoder instanceof CANCoder ||
            encoder instanceof AbsoluteEncoder;
 
@@ -413,7 +413,6 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
    */
   public void setVelocity(double velocity)
   {
-    targetVelocity = velocity;
     driveMotor.setTarget(velocity, driveFeedforward.calculate(velocity));
   }
 
@@ -463,6 +462,7 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
     setAngle(angle, optimizedState.angularVelocityRadPerSecond * steeringKV);
     setVelocity(velocity);
     targetAngle = angle;
+    targetVelocity = velocity;
     targetAngularVelocityRPS = optimizedState.angularVelocityRadPerSecond;
   }
 
