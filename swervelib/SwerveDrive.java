@@ -61,7 +61,7 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
   /**
    * Maximum speed in meters per second.
    */
-  public final double                m_driverMaxSpeedMPS, m_driverMaxAngularVelocity, m_physicalMaxSpeedMPS;
+  public final double                m_driverMaxSpeedMPS, m_driverMaxAngularVelocity, m_physicalMaxSpeedMPS, m_driveAccellerationMetersPerSecondSquared;
   /**
    * Swerve drive pose estimator for attempting to figure out our current position.
    */
@@ -73,7 +73,7 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
   /**
    * Swerve drive kinematics.
    */
-  private final SwerveDriveKinematics2   m_swerveKinematics;
+  public final  SwerveDriveKinematics2   m_swerveKinematics;
   /**
    * Field2d displayed on shuffleboard with current position.
    */
@@ -148,6 +148,7 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
 
     m_driverMaxSpeedMPS = driverMaxSpeedMetersPerSecond;
     m_driverMaxAngularVelocity = driverMaxAngularVelocityRadiansPerSecond;
+    m_driveAccellerationMetersPerSecondSquared = driverMaxDriveAccelerationMetersPerSecond;
     m_xLimiter = new SlewRateLimiter(driverMaxDriveAccelerationMetersPerSecond);
     m_yLimiter = new SlewRateLimiter(driverMaxDriveAccelerationMetersPerSecond);
     m_turningLimiter = new SlewRateLimiter(driverMaxAngularAccelerationRadiansPerSecond);

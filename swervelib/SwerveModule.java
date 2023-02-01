@@ -70,19 +70,19 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
    */
   private final double                        wheelBase;
   /**
-   * Drive feedforward for PID when driving by velocity.
-   */
-  public        SimpleMotorFeedforward        driveFeedforward;
-  /**
    * kV for steering feedforward.
    */
   private final double                        steeringKV;
   private final ShuffleboardTab               moduleTab;
-  private final HashMap<String, SimpleWidget> NT4Entries               = new HashMap<>();
+  private final HashMap<String, SimpleWidget> NT4Entries    = new HashMap<>();
+  /**
+   * Drive feedforward for PID when driving by velocity.
+   */
+  public        SimpleMotorFeedforward        driveFeedforward;
   /**
    * Angle offset of the CANCoder at initialization.
    */
-  public        double                        angleOffset              = 0;
+  public        double                        angleOffset   = 0;
   /**
    * Maximum speed in meters per second, used to eliminate unnecessary movement of the module.
    */
@@ -90,15 +90,15 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
   /**
    * Inverted drive motor.
    */
-  private       boolean                       invertedDrive            = false;
+  private       boolean                       invertedDrive = false;
   /**
    * Inverted turning motor.
    */
-  private       boolean                       invertedTurn             = false;
+  private       boolean                       invertedTurn  = false;
   /**
    * Power to drive motor from -1 to 1.
    */
-  private       double                        drivePower               = 0;
+  private       double                        drivePower    = 0;
   /**
    * Store the last angle for optimization.
    */
