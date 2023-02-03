@@ -7,6 +7,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -279,7 +280,14 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
     if (!Robot.isReal())
     {
       m_pigeonIMU.setYaw(pos.getRotation().getDegrees());
+      m_field.getObject("XModules").setPoses(
+          pos.plus(new Transform2d(m_frontLeft.swerveModuleLocation, m_frontLeft.getPosition().angle)),
+          pos.plus(new Transform2d(m_frontRight.swerveModuleLocation, m_frontRight.getPosition().angle)),
+          pos.plus(new Transform2d(m_backLeft.swerveModuleLocation, m_backLeft.getPosition().angle)),
+          pos.plus(new Transform2d(m_backRight.swerveModuleLocation, m_backRight.getPosition().angle)));
     }
+    m_field.setRobotPose(pos);
+
     return m_swervePoseEstimator;
   }
 
@@ -309,14 +317,7 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
     // 2. Apply deadband/Dead-Zone
     forward = applyDeadband(forward, true);
     strafe = applyDeadband(strafe, true);
-    turn = applyDeadband(turn, false);
-
-    // If nothing is asked of us we do nothing.
-    if ((Math.abs(forward) + Math.abs(strafe) + Math.abs(turn)) <= m_deadband)
-    {
-      zeroModules();
-      return;
-    }
+    turn = applyDeadband(turn, true);
 
     // 3. Make the driving smoother
     forward = m_xLimiter.calculate(forward) * m_driverMaxSpeedMPS;
@@ -375,7 +376,6 @@ public class SwerveDrive extends RobotDriveBase implements Sendable, AutoCloseab
         m_angle += updated_chassis_speeds.omegaRadiansPerSecond * 0.02;
       }
       this.update();
-      m_field.setRobotPose(m_swervePoseEstimator.getEstimatedPosition());
     } catch (Exception e)
     {
       System.err.println("Cannot update SwerveDrive Odometry!");
