@@ -74,7 +74,7 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
    */
   private final double                        steeringKV;
   private final ShuffleboardTab               moduleTab;
-  private final HashMap<String, SimpleWidget> NT4Entries    = new HashMap<>();
+  private final HashMap<String, SimpleWidget> NT4Entries               = new HashMap<>();
   /**
    * Drive feedforward for PID when driving by velocity.
    */
@@ -82,7 +82,7 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
   /**
    * Angle offset of the CANCoder at initialization.
    */
-  public        double                        angleOffset   = 0;
+  public        double                        angleOffset              = 0;
   /**
    * Maximum speed in meters per second, used to eliminate unnecessary movement of the module.
    */
@@ -90,15 +90,15 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
   /**
    * Inverted drive motor.
    */
-  private       boolean                       invertedDrive = false;
+  private       boolean                       invertedDrive            = false;
   /**
    * Inverted turning motor.
    */
-  private       boolean                       invertedTurn  = false;
+  private       boolean                       invertedTurn             = false;
   /**
    * Power to drive motor from -1 to 1.
    */
-  private       double                        drivePower    = 0;
+  private       double                        drivePower               = 0;
   /**
    * Store the last angle for optimization.
    */
@@ -451,14 +451,13 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
 //    SwerveModuleState optimizedState = SwerveModuleState.optimize(new SwerveModuleState(state.speedMetersPerSecond,
 //                                                                                        state.angle), currentAngle);
     SwerveModuleState2 optimizedState = SwerveModuleState2.optimize(state, currentAngle);
-    double             angle          = optimizedState.angle.getDegrees(); // getDegrees returns in the range of -180 to 180 we want 0 to
+    double             angle          = optimizedState.angle.getDegrees(); // getDegrees returns in the range of -180
+    // to 180 we want 0 to
     // 360.
-    double velocity = (Math.abs(optimizedState.speedMetersPerSecond) <= (maxDriveSpeedMPS * 0.01)) ? 0
-                                                                                                   :
-                      optimizedState.speedMetersPerSecond;
+    double velocity = optimizedState.speedMetersPerSecond;
     // turn motor code
     // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-    angle = (Math.abs(optimizedState.speedMetersPerSecond) <= (maxDriveSpeedMPS * 0.01)) ? 0 : angle;
+    angle = (Math.abs(optimizedState.speedMetersPerSecond) <= (maxDriveSpeedMPS * 0.01)) ? targetAngle : angle;
     setAngle(angle, optimizedState.angularVelocityRadPerSecond * steeringKV);
     setVelocity(velocity);
     targetAngle = angle;
