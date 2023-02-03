@@ -17,6 +17,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -413,7 +414,7 @@ public class SwerveModule<DriveMotorType extends MotorController, AngleMotorType
    */
   public void setVelocity(double velocity)
   {
-    driveMotor.setTarget(velocity, driveFeedforward.calculate(velocity));
+    driveMotor.setTarget(velocity, driveFeedforward.calculate(velocity) / RobotController.getBatteryVoltage());
   }
 
   /**
