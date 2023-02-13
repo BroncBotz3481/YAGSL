@@ -1,0 +1,17 @@
+{
+  "wheelDiameter": 4,
+  "gearRatio": {
+    "drive": 6.75,
+    "angle": 12.8
+  },
+  "currentLimit": {
+    "drive": 40,
+    "angle": 20
+  },
+  "rampRate": {
+    "drive": 0.25,
+    "angle": 0.25
+  },
+  "wheelGripCoefficientOfFriction": 1.19,
+  "angleMotorFreeSpeedRPM": 5676
+}

@@ -1,4 +1,9 @@
-frc.robot.subsystems.swervedrive.swerve
-frc.robot.subsystems.swervedrive.swerve.encoders
-frc.robot.subsystems.swervedrive.swerve.kinematics
-frc.robot.subsystems.swervedrive.swerve.motors
+frc.robot.subsystems.swervedrive2.swervelib
+frc.robot.subsystems.swervedrive2.swervelib.encoders
+frc.robot.subsystems.swervedrive2.swervelib.imu
+frc.robot.subsystems.swervedrive2.swervelib.math
+frc.robot.subsystems.swervedrive2.swervelib.motors
+frc.robot.subsystems.swervedrive2.swervelib.parser
+frc.robot.subsystems.swervedrive2.swervelib.parser.deserializer
+frc.robot.subsystems.swervedrive2.swervelib.parser.json
+frc.robot.subsystems.swervedrive2.swervelib.parser.json.modules
