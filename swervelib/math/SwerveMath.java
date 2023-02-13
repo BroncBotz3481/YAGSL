@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.math;
+package swervelib.math;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -6,10 +6,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveController;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModuleConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveParser;
+import swervelib.SwerveController;
+import swervelib.parser.SwerveDriveConfiguration;
+import swervelib.parser.SwerveModuleConfiguration;
+import swervelib.parser.SwerveParser;
 
 /**
  * Mathematical functions which pertain to swerve drive.

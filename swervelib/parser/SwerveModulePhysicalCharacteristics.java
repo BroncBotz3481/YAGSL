@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser;
+package swervelib.parser;
 
 /**
  * Configuration class which stores physical characteristics shared between every swerve module.

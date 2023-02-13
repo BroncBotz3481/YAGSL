@@ -1,18 +1,18 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser;
+package swervelib.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveDrive;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveModule;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.ControllerPropertiesJson;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.ModuleJson;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.PIDFPropertiesJson;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.PhysicalPropertiesJson;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.SwerveDriveJson;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
+import swervelib.parser.json.ControllerPropertiesJson;
+import swervelib.parser.json.ModuleJson;
+import swervelib.parser.json.PIDFPropertiesJson;
+import swervelib.parser.json.PhysicalPropertiesJson;
+import swervelib.parser.json.SwerveDriveJson;
 
 /**
  * Helper class used to parse the JSON directory with specified configuration options.

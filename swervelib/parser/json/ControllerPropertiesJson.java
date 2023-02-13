@@ -1,11 +1,11 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
+package swervelib.parser.json;
 
-import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveControllerConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfiguration;
+import swervelib.parser.PIDFConfig;
+import swervelib.parser.SwerveControllerConfiguration;
+import swervelib.parser.SwerveDriveConfiguration;
 
 /**
- * {@link frc.robot.subsystems.swervedrive2.swervelib.SwerveController} parsed class. Used to access the JSON data.
+ * {@link swervelib.SwerveController} parsed class. Used to access the JSON data.
  */
 public class ControllerPropertiesJson
 {

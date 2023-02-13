@@ -1,8 +1,8 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser;
+package swervelib.parser;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveModule;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.SwerveIMU;
+import swervelib.SwerveModule;
+import swervelib.imu.SwerveIMU;
 
 /**
  * Swerve drive configurations used during SwerveDrive construction.

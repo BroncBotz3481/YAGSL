@@ -1,18 +1,17 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser;
+package swervelib.parser;
 
-import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateAngleKV;
-import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
-import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateMaxAcceleration;
-import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateMetersPerRotation;
+import static swervelib.math.SwerveMath.calculateAngleKV;
+import static swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
+import static swervelib.math.SwerveMath.calculateMaxAcceleration;
+import static swervelib.math.SwerveMath.calculateMetersPerRotation;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
-import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
+import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.motors.SwerveMotor;
 
 /**
- * Swerve Module configuration class which is used to configure
- * {@link frc.robot.subsystems.swervedrive2.swervelib.SwerveModule}.
+ * Swerve Module configuration class which is used to configure {@link swervelib.SwerveModule}.
  */
 public class SwerveModuleConfiguration
 {

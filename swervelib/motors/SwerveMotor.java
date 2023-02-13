@@ -1,7 +1,7 @@
-package frc.robot.subsystems.swervedrive2.swervelib.motors;
+package swervelib.motors;
 
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
+import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.parser.PIDFConfig;
 
 /**
  * Swerve motor abstraction which defines a standard interface for motors within a swerve module.

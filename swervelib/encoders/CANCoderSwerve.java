@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.encoders;
+package swervelib.encoders;
 
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;

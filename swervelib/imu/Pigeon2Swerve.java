@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.imu;
+package swervelib.imu;
 
 import com.ctre.phoenix.sensors.Pigeon2Configuration;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;

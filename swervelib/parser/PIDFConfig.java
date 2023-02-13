@@ -1,7 +1,7 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser;
+package swervelib.parser;
 
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.deserializer.PIDFRange;
+import swervelib.parser.deserializer.PIDFRange;
 
 /**
  * Hold the PIDF and Integral Zone values for a PID.

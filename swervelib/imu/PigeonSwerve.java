@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.imu;
+package swervelib.imu;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

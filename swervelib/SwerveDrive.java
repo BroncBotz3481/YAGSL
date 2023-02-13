@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib;
+package swervelib;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -13,13 +13,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.SwerveIMU;
-import frc.robot.subsystems.swervedrive2.swervelib.math.SwerveKinematics2;
-import frc.robot.subsystems.swervedrive2.swervelib.math.SwerveModuleState2;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveControllerConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfiguration;
 import java.util.ArrayList;
 import java.util.List;
+import swervelib.imu.SwerveIMU;
+import swervelib.math.SwerveKinematics2;
+import swervelib.math.SwerveModuleState2;
+import swervelib.parser.SwerveControllerConfiguration;
+import swervelib.parser.SwerveDriveConfiguration;
 
 /**
  * Swerve Drive class representing and controlling the swerve drive.

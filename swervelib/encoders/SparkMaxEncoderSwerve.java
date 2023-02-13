@@ -1,9 +1,9 @@
-package frc.robot.subsystems.swervedrive2.swervelib.encoders;
+package swervelib.encoders;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
+import swervelib.motors.SwerveMotor;
 
 /**
  * SparkMax absolute encoder, attached through the data port.

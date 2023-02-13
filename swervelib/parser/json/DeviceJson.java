@@ -1,14 +1,16 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
+package swervelib.parser.json;
 
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.CANCoderSwerve;
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.SparkMaxEncoderSwerve;
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.NavXSwerve;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.Pigeon2Swerve;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.PigeonSwerve;
-import frc.robot.subsystems.swervedrive2.swervelib.imu.SwerveIMU;
-import frc.robot.subsystems.swervedrive2.swervelib.motors.SparkMaxSwerve;
-import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
+import swervelib.encoders.CANCoderSwerve;
+import swervelib.encoders.SparkMaxEncoderSwerve;
+import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.imu.NavXSwerve;
+import swervelib.imu.Pigeon2Swerve;
+import swervelib.imu.PigeonSwerve;
+import swervelib.imu.SwerveIMU;
+import swervelib.motors.SparkMaxSwerve;
+import swervelib.motors.SwerveMotor;
+import swervelib.motors.TalonFXSwerve;
+import swervelib.motors.TalonSRXSwerve;
 
 /**
  * Device JSON parsed class. Used to access the JSON data.
@@ -76,11 +78,19 @@ public class DeviceJson
    */
   public SwerveMotor createMotor(boolean isDriveMotor)
   {
-    if (type.equals("sparkmax"))
+    switch (type)
     {
-      return new SparkMaxSwerve(id, isDriveMotor);
+      case "sparkmax":
+        return new SparkMaxSwerve(id, isDriveMotor);
+      case "falcon":
+      case "talonfx":
+        return new TalonFXSwerve(id, canbus != null ? canbus : "", isDriveMotor);
+      case "talonsrx":
+        return new TalonSRXSwerve(id, isDriveMotor);
+      default:
+        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+
     }
-    throw new RuntimeException(type + " is not a recognized absolute encoder type.");
   }
 
   /**

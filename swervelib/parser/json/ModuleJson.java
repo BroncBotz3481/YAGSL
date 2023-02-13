@@ -1,16 +1,19 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
+package swervelib.parser.json;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
-import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModuleConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModulePhysicalCharacteristics;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.modules.BoolMotorJson;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.json.modules.LocationJson;
+import swervelib.encoders.CANCoderSwerve;
+import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.motors.SwerveMotor;
+import swervelib.motors.TalonFXSwerve;
+import swervelib.motors.TalonSRXSwerve;
+import swervelib.parser.PIDFConfig;
+import swervelib.parser.SwerveModuleConfiguration;
+import swervelib.parser.SwerveModulePhysicalCharacteristics;
+import swervelib.parser.json.modules.BoolMotorJson;
+import swervelib.parser.json.modules.LocationJson;
 
 /**
- * {@link frc.robot.subsystems.swervedrive2.swervelib.SwerveModule} JSON parsed class. Used to access the JSON data.
+ * {@link swervelib.SwerveModule} JSON parsed class. Used to access the JSON data.
  */
 public class ModuleJson
 {
@@ -64,6 +67,10 @@ public class ModuleJson
     if (absEncoder == null)
     {
       absEncoder = angle.createIntegratedEncoder(angleMotor);
+      angleMotor.setAbsoluteEncoder(absEncoder);
+    } else if ((angleMotor instanceof TalonFXSwerve || angleMotor instanceof TalonSRXSwerve) &&
+               absEncoder instanceof CANCoderSwerve)
+    {
       angleMotor.setAbsoluteEncoder(absEncoder);
     }
 

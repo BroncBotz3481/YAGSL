@@ -1,11 +1,10 @@
-package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
+package swervelib.parser.json;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModulePhysicalCharacteristics;
+import swervelib.parser.SwerveModulePhysicalCharacteristics;
 
 /**
- * {@link frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModulePhysicalCharacteristics} parsed data. Used to
- * configure the SwerveModule.
+ * {@link swervelib.parser.SwerveModulePhysicalCharacteristics} parsed data. Used to configure the SwerveModule.
  */
 public class PhysicalPropertiesJson
 {

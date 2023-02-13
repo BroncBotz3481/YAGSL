@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swervedrive2.swervelib.imu;
+package swervelib.imu;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
