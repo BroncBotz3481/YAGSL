@@ -8,7 +8,7 @@
 * The swerve drive is configurable via JSON files, and you can initialize the entire swerve drive with a similar line as the following.
 * Simulation support.
 ```java
-SwerveDrive swerveDrive = SwerveParser.fromJSONDirectory(new File(Filesystem.getDeployDirectory(), "swerve"));
+SwerveDrive swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve")).createSwerveDrive();
 ```
 
 # Library Information
