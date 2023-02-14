@@ -141,6 +141,21 @@ public class SwerveDrive
   }
 
   /**
+   * Lock the swerve drive to prevent it from moving.
+   */
+  public void lock()
+  {
+    double[]             angles        = new double[]{45, -45, -45, 45};
+    SwerveModuleState2[] moduleState2s = new SwerveModuleState2[swerveModules.length];
+    for (int i = 0; i < moduleState2s.length; i++)
+    {
+      swerveModules[i].lastAngle = angles[i % 4]; // Override jittering to ensure module is set to angle.
+      moduleState2s[i] = new SwerveModuleState2(0, Rotation2d.fromDegrees(angles[i % 4]), 0);
+    }
+    setModuleStates(moduleState2s, false);
+  }
+
+  /**
    * Set the module states (azimuth and velocity) directly.  Used primarily for auto pathing.
    *
    * @param desiredStates A list of SwerveModuleStates to send to the modules.
