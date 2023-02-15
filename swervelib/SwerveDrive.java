@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -168,16 +169,15 @@ public class SwerveDrive
   }
 
   /**
-   * Set field-relative chassis speeds with closed-loop velocity control.
+   * Set chassis speeds with closed-loop velocity control.
    *
-   * @param chassisSpeeds Field-relative.
+   * @param chassisSpeeds Chassis speeds to set.
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds)
   {
-    setModuleStates(kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getYaw())),
+    setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds),
                     false);
   }
-
 
   /**
    * Gets the current pose (position and rotation) of the robot, as reported by odometry.
@@ -223,6 +223,16 @@ public class SwerveDrive
   public void resetOdometry(Pose2d pose)
   {
     swerveDrivePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
+  }
+
+  /**
+   * Post the trajectory to the field
+   *
+   * @param trajectory the trajectory to post.
+   */
+  public void postTrajectory(Trajectory trajectory)
+  {
+    field.getObject("Trajectory").setTrajectory(trajectory);
   }
 
   /**
@@ -425,7 +435,7 @@ public class SwerveDrive
 
     field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
 
-    double[] moduleStates = new double[8];
+    double[] moduleStates = new double[swerveModules.length * 2];
     for (SwerveModule module : swerveModules)
     {
       SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", module.getAbsolutePosition());
