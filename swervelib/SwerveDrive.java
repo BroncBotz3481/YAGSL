@@ -356,7 +356,7 @@ public class SwerveDrive
    *
    * @param brake True to set motors to brake mode, false for coast.
    */
-  public void setMotorBrake(boolean brake)
+  public void setMotorIdleMode(boolean brake)
   {
     for (SwerveModule swerveModule : swerveModules)
     {
@@ -428,8 +428,8 @@ public class SwerveDrive
     double[] moduleStates = new double[8];
     for (SwerveModule module : swerveModules)
     {
-      SmartDashboard.putNumber("Module" + module.moduleNumber + "CANCoder", module.getCANCoder());
-      SmartDashboard.putNumber("Module" + module.moduleNumber + "Relative Encoder", module.getRelativeEncoder());
+      SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", module.getAbsolutePosition());
+      SmartDashboard.putNumber("Module" + module.moduleNumber + "Relative Encoder", module.getRelativePosition());
       moduleStates[module.moduleNumber] = module.getState().angle.getDegrees();
       moduleStates[module.moduleNumber + 1] = module.getState().speedMetersPerSecond;
     }

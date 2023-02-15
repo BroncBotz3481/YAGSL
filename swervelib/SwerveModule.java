@@ -233,21 +233,21 @@ public class SwerveModule
   }
 
   /**
-   * Get the CANCoder absolute position.
+   * Get the absolute position.
    *
    * @return Absolute encoder angle in degrees.
    */
-  public double getCANCoder()
+  public double getAbsolutePosition()
   {
     return absoluteEncoder.getAbsolutePosition();
   }
 
   /**
-   * Get the relative encoder angle in degrees.
+   * Get the relative angle in degrees.
    *
    * @return Angle in degrees.
    */
-  public double getRelativeEncoder()
+  public double getRelativePosition()
   {
     return angleMotor.getPosition();
   }
