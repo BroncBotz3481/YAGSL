@@ -28,6 +28,8 @@ public class SwerveController
   /**
    * Construct the SwerveController object which is used for determining the speeds of the robot based on controller
    * input.
+   *
+   * @param cfg {@link SwerveControllerConfiguration} containing the PIDF variables for the heading PIDF.
    */
   public SwerveController(SwerveControllerConfiguration cfg)
   {
@@ -53,6 +55,8 @@ public class SwerveController
    *
    * @param x The x value for the joystick in which the deadband should be applied.
    * @param y The y value for the joystick in which the deadband should be applied.
+   * @return Whether the values are within the deadband from
+   * {@link SwerveControllerConfiguration#angleJoyStickRadiusDeadband}.
    */
   public boolean withinHypotDeadband(double x, double y)
   {

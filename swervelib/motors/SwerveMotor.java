@@ -28,6 +28,7 @@ public abstract class SwerveMotor
    * Set the absolute encoder to be a compatible absolute encoder.
    *
    * @param encoder The encoder to use.
+   * @return The {@link SwerveMotor} for single line configuration.
    */
   public abstract SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder);
 

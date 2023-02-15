@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -69,6 +70,10 @@ public class SwerveDrive
    * method.  The drive() method incorporates kinematics— it takes a translation and rotation, as well as parameters for
    * field-centric and closed-loop velocity control. setModuleStates() takes a list of SwerveModuleStates and directly
    * passes them to the modules. This subsystem also handles odometry.
+   *
+   * @param config           The {@link SwerveDriveConfiguration} configuration to base the swerve drive off of.
+   * @param controllerConfig The {@link SwerveControllerConfiguration} to use when creating the
+   *                         {@link SwerveController}.
    */
   public SwerveDrive(SwerveDriveConfiguration config, SwerveControllerConfiguration controllerConfig)
   {
@@ -302,7 +307,7 @@ public class SwerveDrive
   }
 
   /**
-   * Gets the current yaw angle of the robot, as reported by the imu.  CCW positive, not wrapped.
+   * Gets the current pitch angle of the robot, as reported by the imu.
    *
    * @return The heading as a {@link Rotation2d} angle
    */
@@ -316,7 +321,48 @@ public class SwerveDrive
       return Rotation2d.fromDegrees(swerveDriveConfiguration.invertedIMU ? 360 - ypr[1] : ypr[1]);
     } else
     {
-      return new Rotation2d(angle);
+      return new Rotation2d();
+    }
+  }
+
+  /**
+   * Gets the current roll angle of the robot, as reported by the imu.
+   *
+   * @return The heading as a {@link Rotation2d} angle
+   */
+  public Rotation2d getRoll()
+  {
+    // Read the imu if the robot is real or the accumulator if the robot is simulated.
+    if (Robot.isReal())
+    {
+      double[] ypr = new double[3];
+      imu.getYawPitchRoll(ypr);
+      return Rotation2d.fromDegrees(swerveDriveConfiguration.invertedIMU ? 360 - ypr[1] : ypr[1]);
+    } else
+    {
+      return new Rotation2d();
+    }
+  }
+
+  /**
+   * Gets the current gyro Rotation3d of the robot, as reported by the imu.
+   *
+   * @return The heading as a {@link Rotation3d} angle
+   */
+  public Rotation3d getGyroRotation3d()
+  {
+    // Read the imu if the robot is real or the accumulator if the robot is simulated.
+    if (Robot.isReal())
+    {
+      double[] ypr = new double[3];
+      imu.getYawPitchRoll(ypr);
+      return new Rotation3d(
+          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[0] : ypr[0]),
+          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[1] : ypr[1]),
+          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[2] : ypr[2]));
+    } else
+    {
+      return new Rotation3d(angle, 0, 0);
     }
   }
 
@@ -405,4 +451,14 @@ public class SwerveDrive
     SmartDashboard.putNumberArray("moduleStates", moduleStates);
   }
 
+  /**
+   * Synchronize angle motor integrated encoders with data from absolute encoders.
+   */
+  public void synchronizeModuleEncoders()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.synchronizeEncoders();
+    }
+  }
 }

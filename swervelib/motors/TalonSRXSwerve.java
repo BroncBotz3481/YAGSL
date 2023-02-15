@@ -20,7 +20,7 @@ public class TalonSRXSwerve extends SwerveMotor
   /**
    * Factory default already occurred.
    */
-  private final boolean factoryDefaultOccurred   = false;
+  private final boolean factoryDefaultOccurred = false;
   /**
    * TalonSRX motor controller.
    */
@@ -28,11 +28,11 @@ public class TalonSRXSwerve extends SwerveMotor
   /**
    * Whether the absolute encoder is integrated.
    */
-  private       boolean absoluteEncoder          = false;
+  private boolean absoluteEncoder          = false;
   /**
    * The position conversion factor.
    */
-  private       double  positionConversionFactor = 1;
+  private double  positionConversionFactor = 1;
 
   /**
    * Constructor for TalonSRX swerve motor.
@@ -301,7 +301,22 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   enum CTRE_slotIdx
   {
-    Distance, Turning, Velocity, MotionProfile
+    /**
+     * Slot 0, meant for distances PID's.
+     */
+    Distance,
+    /**
+     * Slot 1, meant for turning PID's.
+     */
+    Turning,
+    /**
+     * Slot 2, meant for velocity PID's.
+     */
+    Velocity,
+    /**
+     * Slot 3, meant for motion profiles.
+     */
+    MotionProfile
   }
 
   /**
@@ -309,7 +324,22 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   enum CTRE_pidIdx
   {
-    PRIMARY_PID, AUXILIARY_PID, THIRD_PID, FOURTH_PID
+    /**
+     * Primary PID for talons.
+     */
+    PRIMARY_PID,
+    /**
+     * Secondary PID for talons.
+     */
+    AUXILIARY_PID,
+    /**
+     * Third PID slot for talons.
+     */
+    THIRD_PID,
+    /**
+     * Fourth PID slot for talons.
+     */
+    FOURTH_PID
   }
 
   /**
@@ -317,6 +347,13 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   enum CTRE_remoteSensor
   {
-    REMOTE_SENSOR_0, REMOTE_SENSOR_1
+    /**
+     * Remote sensor 0.
+     */
+    REMOTE_SENSOR_0,
+    /**
+     * Remote sensor 1.
+     */
+    REMOTE_SENSOR_1
   }
 }

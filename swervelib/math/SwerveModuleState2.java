@@ -9,14 +9,18 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 public class SwerveModuleState2 extends SwerveModuleState
 {
 
-  public double speedMetersPerSecond;
-
+  /**
+   * Swerve module speed in meters per second.
+   */
+  public double     speedMetersPerSecond;
   /**
    * Rad per sec
    */
-  public double omegaRadPerSecond = 0;
-
-  public Rotation2d angle = Rotation2d.fromDegrees(0);
+  public double     omegaRadPerSecond = 0;
+  /**
+   * Swerve module angle as a {@link Rotation2d}.
+   */
+  public Rotation2d angle             = Rotation2d.fromDegrees(0);
 
   /**
    * Constructs a SwerveModuleState with zeros for speed and angle.

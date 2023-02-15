@@ -20,6 +20,9 @@ import swervelib.parser.json.SwerveDriveJson;
 public class SwerveParser
 {
 
+  /**
+   * Module number mapped to the JSON name.
+   */
   private static final HashMap<String, Integer> moduleConfigs = new HashMap<>();
   /**
    * Parsed swervedrive.json
@@ -47,6 +50,7 @@ public class SwerveParser
    * Construct a swerve parser. Will throw an error if there is a missing file.
    *
    * @param directory Directory with swerve configurations.
+   * @throws IOException if a file doesn't exist.
    */
   public SwerveParser(File directory) throws IOException
   {

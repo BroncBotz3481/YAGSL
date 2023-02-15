@@ -335,6 +335,17 @@ public class SparkMaxSwerve extends SwerveMotor
    */
   enum SparkMAX_slotIdx
   {
-    Position, Velocity, Simulation
+    /**
+     * Slot 1, used for position PID's.
+     */
+    Position,
+    /**
+     * Slot 2, used for velocity PID's.
+     */
+    Velocity,
+    /**
+     * Slot 3, used arbitrarily. (Documentation show simulations).
+     */
+    Simulation
   }
 }

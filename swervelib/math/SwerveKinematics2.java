@@ -15,21 +15,39 @@ import org.ejml.simple.SimpleMatrix;
 
 /**
  * Clone of WPI SwerveKinematics, which implements second order kinematics when calculating modules states from chassis
- * speed.
- * <p></p>
- * <p>
- * Makes use of {@link SwerveModuleState2} to add the angular velocity that is required of the module as an output.
+ * speed. Makes use of {@link SwerveModuleState2} to add the angular velocity that is required of the module as an
+ * output.
  */
 public class SwerveKinematics2 extends SwerveDriveKinematics
 {
 
-  private final SimpleMatrix m_inverseKinematics;
-  private final SimpleMatrix m_forwardKinematics;
-  private final SimpleMatrix bigInverseKinematics;
-
+  /**
+   * Inverse kinematics matrix.
+   */
+  private final SimpleMatrix         m_inverseKinematics;
+  /**
+   * Forward kinematics matrix.
+   */
+  private final SimpleMatrix         m_forwardKinematics;
+  /**
+   * Second order kinematics inverse matrix.
+   */
+  private final SimpleMatrix         bigInverseKinematics;
+  /**
+   * Number of swerve modules.
+   */
   private final int                  m_numModules;
+  /**
+   * Location of each swerve module in meters.
+   */
   private final Translation2d[]      m_modules;
+  /**
+   * Swerve module states.
+   */
   private final SwerveModuleState2[] m_moduleStates;
+  /**
+   * Previous CoR
+   */
   private       Translation2d        m_prevCoR = new Translation2d();
 
   /**

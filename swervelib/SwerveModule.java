@@ -210,6 +210,11 @@ public class SwerveModule
     return new SwerveModuleState2(velocity, azimuth, omega);
   }
 
+  /**
+   * Get the position of the swerve module.
+   *
+   * @return {@link SwerveModulePosition} of the swerve module.
+   */
   public SwerveModulePosition getPosition()
   {
     double     position;
