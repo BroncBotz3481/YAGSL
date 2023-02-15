@@ -200,7 +200,7 @@ public class SwerveModule
     {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
-      omega = angleMotor.getVelocity();
+      omega = Math.toRadians(angleMotor.getVelocity());
     } else
     {
       velocity = speed;

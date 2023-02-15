@@ -19,13 +19,13 @@ public class TalonFXSwerve extends SwerveMotor
 {
 
   /**
+   * Factory default already occurred.
+   */
+  private final boolean factoryDefaultOccurred = false;
+  /**
    * TalonFX motor controller.
    */
   WPI_TalonFX motor;
-  /**
-   * Factory default already occurred.
-   */
-  private final boolean factoryDefaultOccurred   = false;
   /**
    * Whether the absolute encoder is integrated.
    */
@@ -218,7 +218,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public double getVelocity()
   {
-    return motor.getSelectedSensorVelocity() * (100 * positionConversionFactor);
+    return motor.getSelectedSensorVelocity() * (10 * positionConversionFactor);
   }
 
   /**
