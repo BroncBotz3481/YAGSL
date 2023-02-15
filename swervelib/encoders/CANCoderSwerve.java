@@ -2,9 +2,11 @@ package swervelib.encoders;
 
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * Swerve Absolute Encoder for CTRE CANCoders.
@@ -80,6 +82,10 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getAbsolutePosition()
   {
+    if (encoder.getMagnetFieldStrength() != MagnetFieldStrength.Good_GreenLED)
+    {
+      DriverStation.reportWarning("CANCoder " + encoder.getDeviceID() + " magnetic field is less than ideal.\n", false);
+    }
     return encoder.getAbsolutePosition();
   }
 
