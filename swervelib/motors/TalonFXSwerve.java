@@ -29,11 +29,11 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Whether the absolute encoder is integrated.
    */
-  private       boolean absoluteEncoder          = false;
+  private boolean absoluteEncoder          = false;
   /**
    * The position conversion factor.
    */
-  private       double  positionConversionFactor = 1;
+  private double  positionConversionFactor = 1;
 
   /**
    * Constructor for TalonFX swerve motor.

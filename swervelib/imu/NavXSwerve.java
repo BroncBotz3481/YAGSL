@@ -45,7 +45,7 @@ public class NavXSwerve extends SwerveIMU
   public void factoryDefault()
   {
     // gyro.reset(); // Reported to be slow
-    yawOffset = gyro.getYaw();
+    yawOffset = gyro.getYaw() % 360;
   }
 
   /**
@@ -65,10 +65,7 @@ public class NavXSwerve extends SwerveIMU
   public void setYaw(double yaw)
   {
     // gyro.reset(); // Reported to be slow using the offset.
-    if (yaw != 0)
-    {
-      yawOffset = yaw + gyro.getYaw();
-    }
+    yawOffset = (yaw % 360) + (gyro.getYaw() % 360);
   }
 
   /**
@@ -79,9 +76,9 @@ public class NavXSwerve extends SwerveIMU
   @Override
   public void getYawPitchRoll(double[] yprArray)
   {
-    yprArray[0] = gyro.getYaw() - yawOffset;
-    yprArray[1] = gyro.getPitch();
-    yprArray[2] = gyro.getRoll();
+    yprArray[0] = (gyro.getYaw() % 360) - yawOffset;
+    yprArray[1] = gyro.getPitch() % 360;
+    yprArray[2] = gyro.getRoll() % 360;
   }
 
   /**

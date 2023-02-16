@@ -22,6 +22,7 @@ import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
+import swervelib.simulation.SwerveIMUSimulation;
 
 /**
  * Swerve Drive class representing and controlling the swerve drive.
@@ -48,7 +49,7 @@ public class SwerveDrive
   /**
    * Field object.
    */
-  public        Field2d                  field = new Field2d();
+  public        Field2d                  field                        = new Field2d();
   /**
    * Swerve controller for controlling heading of the robot.
    */
@@ -58,19 +59,20 @@ public class SwerveDrive
    */
   private       SwerveIMU                imu;
   /**
-   * The current angle of the robot and last time odometry during simulations.
+   * Simulation of the swerve drive.
    */
-  private       double                   angle, lastTime;
+  private       SwerveIMUSimulation      simIMU;
   /**
-   * Time during simulations.
+   * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
-  private Timer timer;
+  private       int                      moduleSynchronizationCounter = 0;
 
   /**
-   * Creates a new swerve drivebase subsystem.  Robot is controlled via the drive() method, or via the setModuleStates()
-   * method.  The drive() method incorporates kinematics— it takes a translation and rotation, as well as parameters for
-   * field-centric and closed-loop velocity control. setModuleStates() takes a list of SwerveModuleStates and directly
-   * passes them to the modules. This subsystem also handles odometry.
+   * Creates a new swerve drivebase subsystem.  Robot is controlled via the {@link SwerveDrive#drive} method, or via the
+   * {@link SwerveDrive#setModuleStates} method.  The {@link SwerveDrive#drive} method incorporates kinematics— it takes
+   * a translation and rotation, as well as parameters for field-centric and closed-loop velocity control.
+   * {@link SwerveDrive#setModuleStates} takes a list of SwerveModuleStates and directly passes them to the modules.
+   * This subsystem also handles odometry.
    *
    * @param config           The {@link SwerveDriveConfiguration} configuration to base the swerve drive off of.
    * @param controllerConfig The {@link SwerveControllerConfiguration} to use when creating the
@@ -87,9 +89,7 @@ public class SwerveDrive
     // If the robot is real, instantiate the IMU instead.
     if (!Robot.isReal())
     {
-      timer = new Timer();
-      timer.start();
-      lastTime = 0;
+      simIMU = new SwerveIMUSimulation();
     } else
     {
       imu = config.imu;
@@ -105,7 +105,7 @@ public class SwerveDrive
         getModulePositions(),
         new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)),
         VecBuilder.fill(0.1, 0.1, 0.1), // x,y,heading in radians; state std dev, higher=less weight
-        VecBuilder.fill(0.9, 1.0, 0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
+        VecBuilder.fill(0.9, 0.9, 0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
 
     zeroGyro();
     SmartDashboard.putData("Field", field);
@@ -276,7 +276,7 @@ public class SwerveDrive
       imu.setYaw(0);
     } else
     {
-      angle = 0;
+      simIMU.setAngle(0);
     }
     swerveController.lastAngle = 0;
     resetOdometry(new Pose2d(getPose().getTranslation(), new Rotation2d()));
@@ -297,7 +297,7 @@ public class SwerveDrive
       return Rotation2d.fromDegrees(swerveDriveConfiguration.invertedIMU ? 360 - ypr[0] : ypr[0]);
     } else
     {
-      return new Rotation2d(angle);
+      return simIMU.getYaw();
     }
   }
 
@@ -316,7 +316,7 @@ public class SwerveDrive
       return Rotation2d.fromDegrees(swerveDriveConfiguration.invertedIMU ? 360 - ypr[1] : ypr[1]);
     } else
     {
-      return new Rotation2d();
+      return simIMU.getPitch();
     }
   }
 
@@ -335,12 +335,12 @@ public class SwerveDrive
       return Rotation2d.fromDegrees(swerveDriveConfiguration.invertedIMU ? 360 - ypr[2] : ypr[2]);
     } else
     {
-      return new Rotation2d();
+      return simIMU.getRoll();
     }
   }
 
   /**
-   * Gets the current gyro Rotation3d of the robot, as reported by the imu.
+   * Gets the current gyro {@link Rotation3d} of the robot, as reported by the imu.
    *
    * @return The heading as a {@link Rotation3d} angle
    */
@@ -357,7 +357,7 @@ public class SwerveDrive
           Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[0] : ypr[0]));
     } else
     {
-      return new Rotation3d(angle, 0, 0);
+      return simIMU.getGyroRotation3d();
     }
   }
 
@@ -375,9 +375,10 @@ public class SwerveDrive
   }
 
   /**
-   * Point all modules toward the robot center, thus making the robot very difficult to move.
+   * Point all modules toward the robot center, thus making the robot very difficult to move. Forcing the robot to keep
+   * the current pose.
    */
-  public void setDriveBrake()
+  public void lockPose()
   {
     for (SwerveModule swerveModule : swerveModules)
     {
@@ -418,7 +419,9 @@ public class SwerveDrive
   }
 
   /**
-   * Update odometry should be run every loop.
+   * Update odometry should be run every loop. Synchronizes module absolute encoders with relative encoders
+   * periodically. In simulation mode will also post the pose of each module. Updates SmartDashboard with module encoder
+   * readings and states.
    */
   public void updateOdometry()
   {
@@ -428,22 +431,34 @@ public class SwerveDrive
     // Update angle accumulator if the robot is simulated
     if (!Robot.isReal())
     {
-      angle += kinematics.toChassisSpeeds(getStates()).omegaRadiansPerSecond * (timer.get() - lastTime);
-      lastTime = timer.get();
-      field.getObject("XModules").setPoses(getSwerveModulePoses(swerveDrivePoseEstimator.getEstimatedPosition()));
+      simIMU.updateOdometry(kinematics, getStates(),
+                            getSwerveModulePoses(swerveDrivePoseEstimator.getEstimatedPosition()), field);
     }
 
     field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
 
     double[] moduleStates = new double[swerveModules.length * 2];
+    double   sumOmega     = 0;
     for (SwerveModule module : swerveModules)
     {
-      SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", module.getAbsolutePosition());
+      SwerveModuleState2 moduleState = module.getState();
+      moduleStates[module.moduleNumber] = moduleState.angle.getDegrees();
+      moduleStates[module.moduleNumber + 1] = moduleState.speedMetersPerSecond;
+      sumOmega += Math.abs(moduleState.omegaRadPerSecond);
+
       SmartDashboard.putNumber("Module" + module.moduleNumber + "Relative Encoder", module.getRelativePosition());
-      moduleStates[module.moduleNumber] = module.getState().angle.getDegrees();
-      moduleStates[module.moduleNumber + 1] = module.getState().speedMetersPerSecond;
+      SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", module.getAbsolutePosition());
     }
     SmartDashboard.putNumberArray("moduleStates", moduleStates);
+
+    // If the robot isn't moving synchronize the encoders every 100ms (Inspired by democrat's SDS lib)
+    // To ensure that everytime we initialize it works.
+    if (sumOmega <= .01 && ++moduleSynchronizationCounter > 5)
+    {
+      synchronizeModuleEncoders();
+      moduleSynchronizationCounter = 0;
+    }
+
   }
 
   /**
@@ -458,15 +473,35 @@ public class SwerveDrive
   }
 
   /**
-   * Add a vision measurement to the {@link SwerveDrivePoseEstimator} with the given timestamp of the vision
-   * measurement. <b>THIS WILL BREAK IF UPDATED TOO OFTEN.</b>
+   * Add a vision measurement to the {@link SwerveDrivePoseEstimator} and update the {@link SwerveIMU} gyro reading with
+   * the given timestamp of the vision measurement. <b>THIS WILL BREAK IF UPDATED TOO OFTEN.</b>
    *
    * @param robotPose Robot {@link Pose2d} as measured by vision.
-   * @param timestamp Timestamp the measurement was taken as time since FPGATimestamp, could be taken from
-   *                  {@link Timer#getFPGATimestamp()}.
+   * @param timestamp Timestamp the measurement was taken as time since startup, should be taken from
+   *                  {@link Timer#getFPGATimestamp()} or similar sources.
+   * @param soft      Add vision estimate using the
+   *                  {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double)} function, or hard reset
+   *                  odometry with the given position with
+   *                  {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry#resetPosition(Rotation2d,
+   *                  SwerveModulePosition[], Pose2d)}.
    */
-  public void addVisionMeasurement(Pose2d robotPose, double timestamp)
+  public void addVisionMeasurement(Pose2d robotPose, double timestamp, boolean soft)
   {
-    swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp);
+    if (soft)
+    {
+      swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp);
+    } else
+    {
+      swerveDrivePoseEstimator.resetPosition(robotPose.getRotation(), getModulePositions(), robotPose);
+    }
+
+    if (Robot.isReal())
+    {
+      imu.setYaw(swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees());
+      // Yaw reset recommended by Team 1622
+    } else
+    {
+      simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians());
+    }
   }
 }

@@ -3,6 +3,10 @@ package swervelib.parser.json;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.encoders.SparkMaxEncoderSwerve;
 import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.imu.ADIS16448Swerve;
+import swervelib.imu.ADIS16470Swerve;
+import swervelib.imu.ADXRS450Swerve;
+import swervelib.imu.AnalogGyroSwerve;
 import swervelib.imu.NavXSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.PigeonSwerve;
@@ -59,6 +63,14 @@ public class DeviceJson
   {
     switch (type)
     {
+      case "adis16448":
+        return new ADIS16448Swerve();
+      case "adis16470":
+        return new ADIS16470Swerve();
+      case "adxrs450":
+        return new ADXRS450Swerve();
+      case "analog":
+        return new AnalogGyroSwerve(id);
       case "navx":
         return new NavXSwerve();
       case "pigeon":
