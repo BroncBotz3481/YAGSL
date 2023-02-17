@@ -47,6 +47,18 @@ public class SwerveMath
   }
 
   /**
+   * Normalize an angle to be within 0 to 360.
+   *
+   * @param angle Angle in degrees.
+   * @return Normalized angle in degrees.
+   */
+  public static double normalizeAngle(double angle)
+  {
+    Rotation2d angleRotation = Rotation2d.fromDegrees(angle);
+    return new Rotation2d(angleRotation.getCos(), angleRotation.getSin()).getDegrees();
+  }
+
+  /**
    * Algebraically apply a deadband using a piece wise function.
    *
    * @param value    value to apply deadband to.

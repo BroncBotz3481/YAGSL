@@ -8,3 +8,4 @@ swervelib.parser.deserializer
 swervelib.parser.json
 swervelib.parser.json.modules
 swervelib.simulation
+swervelib.simulation.ctre
