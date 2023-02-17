@@ -21,4 +21,4 @@ SwerveDrive swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirector
 ![Field Shuffleboard](./imgaes/field.png)
 ![Simulation](./imgaes/simulation.png)
 ![Falcon Drive](./imgaes/swerve_falcons_fix.mov)
-![Neo Drive](./imgaes/swerve_neos.mp4)
+![Dashboard as graphs](./imgaes/swerve_neos.mp4)
