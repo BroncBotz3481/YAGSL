@@ -10,9 +10,17 @@
 ```java
 SwerveDrive swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve")).createSwerveDrive();
 ```
+* The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [deploy](./deploy).
+
 
 # Library Information
-* The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [deploy](./deploy).
+### Installation
+- [ ] Install NavX Library
+- [ ] Install Pheonix Library
+- [ ] Install REVLib.
+- [ ] Install YAGSL (`https://broncbotz3481.github.io/YAGSL-Lib/yagsl/yagsl.json`)  
+
+### [Easy Configuration File Generation](https://broncbotz3481.github.io/YAGSL-Example/)
 
 # Check out the [Wiki](https://github.com/BroncBotz3481/YAGSL/wiki)
 # Java docs is [here](https://broncbotz3481.github.io/YAGSL/).
