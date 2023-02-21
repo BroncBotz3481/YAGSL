@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import frc.robot.Robot;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 
@@ -21,17 +21,17 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   private final boolean factoryDefaultOccurred = false;
   /**
+   * Whether the absolute encoder is integrated.
+   */
+  private final boolean absoluteEncoder        = false;
+  /**
    * TalonSRX motor controller.
    */
   WPI_TalonSRX motor;
   /**
-   * Whether the absolute encoder is integrated.
-   */
-  private final boolean absoluteEncoder          = false;
-  /**
    * The position conversion factor.
    */
-  private       double  positionConversionFactor = 1;
+  private double positionConversionFactor = 1;
 
   /**
    * Constructor for TalonSRX swerve motor.
@@ -81,7 +81,6 @@ public class TalonSRXSwerve extends SwerveMotor
   {
     motor.clearStickyFaults();
   }
-
 
   /**
    * Set the absolute encoder to be a compatible absolute encoder.
@@ -187,10 +186,11 @@ public class TalonSRXSwerve extends SwerveMotor
   {
     burnFlash();
 
-    motor.set(isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
-              convertToNativeSensorUnits(setpoint),
-              DemandType.ArbitraryFeedForward,
-              feedforward * -0.3);
+    motor.set(
+        isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
+        convertToNativeSensorUnits(setpoint),
+        DemandType.ArbitraryFeedForward,
+        feedforward * -0.3);
     // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
@@ -234,7 +234,7 @@ public class TalonSRXSwerve extends SwerveMotor
   @Override
   public void setPosition(double position)
   {
-    if (!absoluteEncoder && Robot.isReal())
+    if (!absoluteEncoder && !RobotBase.isSimulation())
     {
       motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
     }
@@ -354,9 +354,8 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   public double convertToNativeSensorUnits(double setpoint)
   {
-    setpoint = isDriveMotor ?
-               setpoint * .1 :
-               placeInAppropriate0To360Scope(getRawPosition(), setpoint);
+    setpoint =
+        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getRawPosition(), setpoint);
     return setpoint / positionConversionFactor;
   }
 }

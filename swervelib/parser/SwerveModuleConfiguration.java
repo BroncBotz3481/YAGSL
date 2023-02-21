@@ -65,7 +65,6 @@ public class SwerveModuleConfiguration
    */
   public SwerveAbsoluteEncoder absoluteEncoder;
 
-
   /**
    * Construct a configuration object for swerve modules.
    *
@@ -83,13 +82,20 @@ public class SwerveModuleConfiguration
    * @param maxSpeed                Maximum speed in meters per second.
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    */
-  public SwerveModuleConfiguration(SwerveMotor driveMotor, SwerveMotor angleMotor,
-                                   SwerveAbsoluteEncoder absoluteEncoder, double angleOffset,
-                                   double xMeters,
-                                   double yMeters, PIDFConfig anglePIDF, PIDFConfig velocityPIDF, double maxSpeed,
-                                   SwerveModulePhysicalCharacteristics physicalCharacteristics,
-                                   boolean absoluteEncoderInverted, boolean driveMotorInverted,
-                                   boolean angleMotorInverted)
+  public SwerveModuleConfiguration(
+      SwerveMotor driveMotor,
+      SwerveMotor angleMotor,
+      SwerveAbsoluteEncoder absoluteEncoder,
+      double angleOffset,
+      double xMeters,
+      double yMeters,
+      PIDFConfig anglePIDF,
+      PIDFConfig velocityPIDF,
+      double maxSpeed,
+      SwerveModulePhysicalCharacteristics physicalCharacteristics,
+      boolean absoluteEncoderInverted,
+      boolean driveMotorInverted,
+      boolean angleMotorInverted)
   {
     this.driveMotor = driveMotor;
     this.angleMotor = angleMotor;
@@ -102,11 +108,12 @@ public class SwerveModuleConfiguration
     this.anglePIDF = anglePIDF;
     this.velocityPIDF = velocityPIDF;
     this.maxSpeed = maxSpeed;
-    this.angleKV = calculateAngleKV(physicalCharacteristics.optimalVoltage,
-                                    physicalCharacteristics.angleMotorFreeSpeedRPM,
-                                    physicalCharacteristics.angleGearRatio);
+    this.angleKV =
+        calculateAngleKV(
+            physicalCharacteristics.optimalVoltage,
+            physicalCharacteristics.angleMotorFreeSpeedRPM,
+            physicalCharacteristics.angleGearRatio);
     this.physicalCharacteristics = physicalCharacteristics;
-
   }
 
   /**
@@ -124,26 +131,33 @@ public class SwerveModuleConfiguration
    * @param maxSpeed                Maximum robot speed in meters per second.
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    */
-  public SwerveModuleConfiguration(SwerveMotor driveMotor, SwerveMotor angleMotor,
-                                   SwerveAbsoluteEncoder absoluteEncoder, double angleOffset,
-                                   double xMeters, double yMeters, PIDFConfig anglePIDF, PIDFConfig velocityPIDF,
-                                   double maxSpeed, SwerveModulePhysicalCharacteristics physicalCharacteristics)
+  public SwerveModuleConfiguration(
+      SwerveMotor driveMotor,
+      SwerveMotor angleMotor,
+      SwerveAbsoluteEncoder absoluteEncoder,
+      double angleOffset,
+      double xMeters,
+      double yMeters,
+      PIDFConfig anglePIDF,
+      PIDFConfig velocityPIDF,
+      double maxSpeed,
+      SwerveModulePhysicalCharacteristics physicalCharacteristics)
   {
-    this(driveMotor,
-         angleMotor,
-         absoluteEncoder,
-         angleOffset,
-         xMeters,
-         yMeters,
-         anglePIDF,
-         velocityPIDF,
-         maxSpeed,
-         physicalCharacteristics,
-         false,
-         false,
-         false);
+    this(
+        driveMotor,
+        angleMotor,
+        absoluteEncoder,
+        angleOffset,
+        xMeters,
+        yMeters,
+        anglePIDF,
+        velocityPIDF,
+        maxSpeed,
+        physicalCharacteristics,
+        false,
+        false,
+        false);
   }
-
 
   /**
    * Create the drive feedforward for swerve modules.
@@ -153,10 +167,11 @@ public class SwerveModuleConfiguration
   public SimpleMotorFeedforward createDriveFeedforward()
   {
     double kv = physicalCharacteristics.optimalVoltage / maxSpeed;
-    ///^ Volt-seconds per meter (max voltage divided by max speed)
-    double ka = physicalCharacteristics.optimalVoltage /
-                calculateMaxAcceleration(physicalCharacteristics.wheelGripCoefficientOfFriction);
-    ///^ Volt-seconds^2 per meter (max voltage divided by max accel)
+    /// ^ Volt-seconds per meter (max voltage divided by max speed)
+    double ka =
+        physicalCharacteristics.optimalVoltage
+        / calculateMaxAcceleration(physicalCharacteristics.wheelGripCoefficientOfFriction);
+    /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
     return new SimpleMotorFeedforward(0, kv, ka);
   }
 
@@ -168,11 +183,13 @@ public class SwerveModuleConfiguration
    */
   public double getPositionEncoderConversion(boolean isDriveMotor)
   {
-    return isDriveMotor ? calculateMetersPerRotation(physicalCharacteristics.wheelDiameter,
-                                                     physicalCharacteristics.driveGearRatio,
-                                                     physicalCharacteristics.driveEncoderPulsePerRotation)
-                        : calculateDegreesPerSteeringRotation(
-                            physicalCharacteristics.angleGearRatio,
-                            physicalCharacteristics.angleEncoderPulsePerRotation);
+    return isDriveMotor
+           ? calculateMetersPerRotation(
+        physicalCharacteristics.wheelDiameter,
+        physicalCharacteristics.driveGearRatio,
+        physicalCharacteristics.driveEncoderPulsePerRotation)
+           : calculateDegreesPerSteeringRotation(
+               physicalCharacteristics.angleGearRatio,
+               physicalCharacteristics.angleEncoderPulsePerRotation);
   }
 }

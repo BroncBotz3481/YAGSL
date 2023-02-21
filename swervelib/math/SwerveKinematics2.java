@@ -76,8 +76,10 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
     {
       m_inverseKinematics.setRow(i * 2, 0, /* Start Data */ 1, 0, -m_modules[i].getY());
       m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
-      bigInverseKinematics.setRow(i * 2, 0, /* Start Data */ 1, 0, -m_modules[i].getX(), -m_modules[i].getY());
-      bigInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, -m_modules[i].getY(), +m_modules[i].getX());
+      bigInverseKinematics.setRow(
+          i * 2, 0, /* Start Data */ 1, 0, -m_modules[i].getX(), -m_modules[i].getY());
+      bigInverseKinematics.setRow(
+          i * 2 + 1, 0, /* Start Data */ 0, 1, -m_modules[i].getY(), +m_modules[i].getX());
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
@@ -197,11 +199,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
       for (int i = 0; i < m_numModules; i++)
       {
         m_inverseKinematics.setRow(
-            i * 2,
-            0, /* Start Data */
-            1,
-            0,
-            -m_modules[i].getY() + centerOfRotationMeters.getY());
+            i * 2, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotationMeters.getY());
         m_inverseKinematics.setRow(
             i * 2 + 1,
             0, /* Start Data */
@@ -237,14 +235,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
     var moduleVelocityStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
     var accelerationVector = new SimpleMatrix(4, 1);
-    accelerationVector.setColumn(
-        0,
-        0,
-        0,
-        0,
-        Math.pow(chassisSpeeds.omegaRadiansPerSecond, 2),
-        0
-                                );
+    accelerationVector.setColumn(0, 0, 0, 0, Math.pow(chassisSpeeds.omegaRadiansPerSecond, 2), 0);
 
     var moduleAccelerationStatesMatrix = bigInverseKinematics.mult(accelerationVector);
 
@@ -260,26 +251,11 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
       Rotation2d angle = new Rotation2d(x, y);
 
       var trigThetaAngle = new SimpleMatrix(2, 2);
-      trigThetaAngle.setColumn(
-          0,
-          0,
-          angle.getCos(),
-          -angle.getSin()
-                              );
-      trigThetaAngle.setColumn(
-          1,
-          0,
-          angle.getSin(),
-          angle.getCos()
-                              );
+      trigThetaAngle.setColumn(0, 0, angle.getCos(), -angle.getSin());
+      trigThetaAngle.setColumn(1, 0, angle.getSin(), angle.getCos());
 
       var accelVector = new SimpleMatrix(2, 1);
-      accelVector.setColumn(
-          0,
-          0,
-          ax,
-          ay
-                           );
+      accelVector.setColumn(0, 0, ax, ay);
 
       var omegaVector = trigThetaAngle.mult(accelVector);
 

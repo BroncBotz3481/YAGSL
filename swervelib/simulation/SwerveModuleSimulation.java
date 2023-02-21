@@ -73,7 +73,8 @@ public class SwerveModuleSimulation
    */
   public SwerveModulePosition getPosition()
   {
-    return new SwerveModulePosition(fakePos, state.angle.plus(new Rotation2d(state.omegaRadPerSecond * dt)));
+    return new SwerveModulePosition(
+        fakePos, state.angle.plus(new Rotation2d(state.omegaRadPerSecond * dt)));
   }
 
   /**

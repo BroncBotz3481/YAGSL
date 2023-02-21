@@ -72,11 +72,14 @@ public class SwerveController
    * @param currentHeadingAngleRadians The current robot heading in radians.
    * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
    */
-  public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double angle, double currentHeadingAngleRadians)
+  public ChassisSpeeds getTargetSpeeds(
+      double xInput, double yInput, double angle, double currentHeadingAngleRadians)
   {
-    // Calculates an angular rate using a PIDController and the commanded angle.  This is then scaled by
+    // Calculates an angular rate using a PIDController and the commanded angle.  This is then
+    // scaled by
     // the drivebase's maximum angular velocity.
-    double omega = thetaController.calculate(currentHeadingAngleRadians, angle) * config.maxAngularVelocity;
+    double omega =
+        thetaController.calculate(currentHeadingAngleRadians, angle) * config.maxAngularVelocity;
     // Convert joystick inputs to m/s by scaling by max linear speed.  Also uses a cubic function
     // to allow for precise control and fast movement.
     double x = Math.pow(xInput, 3) * config.maxSpeed;
@@ -96,13 +99,20 @@ public class SwerveController
    * @param currentHeadingAngleRadians The current robot heading in radians.
    * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
    */
-  public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY,
-                                       double currentHeadingAngleRadians)
+  public ChassisSpeeds getTargetSpeeds(
+      double xInput,
+      double yInput,
+      double headingX,
+      double headingY,
+      double currentHeadingAngleRadians)
   {
-    // Converts the horizontal and vertical components to the commanded angle, in radians, unless the joystick is near
-    // the center (i. e. has been released), in which case the angle is held at the last valid joystick input (hold
+    // Converts the horizontal and vertical components to the commanded angle, in radians, unless
+    // the joystick is near
+    // the center (i. e. has been released), in which case the angle is held at the last valid
+    // joystick input (hold
     // position when stick released).
-    double        angle  = withinHypotDeadband(headingX, headingY) ? lastAngle : Math.atan2(headingX, headingY);
+    double angle =
+        withinHypotDeadband(headingX, headingY) ? lastAngle : Math.atan2(headingX, headingY);
     ChassisSpeeds speeds = getTargetSpeeds(xInput, yInput, angle, currentHeadingAngleRadians);
 
     // Used for the position hold feature

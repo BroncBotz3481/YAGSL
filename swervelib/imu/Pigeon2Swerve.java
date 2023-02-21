@@ -15,7 +15,6 @@ public class Pigeon2Swerve extends SwerveIMU
    */
   WPI_Pigeon2 imu;
 
-
   /**
    * Generate the SwerveIMU for pigeon.
    *

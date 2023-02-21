@@ -36,7 +36,8 @@ public class SwerveModuleState2 extends SwerveModuleState
    * @param angle                The angle of the module.
    * @param omegaRadPerSecond    The angular velocity of the module.
    */
-  public SwerveModuleState2(double speedMetersPerSecond, Rotation2d angle, double omegaRadPerSecond)
+  public SwerveModuleState2(
+      double speedMetersPerSecond, Rotation2d angle, double omegaRadPerSecond)
   {
     this.speedMetersPerSecond = speedMetersPerSecond;
     this.angle = angle;

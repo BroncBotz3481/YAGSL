@@ -16,6 +16,8 @@ public class PhysicsSim
 
   /**
    * Gets the robot simulator instance.
+   *
+   * @return {@link PhysicsSim} instance.
    */
   public static PhysicsSim getInstance()
   {
@@ -25,7 +27,8 @@ public class PhysicsSim
   /* scales a random domain of [0, 2pi] to [min, max] while prioritizing the peaks */
   static double random(double min, double max)
   {
-    return (max - min) / 2 * Math.sin(Math.IEEEremainder(Math.random(), 2 * 3.14159)) + (max + min) / 2;
+    return (max - min) / 2 * Math.sin(Math.IEEEremainder(Math.random(), 2 * 3.14159))
+           + (max + min) / 2;
   }
 
   static double random(double max)
@@ -53,11 +56,16 @@ public class PhysicsSim
    * @param fullVel         The maximum motor velocity, in ticks per 100ms
    * @param sensorPhase     The phase of the TalonSRX sensors
    */
-  public void addTalonSRX(TalonSRX talon, final double accelToFullTime, final double fullVel, final boolean sensorPhase)
+  public void addTalonSRX(
+      TalonSRX talon,
+      final double accelToFullTime,
+      final double fullVel,
+      final boolean sensorPhase)
   {
     if (talon != null)
     {
-      TalonSRXSimProfile simTalon = new TalonSRXSimProfile(talon, accelToFullTime, fullVel, sensorPhase);
+      TalonSRXSimProfile simTalon =
+          new TalonSRXSimProfile(talon, accelToFullTime, fullVel, sensorPhase);
       _simProfiles.add(simTalon);
     }
   }
@@ -82,11 +90,16 @@ public class PhysicsSim
    * @param fullVel         The maximum motor velocity, in ticks per 100ms
    * @param sensorPhase     The phase of the TalonFX sensors
    */
-  public void addTalonFX(TalonFX falcon, final double accelToFullTime, final double fullVel, final boolean sensorPhase)
+  public void addTalonFX(
+      TalonFX falcon,
+      final double accelToFullTime,
+      final double fullVel,
+      final boolean sensorPhase)
   {
     if (falcon != null)
     {
-      TalonFXSimProfile simFalcon = new TalonFXSimProfile(falcon, accelToFullTime, fullVel, sensorPhase);
+      TalonFXSimProfile simFalcon =
+          new TalonFXSimProfile(falcon, accelToFullTime, fullVel, sensorPhase);
       _simProfiles.add(simFalcon);
     }
   }

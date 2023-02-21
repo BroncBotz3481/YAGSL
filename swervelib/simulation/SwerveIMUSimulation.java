@@ -86,8 +86,11 @@ public class SwerveIMUSimulation
    * @param modulePoses {@link Pose2d} representing the swerve modules.
    * @param field       {@link Field2d} to update.
    */
-  public void updateOdometry(SwerveKinematics2 kinematics, SwerveModuleState2[] states, Pose2d[] modulePoses,
-                             Field2d field)
+  public void updateOdometry(
+      SwerveKinematics2 kinematics,
+      SwerveModuleState2[] states,
+      Pose2d[] modulePoses,
+      Field2d field)
   {
     angle += kinematics.toChassisSpeeds(states).omegaRadiansPerSecond * (timer.get() - lastTime);
     lastTime = timer.get();

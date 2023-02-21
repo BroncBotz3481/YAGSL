@@ -53,9 +53,11 @@ public class ModuleJson
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    * @return {@link SwerveModuleConfiguration} based on the provided data and parsed data.
    */
-  public SwerveModuleConfiguration createModuleConfiguration(PIDFConfig anglePIDF, PIDFConfig velocityPIDF,
-                                                             double maxSpeed,
-                                                             SwerveModulePhysicalCharacteristics physicalCharacteristics)
+  public SwerveModuleConfiguration createModuleConfiguration(
+      PIDFConfig anglePIDF,
+      PIDFConfig velocityPIDF,
+      double maxSpeed,
+      SwerveModulePhysicalCharacteristics physicalCharacteristics)
   {
     SwerveMotor           angleMotor = angle.createMotor(false);
     SwerveAbsoluteEncoder absEncoder = encoder.createEncoder();
@@ -67,10 +69,19 @@ public class ModuleJson
       angleMotor.setAbsoluteEncoder(absEncoder);
     }
 
-    return new SwerveModuleConfiguration(drive.createMotor(true), angleMotor, absEncoder,
-                                         absoluteEncoderOffset, Units.inchesToMeters(location.x),
-                                         Units.inchesToMeters(location.y), anglePIDF, velocityPIDF, maxSpeed,
-                                         physicalCharacteristics, absoluteEncoderInverted, inverted.drive,
-                                         inverted.angle);
+    return new SwerveModuleConfiguration(
+        drive.createMotor(true),
+        angleMotor,
+        absEncoder,
+        absoluteEncoderOffset,
+        Units.inchesToMeters(location.x),
+        Units.inchesToMeters(location.y),
+        anglePIDF,
+        velocityPIDF,
+        maxSpeed,
+        physicalCharacteristics,
+        absoluteEncoderInverted,
+        inverted.drive,
+        inverted.angle);
   }
 }

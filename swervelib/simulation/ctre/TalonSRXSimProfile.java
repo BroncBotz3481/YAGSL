@@ -31,8 +31,11 @@ class TalonSRXSimProfile extends SimProfile
    * @param fullVel         The maximum motor velocity, in ticks per 100ms
    * @param sensorPhase     The phase of the TalonSRX sensors
    */
-  public TalonSRXSimProfile(final TalonSRX talon, final double accelToFullTime, final double fullVel,
-                            final boolean sensorPhase)
+  public TalonSRXSimProfile(
+      final TalonSRX talon,
+      final double accelToFullTime,
+      final double fullVel,
+      final boolean sensorPhase)
   {
     this._talon = talon;
     this._accelToFullTime = accelToFullTime;
@@ -42,9 +45,10 @@ class TalonSRXSimProfile extends SimProfile
 
   /**
    * Runs the simulation profile.
-   * <p>
-   * This uses very rudimentary physics simulation and exists to allow users to test features of our products in
-   * simulation using our examples out of the box. Users may modify this to utilize more accurate physics simulation.
+   *
+   * <p>This uses very rudimentary physics simulation and exists to allow users to test features of
+   * our products in simulation using our examples out of the box. Users may modify this to utilize more accurate
+   * physics simulation.
    */
   public void run()
   {

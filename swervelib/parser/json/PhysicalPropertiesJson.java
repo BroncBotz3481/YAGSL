@@ -46,12 +46,19 @@ public class PhysicalPropertiesJson
    */
   public SwerveModulePhysicalCharacteristics createPhysicalProperties(double optimalVoltage)
   {
-    return new SwerveModulePhysicalCharacteristics(gearRatio.drive, gearRatio.angle, angleMotorFreeSpeedRPM,
-                                                   Units.inchesToMeters(wheelDiameter), wheelGripCoefficientOfFriction,
-                                                   optimalVoltage,
-                                                   currentLimit.drive, currentLimit.angle, rampRate.drive,
-                                                   rampRate.angle, encoderPulsePerRotation.drive,
-                                                   encoderPulsePerRotation.angle);
+    return new SwerveModulePhysicalCharacteristics(
+        gearRatio.drive,
+        gearRatio.angle,
+        angleMotorFreeSpeedRPM,
+        Units.inchesToMeters(wheelDiameter),
+        wheelGripCoefficientOfFriction,
+        optimalVoltage,
+        currentLimit.drive,
+        currentLimit.angle,
+        rampRate.drive,
+        rampRate.angle,
+        encoderPulsePerRotation.drive,
+        encoderPulsePerRotation.angle);
   }
 }
 
@@ -88,7 +95,6 @@ class MotorConfigDouble
     this.angle = angle;
     this.drive = drive;
   }
-
 }
 
 /**

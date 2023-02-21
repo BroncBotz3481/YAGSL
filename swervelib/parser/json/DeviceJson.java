@@ -102,7 +102,6 @@ public class DeviceJson
         return new TalonSRXSwerve(id, isDriveMotor);
       default:
         throw new RuntimeException(type + " is not a recognized absolute encoder type.");
-
     }
   }
 
@@ -121,6 +120,7 @@ public class DeviceJson
       case "none":
         return null;
     }
-    throw new RuntimeException("Could not create absolute encoder from data port of " + type + " id " + id);
+    throw new RuntimeException(
+        "Could not create absolute encoder from data port of " + type + " id " + id);
   }
 }

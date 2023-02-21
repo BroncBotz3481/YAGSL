@@ -27,7 +27,8 @@ public class AnalogGyroSwerve extends SwerveIMU
   {
     if (!(channel == 0 || channel == 1))
     {
-      throw new RuntimeException("Analog Gyroscope must be attached to port 0 or 1 on the roboRIO.\n");
+      throw new RuntimeException(
+          "Analog Gyroscope must be attached to port 0 or 1 on the roboRIO.\n");
     }
     gyro = new AnalogGyro(channel);
     SmartDashboard.putData(gyro);

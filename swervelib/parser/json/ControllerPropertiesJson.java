@@ -25,8 +25,10 @@ public class ControllerPropertiesJson
    * @param driveConfiguration {@link SwerveDriveConfiguration} parsed configuration.
    * @return {@link SwerveControllerConfiguration} object based on parsed data.
    */
-  public SwerveControllerConfiguration createControllerConfiguration(SwerveDriveConfiguration driveConfiguration)
+  public SwerveControllerConfiguration createControllerConfiguration(
+      SwerveDriveConfiguration driveConfiguration)
   {
-    return new SwerveControllerConfiguration(driveConfiguration, heading, angleJoystickRadiusDeadband);
+    return new SwerveControllerConfiguration(
+        driveConfiguration, heading, angleJoystickRadiusDeadband);
   }
 }

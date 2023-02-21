@@ -66,13 +66,19 @@ public class SwerveModulePhysicalCharacteristics
    * @param driveEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
    * @param angleEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
    */
-  public SwerveModulePhysicalCharacteristics(double driveGearRatio, double angleGearRatio,
-                                             double angleMotorFreeSpeedRPM,
-                                             double wheelDiameter, double wheelGripCoefficientOfFriction,
-                                             double optimalVoltage, int driveMotorCurrentLimit,
-                                             int angleMotorCurrentLimit, double driveMotorRampRate,
-                                             double angleMotorRampRate, int driveEncoderPulsePerRotation,
-                                             int angleEncoderPulsePerRotation)
+  public SwerveModulePhysicalCharacteristics(
+      double driveGearRatio,
+      double angleGearRatio,
+      double angleMotorFreeSpeedRPM,
+      double wheelDiameter,
+      double wheelGripCoefficientOfFriction,
+      double optimalVoltage,
+      int driveMotorCurrentLimit,
+      int angleMotorCurrentLimit,
+      double driveMotorRampRate,
+      double angleMotorRampRate,
+      int driveEncoderPulsePerRotation,
+      int angleEncoderPulsePerRotation)
   {
     this.wheelGripCoefficientOfFriction = wheelGripCoefficientOfFriction;
     this.optimalVoltage = optimalVoltage;
@@ -106,12 +112,28 @@ public class SwerveModulePhysicalCharacteristics
    * @param driveEncoderPulsePerRotation The number of encoder pulses per motor rotation, 1 for integrated encoders.
    * @param angleEncoderPulsePerRotation The number of encoder pulses per motor rotation, 1 for integrated encoders.
    */
-  public SwerveModulePhysicalCharacteristics(double driveGearRatio, double angleGearRatio,
-                                             double angleMotorFreeSpeedRPM,
-                                             double wheelDiameter, double driveMotorRampRate, double angleMotorRampRate,
-                                             int driveEncoderPulsePerRotation, int angleEncoderPulsePerRotation)
+  public SwerveModulePhysicalCharacteristics(
+      double driveGearRatio,
+      double angleGearRatio,
+      double angleMotorFreeSpeedRPM,
+      double wheelDiameter,
+      double driveMotorRampRate,
+      double angleMotorRampRate,
+      int driveEncoderPulsePerRotation,
+      int angleEncoderPulsePerRotation)
   {
-    this(driveGearRatio, angleGearRatio, angleMotorFreeSpeedRPM, wheelDiameter, 1.19, 12,
-         40, 20, driveMotorRampRate, angleMotorRampRate, driveEncoderPulsePerRotation, angleEncoderPulsePerRotation);
+    this(
+        driveGearRatio,
+        angleGearRatio,
+        angleMotorFreeSpeedRPM,
+        wheelDiameter,
+        1.19,
+        12,
+        40,
+        20,
+        driveMotorRampRate,
+        angleMotorRampRate,
+        driveEncoderPulsePerRotation,
+        angleEncoderPulsePerRotation);
   }
 }

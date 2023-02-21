@@ -38,7 +38,6 @@ public class SparkMaxSwerve extends SwerveMotor
    */
   private boolean               factoryDefaultOccurred = false;
 
-
   /**
    * Initialize the swerve motor.
    *
@@ -54,7 +53,8 @@ public class SparkMaxSwerve extends SwerveMotor
 
     encoder = motor.getEncoder();
     pid = motor.getPIDController();
-    pid.setFeedbackDevice(encoder); // Configure feedback of the PID controller as the integrated encoder.
+    pid.setFeedbackDevice(
+        encoder); // Configure feedback of the PID controller as the integrated encoder.
 
     motor.setCANTimeout(0); // Spin off configurations in a different thread.
   }
@@ -179,12 +179,17 @@ public class SparkMaxSwerve extends SwerveMotor
       encoder.setPositionConversionFactor(positionConversionFactor);
       encoder.setVelocityConversionFactor(positionConversionFactor / 60);
 
-      // Taken from https://github.com/frc3512/SwerveBot-2022/blob/9d31afd05df6c630d5acb4ec2cf5d734c9093bf8/src/main/java/frc/lib/util/CANSparkMaxUtil.java#L67
+      // Taken from
+      // https://github.com/frc3512/SwerveBot-2022/blob/9d31afd05df6c630d5acb4ec2cf5d734c9093bf8/src/main/java/frc/lib/util/CANSparkMaxUtil.java#L67
       configureCANStatusFrames(10, 20, 20, 500, 500);
     } else
     {
       absoluteEncoder.setPositionConversionFactor(positionConversionFactor);
       absoluteEncoder.setVelocityConversionFactor(positionConversionFactor / 60);
+      if (!isAttachedAbsoluteEncoder())
+      {
+        configureCANStatusFrames(10, 20, 20, 500, 500);
+      }
     }
   }
 
@@ -196,7 +201,8 @@ public class SparkMaxSwerve extends SwerveMotor
   @Override
   public void configurePIDF(PIDFConfig config)
   {
-    int pidSlot = isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
+    int pidSlot =
+        isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
     pid.setP(config.p, pidSlot);
     pid.setI(config.i, pidSlot);
     pid.setD(config.d, pidSlot);
@@ -228,7 +234,8 @@ public class SparkMaxSwerve extends SwerveMotor
    * @param CANStatus3 Analog Sensor Voltage, Analog Sensor Velocity, Analog Sensor Position
    * @param CANStatus4 Alternate Encoder Velocity, Alternate Encoder Position
    */
-  public void configureCANStatusFrames(int CANStatus0, int CANStatus1, int CANStatus2, int CANStatus3, int CANStatus4)
+  public void configureCANStatusFrames(
+      int CANStatus0, int CANStatus1, int CANStatus2, int CANStatus3, int CANStatus4)
   {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, CANStatus0);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, CANStatus1);
@@ -290,8 +297,13 @@ public class SparkMaxSwerve extends SwerveMotor
   @Override
   public void setReference(double setpoint, double feedforward)
   {
-    int pidSlot = isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
-    pid.setReference(setpoint, isDriveMotor ? ControlType.kVelocity : ControlType.kPosition, pidSlot, feedforward);
+    int pidSlot =
+        isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
+    pid.setReference(
+        setpoint,
+        isDriveMotor ? ControlType.kVelocity : ControlType.kPosition,
+        pidSlot,
+        feedforward);
   }
 
   /**

@@ -45,7 +45,6 @@ public class SwerveParser
    */
   public static        ModuleJson[]             moduleJsons;
 
-
   /**
    * Construct a swerve parser. Will throw an error if there is a missing file.
    *
@@ -55,13 +54,22 @@ public class SwerveParser
   public SwerveParser(File directory) throws IOException
   {
     checkDirectory(directory);
-    swerveDriveJson = new ObjectMapper().readValue(new File(directory, "swervedrive.json"), SwerveDriveJson.class);
-    controllerPropertiesJson = new ObjectMapper().readValue(new File(directory, "controllerproperties.json"),
-                                                            ControllerPropertiesJson.class);
-    pidfPropertiesJson = new ObjectMapper().readValue(new File(directory, "modules/pidfproperties.json"),
-                                                      PIDFPropertiesJson.class);
-    physicalPropertiesJson = new ObjectMapper().readValue(new File(directory, "modules/physicalproperties.json"),
-                                                          PhysicalPropertiesJson.class);
+    swerveDriveJson =
+        new ObjectMapper()
+            .readValue(new File(directory, "swervedrive.json"), SwerveDriveJson.class);
+    controllerPropertiesJson =
+        new ObjectMapper()
+            .readValue(
+                new File(directory, "controllerproperties.json"), ControllerPropertiesJson.class);
+    pidfPropertiesJson =
+        new ObjectMapper()
+            .readValue(
+                new File(directory, "modules/pidfproperties.json"), PIDFPropertiesJson.class);
+    physicalPropertiesJson =
+        new ObjectMapper()
+            .readValue(
+                new File(directory, "modules/physicalproperties.json"),
+                PhysicalPropertiesJson.class);
     moduleJsons = new ModuleJson[swerveDriveJson.modules.length];
     for (int i = 0; i < moduleJsons.length; i++)
     {
@@ -79,8 +87,8 @@ public class SwerveParser
    * @param driveConfiguration {@link SwerveDriveConfiguration} to pull from.
    * @return {@link SwerveModuleConfiguration} based on the file.
    */
-  public static SwerveModule getModuleConfigurationByName(String name,
-                                                          SwerveDriveConfiguration driveConfiguration)
+  public static SwerveModule getModuleConfigurationByName(
+      String name, SwerveDriveConfiguration driveConfiguration)
   {
     return driveConfiguration.modules[moduleConfigs.get(name + ".json")];
   }
@@ -123,22 +131,28 @@ public class SwerveParser
    */
   public SwerveDrive createSwerveDrive()
   {
-    double                      maxSpeedMPS          = Units.feetToMeters(swerveDriveJson.maxSpeed);
-    SwerveModuleConfiguration[] moduleConfigurations = new SwerveModuleConfiguration[moduleJsons.length];
+    double maxSpeedMPS = Units.feetToMeters(swerveDriveJson.maxSpeed);
+    SwerveModuleConfiguration[] moduleConfigurations =
+        new SwerveModuleConfiguration[moduleJsons.length];
     for (int i = 0; i < moduleConfigurations.length; i++)
     {
       ModuleJson module = moduleJsons[i];
-      moduleConfigurations[i] = module.createModuleConfiguration(pidfPropertiesJson.angle, pidfPropertiesJson.drive,
-                                                                 maxSpeedMPS,
-                                                                 physicalPropertiesJson.createPhysicalProperties(
-                                                                     swerveDriveJson.optimalVoltage));
+      moduleConfigurations[i] =
+          module.createModuleConfiguration(
+              pidfPropertiesJson.angle,
+              pidfPropertiesJson.drive,
+              maxSpeedMPS,
+              physicalPropertiesJson.createPhysicalProperties(swerveDriveJson.optimalVoltage));
     }
-    SwerveDriveConfiguration swerveDriveConfiguration = new SwerveDriveConfiguration(moduleConfigurations,
-                                                                                     swerveDriveJson.imu.createIMU(),
-                                                                                     maxSpeedMPS,
-                                                                                     swerveDriveJson.invertedIMU);
+    SwerveDriveConfiguration swerveDriveConfiguration =
+        new SwerveDriveConfiguration(
+            moduleConfigurations,
+            swerveDriveJson.imu.createIMU(),
+            maxSpeedMPS,
+            swerveDriveJson.invertedIMU);
 
-    return new SwerveDrive(swerveDriveConfiguration,
-                           controllerPropertiesJson.createControllerConfiguration(swerveDriveConfiguration));
+    return new SwerveDrive(
+        swerveDriveConfiguration,
+        controllerPropertiesJson.createControllerConfiguration(swerveDriveConfiguration));
   }
 }

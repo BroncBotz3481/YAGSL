@@ -7,6 +7,11 @@ public abstract class SwerveAbsoluteEncoder
 {
 
   /**
+   * Last angle reading was faulty.
+   */
+  public boolean readingError = false;
+
+  /**
    * Reset the encoder to factory defaults.
    */
   public abstract void factoryDefault();

@@ -5,7 +5,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import frc.robot.Robot;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 import swervelib.simulation.ctre.PhysicsSim;
@@ -55,7 +55,7 @@ public class TalonFXSwerve extends SwerveMotor
     factoryDefaults();
     clearStickyFaults();
 
-    if (!Robot.isReal())
+    if (RobotBase.isSimulation())
     {
       PhysicsSim.getInstance().addTalonFX(motor, .25, 6800);
     }
@@ -106,7 +106,6 @@ public class TalonFXSwerve extends SwerveMotor
     motor.clearStickyFaults();
   }
 
-
   /**
    * Set the absolute encoder to be a compatible absolute encoder.
    *
@@ -122,15 +121,17 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Configure the integrated encoder for the swerve module. Sets the conversion factors for position and velocity.
    *
-   * @param positionConversionFactor The conversion factor to apply for position. <p><br /> Degrees: <br />
+   * @param positionConversionFactor The conversion factor to apply for position.
+   *                                 <p><br>
+   *                                 Degrees: <br>
    *                                 <code>
    *                                 360 / (angleGearRatio * encoderTicksPerRotation)
-   *                                 </code><br /></p>
-   *                                 <p><br />Meters:<br />
+   *                                 </code><br>
+   *                                 <p><br>
+   *                                 Meters:<br>
    *                                 <code>
    *                                 (Math.PI * wheelDiameter) / (driveGearRatio * encoderTicksPerRotation)
    *                                 </code>
-   *                                 </p>
    */
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor)
@@ -265,9 +266,8 @@ public class TalonFXSwerve extends SwerveMotor
    */
   public double convertToNativeSensorUnits(double setpoint)
   {
-    setpoint = isDriveMotor ?
-               setpoint * .1 :
-               placeInAppropriate0To360Scope(getRawPosition(), setpoint);
+    setpoint =
+        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getRawPosition(), setpoint);
     return setpoint / positionConversionFactor;
   }
 
@@ -280,17 +280,18 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void setReference(double setpoint, double feedforward)
   {
-    if (!Robot.isReal())
+    if (RobotBase.isSimulation())
     {
       PhysicsSim.getInstance().run();
     }
 
     burnFlash();
 
-    motor.set(isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
-              convertToNativeSensorUnits(setpoint),
-              DemandType.ArbitraryFeedForward,
-              feedforward * -0.3);
+    motor.set(
+        isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
+        convertToNativeSensorUnits(setpoint),
+        DemandType.ArbitraryFeedForward,
+        feedforward * -0.3);
     // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
@@ -334,7 +335,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void setPosition(double position)
   {
-    if (!absoluteEncoder && Robot.isReal())
+    if (!absoluteEncoder && !RobotBase.isSimulation())
     {
       motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
     }
@@ -400,5 +401,4 @@ public class TalonFXSwerve extends SwerveMotor
   {
     return absoluteEncoder;
   }
-
 }
