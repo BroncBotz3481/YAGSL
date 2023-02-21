@@ -186,10 +186,6 @@ public class SparkMaxSwerve extends SwerveMotor
     {
       absoluteEncoder.setPositionConversionFactor(positionConversionFactor);
       absoluteEncoder.setVelocityConversionFactor(positionConversionFactor / 60);
-      if (!isAttachedAbsoluteEncoder())
-      {
-        configureCANStatusFrames(10, 20, 20, 500, 500);
-      }
     }
   }
 

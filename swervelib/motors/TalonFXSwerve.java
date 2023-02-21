@@ -3,6 +3,7 @@ package swervelib.motors;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -137,6 +138,21 @@ public class TalonFXSwerve extends SwerveMotor
   public void configureIntegratedEncoder(double positionConversionFactor)
   {
     this.positionConversionFactor = positionConversionFactor;
+    // Taken from democat's library.
+    // https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/Falcon500DriveControllerFactoryBuilder.java#L16
+    configureCANStatusFrames(250);
+  }
+
+  /**
+   * Set the CAN status frames.
+   *
+   * @param CANStatus1 Applied Motor Output, Fault Information, Limit Switch Information
+   */
+  public void configureCANStatusFrames(int CANStatus1)
+  {
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, CANStatus1);
+    // TODO: Configure Status Frame 2 thru 21 if necessary
+    //  https://v5.docs.ctr-electronics.com/en/stable/ch18_CommonAPI.html#setting-status-frame-periods
   }
 
   /**
@@ -198,7 +214,7 @@ public class TalonFXSwerve extends SwerveMotor
   {
     if (configChanged)
     {
-      motor.configAllSettings(configuration);
+      motor.configAllSettings(configuration, 250);
       configChanged = false;
     }
   }
@@ -337,7 +353,7 @@ public class TalonFXSwerve extends SwerveMotor
   {
     if (!absoluteEncoder && !RobotBase.isSimulation())
     {
-      motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
+      motor.setSelectedSensorPosition(convertToNativeSensorUnits(position), 0, 250);
     }
   }
 
