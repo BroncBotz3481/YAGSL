@@ -41,6 +41,10 @@ public class TalonFXSwerve extends SwerveMotor
    * If the TalonFX configuration has changed.
    */
   private boolean configChanged            = true;
+  /**
+   * Feedforward scalar value for the angle motor.
+   */
+  private double  fscalar                  = 1;
 
   /**
    * Constructor for TalonFX swerve motor.
@@ -169,6 +173,7 @@ public class TalonFXSwerve extends SwerveMotor
     configuration.slot0.kF = config.f;
     configuration.slot0.integralZone = config.iz;
     configuration.slot0.closedLoopPeakOutput = config.output.max;
+    fscalar = config.fscalar;
     configChanged = true;
   }
 
@@ -307,7 +312,7 @@ public class TalonFXSwerve extends SwerveMotor
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
         convertToNativeSensorUnits(setpoint),
         DemandType.ArbitraryFeedForward,
-        feedforward * -0.3);
+        isDriveMotor ? feedforward : feedforward * fscalar);
     // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
