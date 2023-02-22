@@ -90,12 +90,12 @@ public class SwerveModule
     {
       absoluteEncoder.factoryDefault();
       absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
-      angleMotor.configureIntegratedEncoder(
-          moduleConfiguration.getPositionEncoderConversion(false));
       angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
     }
 
     // Config angle motor/controller
+    angleMotor.configureIntegratedEncoder(
+      moduleConfiguration.getPositionEncoderConversion(false));
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
     angleMotor.configurePIDWrapping(-180, 180);
     angleMotor.setInverted(moduleConfiguration.angleMotorInverted);
@@ -183,7 +183,7 @@ public class SwerveModule
    */
   public void setAngle(double angle)
   {
-    angleMotor.setReference(angle, 1 * configuration.angleKV);
+    angleMotor.setReference(angle, configuration.angleKV);
     lastAngle = angle;
   }
 
@@ -231,19 +231,24 @@ public class SwerveModule
   }
 
   /**
-   * Get the absolute position.
+   * Get the absolute position. Falls back to relative position on reading failure.
    *
    * @return Absolute encoder angle in degrees.
    */
   public double getAbsolutePosition()
   {
-    double angle = absoluteEncoder.getAbsolutePosition();
-    if (absoluteEncoder.readingError)
+    if (absoluteEncoder != null)
     {
-      angle = getRelativePosition();
+      double angle = absoluteEncoder.getAbsolutePosition();
+      if (absoluteEncoder.readingError)
+      {
+        angle = getRelativePosition();
+      }
+
+      return angle;
     }
 
-    return angle;
+    return getRelativePosition();
   }
 
   /**

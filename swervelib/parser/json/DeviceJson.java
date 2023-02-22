@@ -1,5 +1,6 @@
 package swervelib.parser.json;
 
+import swervelib.encoders.AnalogAbsoluteEncoderSwerve;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.encoders.SparkMaxEncoderSwerve;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -48,6 +49,11 @@ public class DeviceJson
       case "integrated":
       case "attached":
         return null;
+      case "thrifty":
+      case "throughbore":
+      case "dutycycle":
+      case "analog":
+        return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
         return new CANCoderSwerve(id, canbus != null ? canbus : "");
       default:
@@ -117,7 +123,8 @@ public class DeviceJson
     {
       case "sparkmax":
         return new SparkMaxEncoderSwerve(motor);
-      case "none":
+      case "falcon":
+      case "talonfx":
         return null;
     }
     throw new RuntimeException(
