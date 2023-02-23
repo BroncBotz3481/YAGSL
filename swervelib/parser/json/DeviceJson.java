@@ -1,5 +1,6 @@
 package swervelib.parser.json;
 
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import swervelib.encoders.AnalogAbsoluteEncoderSwerve;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.encoders.SparkMaxEncoderSwerve;
@@ -78,8 +79,13 @@ public class DeviceJson
         return new ADXRS450Swerve();
       case "analog":
         return new AnalogGyroSwerve(id);
+      case "navx_onborard":
+        return new NavXSwerve(Port.kOnboard);
+      case "navx_usb":
+        return new NavXSwerve(Port.kUSB);
+      case "navx_mxp":
       case "navx":
-        return new NavXSwerve();
+        return new NavXSwerve(Port.kMXP);
       case "pigeon":
         return new PigeonSwerve(id);
       case "pigeon2":
