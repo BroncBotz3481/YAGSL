@@ -95,6 +95,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
     if (strength == MagnetFieldStrength.Invalid_Unknown || strength == MagnetFieldStrength.BadRange_RedLED)
     {
       readingError = true;
+      DriverStation.reportWarning("CANCoder " + encoder.getDeviceID() + " reading was faulty.\n", false);
       return 0;
     }
     double angle = encoder.getAbsolutePosition();

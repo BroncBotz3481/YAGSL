@@ -1,6 +1,7 @@
 package swervelib;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import swervelib.parser.SwerveControllerConfiguration;
@@ -21,9 +22,21 @@ public class SwerveController
    */
   private final PIDController                 thetaController; // TODO: Switch to ProfilePIDController
   /**
-   * Last angle to robot was set to.
+   * Last angle as a scalar [-1,1] the robot was set to.
    */
-  public        double                        lastAngle;
+  public        double                        lastAngleScalar;
+  /**
+   * {@link SlewRateLimiter} for movement in the X direction in meters/second.
+   */
+  public        SlewRateLimiter               xLimiter     = null;
+  /**
+   * {@link SlewRateLimiter} for movement in the Y direction in meters/second.
+   */
+  public        SlewRateLimiter               yLimiter     = null;
+  /**
+   * {@link SlewRateLimiter} for angular movement in radians/second.
+   */
+  public        SlewRateLimiter               angleLimiter = null;
 
   /**
    * Construct the SwerveController object which is used for determining the speeds of the robot based on controller
@@ -36,7 +49,7 @@ public class SwerveController
     config = cfg;
     thetaController = config.headingPIDF.createPIDController();
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    lastAngle = 0;
+    lastAngleScalar = 0;
   }
 
   /**
@@ -48,6 +61,21 @@ public class SwerveController
   public static Translation2d getTranslation2d(ChassisSpeeds speeds)
   {
     return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+  }
+
+  /**
+   * Add slew rate limiters to all controls. This prevents the robot from ramping up too much. To disable a
+   * {@link SlewRateLimiter} set the desired one to null.
+   *
+   * @param x     The {@link SlewRateLimiter} for the X velocity in meters/second.
+   * @param y     The {@link SlewRateLimiter} for the Y velocity in meters/second.
+   * @param angle The {@link SlewRateLimiter} for the angular velocity in radians/second.
+   */
+  public void addSlewRateLimiters(SlewRateLimiter x, SlewRateLimiter y, SlewRateLimiter angle)
+  {
+    xLimiter = x;
+    yLimiter = y;
+    angleLimiter = angle;
   }
 
   /**
@@ -64,7 +92,8 @@ public class SwerveController
   }
 
   /**
-   * Get the chassis speeds based on controller input of 1 joystick and a angle.
+   * Get the chassis speeds based on controller input of 1 joystick and an angle. Cubes the x and y input for smoother
+   * motion.
    *
    * @param xInput                     X joystick input for the robot to move in the X direction.
    * @param yInput                     Y joystick input for the robot to move in the Y direction.
@@ -75,17 +104,12 @@ public class SwerveController
   public ChassisSpeeds getTargetSpeeds(
       double xInput, double yInput, double angle, double currentHeadingAngleRadians)
   {
-    // Calculates an angular rate using a PIDController and the commanded angle.  This is then
-    // scaled by
-    // the drivebase's maximum angular velocity.
-    double omega =
-        thetaController.calculate(currentHeadingAngleRadians, angle) * config.maxAngularVelocity;
     // Convert joystick inputs to m/s by scaling by max linear speed.  Also uses a cubic function
     // to allow for precise control and fast movement.
     double x = Math.pow(xInput, 3) * config.maxSpeed;
     double y = Math.pow(yInput, 3) * config.maxSpeed;
 
-    return new ChassisSpeeds(x, y, omega);
+    return getRawTargetSpeeds(x, y, angle, currentHeadingAngleRadians);
   }
 
   /**
@@ -112,12 +136,58 @@ public class SwerveController
     // joystick input (hold
     // position when stick released).
     double angle =
-        withinHypotDeadband(headingX, headingY) ? lastAngle : Math.atan2(headingX, headingY);
+        withinHypotDeadband(headingX, headingY) ? lastAngleScalar : Math.atan2(headingX, headingY);
     ChassisSpeeds speeds = getTargetSpeeds(xInput, yInput, angle, currentHeadingAngleRadians);
 
     // Used for the position hold feature
-    lastAngle = angle;
+    lastAngleScalar = angle;
 
     return speeds;
   }
+
+  /**
+   * Get the {@link ChassisSpeeds} based of raw speeds desired in meters/second and heading in radians.
+   *
+   * @param xSpeed X speed in meters per second.
+   * @param ySpeed Y speed in meters per second.
+   * @param omega  Angular velocity in radians/second.
+   * @return {@link ChassisSpeeds} the robot should move to.
+   */
+  public ChassisSpeeds getRawTargetSpeeds(double xSpeed, double ySpeed, double omega)
+  {
+    if (xLimiter != null)
+    {
+      xSpeed = xLimiter.calculate(xSpeed);
+    }
+    if (yLimiter != null)
+    {
+      ySpeed = yLimiter.calculate(ySpeed);
+    }
+    if (angleLimiter != null)
+    {
+      omega = angleLimiter.calculate(omega);
+    }
+
+    return new ChassisSpeeds(xSpeed, ySpeed, omega);
+  }
+
+  /**
+   * Get the {@link ChassisSpeeds} based of raw speeds desired in meters/second and heading in radians.
+   *
+   * @param xSpeed                     X speed in meters per second.
+   * @param ySpeed                     Y speed in meters per second.
+   * @param targetHeadingAngleRadians  Target heading in radians.
+   * @param currentHeadingAngleRadians Current heading in radians.
+   * @return {@link ChassisSpeeds} the robot should move to.
+   */
+  public ChassisSpeeds getRawTargetSpeeds(double xSpeed, double ySpeed, double targetHeadingAngleRadians,
+                                          double currentHeadingAngleRadians)
+  {
+    // Calculates an angular rate using a PIDController and the commanded angle. Returns a value between -1 and 1
+    // which is then scaled to be between -maxAngularVelocity and +maxAngularVelocity.
+    return getRawTargetSpeeds(xSpeed, ySpeed,
+                              thetaController.calculate(currentHeadingAngleRadians, targetHeadingAngleRadians) *
+                              config.maxAngularVelocity);
+  }
+
 }

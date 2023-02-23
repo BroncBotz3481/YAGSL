@@ -11,6 +11,7 @@ import swervelib.math.SwerveModuleState2;
 public class SwerveModuleSimulation
 {
 
+
   /**
    * Main timer to simulate the passage of time.
    */
@@ -59,11 +60,12 @@ public class SwerveModuleSimulation
   public void updateStateAndPosition(SwerveModuleState2 desiredState)
   {
     dt = timer.get() - lastTime;
-    fakePos += (fakeSpeed * dt);
     lastTime = timer.get();
 
     state = desiredState;
     fakeSpeed = desiredState.speedMetersPerSecond;
+    fakePos += (fakeSpeed * dt);
+
   }
 
   /**
@@ -73,6 +75,7 @@ public class SwerveModuleSimulation
    */
   public SwerveModulePosition getPosition()
   {
+
     return new SwerveModulePosition(
         fakePos, state.angle.plus(new Rotation2d(state.omegaRadPerSecond * dt)));
   }

@@ -69,18 +69,18 @@ public class SwerveDriveTelemetry
    */
   public static void updateData()
   {
-    SmartDashboard.putNumber("/swerve/moduleCount", moduleCount);
-    SmartDashboard.putNumberArray("/swerve/wheelLocations", wheelLocations);
-    SmartDashboard.putNumberArray("/swerve/measuredStates", measuredStates);
-    SmartDashboard.putNumberArray("/swerve/desiredStates", desiredStates);
-    SmartDashboard.putNumber("/swerve/robotRotation", robotRotation);
-    SmartDashboard.putNumber("/swerve/maxSpeed", maxSpeed);
-    SmartDashboard.putString("/swerve/rotationUnit", rotationUnit);
-    SmartDashboard.putNumber("/swerve/sizeLeftRight", sizeLeftRight);
-    SmartDashboard.putNumber("/swerve/sizeFrontBack", sizeFrontBack);
-    SmartDashboard.putString("/swerve/forwardDirection", forwardDirection);
-    SmartDashboard.putNumber("/swerve/maxAngularVelocity", maxAngularVelocity);
-    SmartDashboard.putNumberArray("/swerve/measuredChassisSpeeds", measuredChassisSpeeds);
-    SmartDashboard.putNumberArray("/swerve/desiredChassisSpeeds", desiredChassisSpeeds);
+    SmartDashboard.putNumber("swerve/moduleCount", moduleCount);
+    SmartDashboard.putNumberArray("swerve/wheelLocations", wheelLocations);
+    SmartDashboard.putNumberArray("swerve/measuredStates", measuredStates);
+    SmartDashboard.putNumberArray("swerve/desiredStates", desiredStates);
+    SmartDashboard.putNumber("swerve/robotRotation", robotRotation);
+    SmartDashboard.putNumber("swerve/maxSpeed", maxSpeed);
+    SmartDashboard.putString("swerve/rotationUnit", rotationUnit);
+    SmartDashboard.putNumber("swerve/sizeLeftRight", sizeLeftRight);
+    SmartDashboard.putNumber("swerve/sizeFrontBack", sizeFrontBack);
+    SmartDashboard.putString("swerve/forwardDirection", forwardDirection);
+    SmartDashboard.putNumber("swerve/maxAngularVelocity", maxAngularVelocity);
+    SmartDashboard.putNumberArray("swerve/measuredChassisSpeeds", measuredChassisSpeeds);
+    SmartDashboard.putNumberArray("swerve/desiredChassisSpeeds", desiredChassisSpeeds);
   }
 }
