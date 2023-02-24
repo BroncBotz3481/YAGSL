@@ -189,4 +189,15 @@ public class SwerveController
                               config.maxAngularVelocity);
   }
 
+  /**
+   * Calculate the angular velocity given the current and target heading angle in radians.
+   *
+   * @param currentHeadingAngleRadians The current heading of the robot in radians.
+   * @param targetHeadingAngleRadians  The target heading of the robot in radians.
+   * @return Angular velocity in radians per second.
+   */
+  public double headingCalculate(double currentHeadingAngleRadians, double targetHeadingAngleRadians)
+  {
+    return thetaController.calculate(currentHeadingAngleRadians, targetHeadingAngleRadians) * config.maxAngularVelocity;
+  }
 }

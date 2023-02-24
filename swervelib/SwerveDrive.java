@@ -52,23 +52,27 @@ public class SwerveDrive
   /**
    * Field object.
    */
-  public        Field2d                  field                        = new Field2d();
+  public  Field2d             field                        = new Field2d();
   /**
    * Swerve controller for controlling heading of the robot.
    */
-  public        SwerveController         swerveController;
+  public  SwerveController    swerveController;
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
-  private       SwerveIMU                imu;
+  private SwerveIMU           imu;
   /**
    * Simulation of the swerve drive.
    */
-  private       SwerveIMUSimulation      simIMU;
+  private SwerveIMUSimulation simIMU;
   /**
    * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
-  private       int                      moduleSynchronizationCounter = 0;
+  private int                 moduleSynchronizationCounter = 0;
+  /**
+   * The last heading set in radians.
+   */
+  private double              lastHeadingRadians           = 0;
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
@@ -171,6 +175,17 @@ public class SwerveDrive
         ? ChassisSpeeds.fromFieldRelativeSpeeds(
             translation.getX(), translation.getY(), rotation, getYaw())
         : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+
+    // Heading Angular Velocity Deadband, might make a configuration option later.
+    // Originally made by Team 1466 Webb Robotics.
+    if (Math.abs(rotation) < 0.01)
+    {
+      velocity.omegaRadiansPerSecond =
+          swerveController.headingCalculate(lastHeadingRadians, getYaw().getRadians());
+    } else
+    {
+      lastHeadingRadians = getYaw().getRadians();
+    }
 
     // Display commanded speed for testing
     SmartDashboard.putString("RobotVelocity", velocity.toString());
