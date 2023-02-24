@@ -38,7 +38,15 @@ public class ModuleJson
   /**
    * Absolute encoder inversion state.
    */
-  public boolean       absoluteEncoderInverted = false;
+  public boolean       absoluteEncoderInverted        = false;
+  /**
+   * The angle encoder pulse per revolution override. 1 for Neo encoder. 2048 for Falcons.
+   */
+  public double        angleEncoderPulsePerRevolution = 0;
+  /**
+   * Angle motor free speed RPM.
+   */
+  public double        angleMotorFreeSpeedRPM         = 0;
   /**
    * The location of the swerve module from the center of the robot in inches.
    */
@@ -82,6 +90,9 @@ public class ModuleJson
         physicalCharacteristics,
         absoluteEncoderInverted,
         inverted.drive,
-        inverted.angle);
+        inverted.angle,
+        angleEncoderPulsePerRevolution == 0 ? physicalCharacteristics.angleEncoderPulsePerRotation
+                                            : angleEncoderPulsePerRevolution,
+        angleMotorFreeSpeedRPM == 0 ? physicalCharacteristics.angleMotorFreeSpeedRPM : angleMotorFreeSpeedRPM);
   }
 }

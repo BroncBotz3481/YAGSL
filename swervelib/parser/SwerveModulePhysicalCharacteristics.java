@@ -23,7 +23,7 @@ public class SwerveModulePhysicalCharacteristics
    */
   public final int    driveEncoderPulsePerRotation;
   /**
-   * Angle motor encoder pulse per rotation. 1 if integrated encoder.
+   * Angle motor encoder pulse per rotation. 1 for Neo encoder. 2048 for Falcons.
    */
   public final int    angleEncoderPulsePerRotation;
   /**
