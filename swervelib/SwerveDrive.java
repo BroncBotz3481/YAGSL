@@ -59,33 +59,33 @@ public class SwerveDrive
   /**
    * Swerve controller for controlling heading of the robot.
    */
-  public  SwerveController    swerveController;
+  public        SwerveController         swerveController;
   /**
    * Trustworthiness of the internal model of how motors should be moving Measured in expected standard deviation
    * (meters of position and degrees of rotation)
    */
-  public  Matrix<N3, N1>      stateStdDevs                 = VecBuilder.fill(0.1, 0.1, 0.1);
+  public        Matrix<N3, N1>           stateStdDevs                 = VecBuilder.fill(0.1, 0.1, 0.1);
   /**
    * Trustworthiness of the vision system Measured in expected standard deviation (meters of position and degrees of
    * rotation)
    */
-  public  Matrix<N3, N1>      visionMeasurementStdDevs     = VecBuilder.fill(0.9, 0.9, 0.9);
+  public        Matrix<N3, N1>           visionMeasurementStdDevs     = VecBuilder.fill(0.9, 0.9, 0.9);
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
-  private SwerveIMU           imu;
+  private       SwerveIMU                imu;
   /**
    * Simulation of the swerve drive.
    */
-  private SwerveIMUSimulation simIMU;
+  private       SwerveIMUSimulation      simIMU;
   /**
    * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
-  private int                 moduleSynchronizationCounter = 0;
+  private       int                      moduleSynchronizationCounter = 0;
   /**
    * The last heading set in radians.
    */
-  private double              lastHeadingRadians           = 0;
+  private       double                   lastHeadingRadians           = 0;
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
