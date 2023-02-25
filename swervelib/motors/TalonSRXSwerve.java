@@ -6,9 +6,9 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
+import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
  * {@link com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX} Swerve Motor.
@@ -234,7 +234,7 @@ public class TalonSRXSwerve extends SwerveMotor
   @Override
   public void setPosition(double position)
   {
-    if (!absoluteEncoder && !RobotBase.isSimulation())
+    if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation)
     {
       motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
     }

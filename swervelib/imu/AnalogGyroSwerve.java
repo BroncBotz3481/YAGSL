@@ -41,7 +41,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    yawOffset = gyro.getAngle() % 360;
+    yawOffset = Math.IEEEremainder(gyro.getAngle(), 360);
   }
 
   /**
@@ -61,7 +61,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void setYaw(double yaw)
   {
-    yawOffset = (yaw % 360) + (gyro.getAngle() % 360);
+    yawOffset = Math.IEEEremainder(yaw, 360) + Math.IEEEremainder(gyro.getAngle(), 360);
   }
 
   /**
@@ -72,7 +72,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void getYawPitchRoll(double[] yprArray)
   {
-    yprArray[0] = (gyro.getAngle() % 360) - yawOffset;
+    yprArray[0] = Math.IEEEremainder(gyro.getAngle(), 360) - yawOffset;
     yprArray[1] = 0;
     yprArray[2] = 0;
   }

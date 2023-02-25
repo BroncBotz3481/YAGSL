@@ -4,13 +4,14 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveModuleState2;
 import swervelib.motors.SwerveMotor;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.simulation.SwerveModuleSimulation;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 /**
  * The Swerve Module class which represents and controls Swerve Modules for the swerve drive.
@@ -110,7 +111,7 @@ public class SwerveModule
     driveMotor.burnFlash();
     angleMotor.burnFlash();
 
-    if (RobotBase.isSimulation())
+    if (SwerveDriveTelemetry.isSimulation)
     {
       simModule = new SwerveModuleSimulation();
     }
@@ -143,13 +144,15 @@ public class SwerveModule
     desiredState =
         new SwerveModuleState2(
             simpleState.speedMetersPerSecond, simpleState.angle, desiredState.omegaRadPerSecond);
-
-    SmartDashboard.putNumber(
-        "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
-    SmartDashboard.putNumber(
-        "Optimized " + moduleNumber + " Angle Setpoint: ", desiredState.angle.getDegrees());
-    SmartDashboard.putNumber(
-        "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
+    {
+      SmartDashboard.putNumber(
+          "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
+      SmartDashboard.putNumber(
+          "Optimized " + moduleNumber + " Angle Setpoint: ", desiredState.angle.getDegrees());
+      SmartDashboard.putNumber(
+          "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
+    }
 
     if (isOpenLoop)
     {
@@ -170,7 +173,7 @@ public class SwerveModule
         angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
     lastAngle = angle;
 
-    if (RobotBase.isSimulation())
+    if (SwerveDriveTelemetry.isSimulation)
     {
       simModule.updateStateAndPosition(desiredState);
     }
@@ -197,7 +200,7 @@ public class SwerveModule
     double     velocity;
     Rotation2d azimuth;
     double     omega;
-    if (!RobotBase.isSimulation())
+    if (!SwerveDriveTelemetry.isSimulation)
     {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
@@ -218,7 +221,7 @@ public class SwerveModule
   {
     double     position;
     Rotation2d azimuth;
-    if (!RobotBase.isSimulation())
+    if (!SwerveDriveTelemetry.isSimulation)
     {
       position = driveMotor.getPosition();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
@@ -226,7 +229,10 @@ public class SwerveModule
     {
       return simModule.getPosition();
     }
-    SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
+    {
+      SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
+    }
     return new SwerveModulePosition(position, azimuth);
   }
 

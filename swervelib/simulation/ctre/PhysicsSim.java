@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class PhysicsSim
 {
 
-  private static final PhysicsSim            sim          = new PhysicsSim();
-  private final        ArrayList<SimProfile> _simProfiles = new ArrayList<SimProfile>();
+  private static PhysicsSim            sim;
+  private final  ArrayList<SimProfile> _simProfiles = new ArrayList<SimProfile>();
 
   /**
    * Gets the robot simulator instance.
@@ -21,6 +21,10 @@ public class PhysicsSim
    */
   public static PhysicsSim getInstance()
   {
+    if (sim == null)
+    {
+      sim = new PhysicsSim();
+    }
     return sim;
   }
 
