@@ -270,7 +270,7 @@ public class TalonSRXSwerve extends SwerveMotor
   {
     double lowerBound;
     double upperBound;
-    double lowerOffset = Math.IEEEremainder(scopeReference, 360);
+    double lowerOffset = (scopeReference % 360);
 
     // Create the interval from the reference angle.
     if (lowerOffset >= 0)

@@ -34,7 +34,7 @@ public class ADXRS450Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    yawOffset = Math.IEEEremainder(imu.getAngle(), 360);
+    yawOffset = imu.getAngle() % 360;
   }
 
   /**
@@ -54,7 +54,7 @@ public class ADXRS450Swerve extends SwerveIMU
   @Override
   public void setYaw(double yaw)
   {
-    yawOffset = Math.IEEEremainder(yaw, 360) + Math.IEEEremainder(imu.getAngle(), 360);
+    yawOffset = (yaw % 360) + (imu.getAngle() % 360);
   }
 
   /**
@@ -65,7 +65,7 @@ public class ADXRS450Swerve extends SwerveIMU
   @Override
   public void getYawPitchRoll(double[] yprArray)
   {
-    yprArray[0] = Math.IEEEremainder(imu.getAngle(), 360) - yawOffset;
+    yprArray[0] = (imu.getAngle() % 360) - yawOffset;
     yprArray[1] = 0;
     yprArray[2] = 0;
   }
