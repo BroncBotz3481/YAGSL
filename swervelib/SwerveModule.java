@@ -121,6 +121,7 @@ public class SwerveModule
     }
 
     lastAngle = getState().angle.getDegrees();
+    lastVelocity = getState().speedMetersPerSecond;
   }
 
   /**
