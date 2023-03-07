@@ -1,7 +1,10 @@
 package swervelib.imu;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 /**
  * Creates a IMU for {@link edu.wpi.first.wpilibj.AnalogGyro} devices, only uses yaw.
@@ -75,6 +78,29 @@ public class AnalogGyroSwerve extends SwerveIMU
     yprArray[0] = (gyro.getAngle() % 360) - yawOffset;
     yprArray[1] = 0;
     yprArray[2] = 0;
+  }
+
+  /**
+   * Fetch the {@link Rotation3d} from the IMU. Robot relative.
+   *
+   * @return {@link Rotation3d} from the IMU.
+   */
+  public Rotation3d getRotation3d()
+  {
+    return new Rotation3d(0, 0, gyro.getAngle())
+        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU in meters per second squared. If acceleration isn't supported returns
+   * empty.
+   *
+   * @return {@link Translation3d} of the acceleration as an {@link Optional}.
+   */
+  @Override
+  public Optional<Translation3d> getAccel()
+  {
+    return Optional.empty();
   }
 
   /**

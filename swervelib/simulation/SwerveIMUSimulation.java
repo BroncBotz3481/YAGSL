@@ -3,8 +3,10 @@ package swervelib.simulation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import java.util.Optional;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
 
@@ -75,6 +77,16 @@ public class SwerveIMUSimulation
   public Rotation3d getGyroRotation3d()
   {
     return new Rotation3d(0, 0, angle);
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU in m/s/s. If acceleration isn't supported returns empty.
+   *
+   * @return {@link Translation3d} of the acceleration as an {@link Optional}.
+   */
+  public Optional<Translation3d> getAccel()
+  {
+    return Optional.empty();
   }
 
   /**
