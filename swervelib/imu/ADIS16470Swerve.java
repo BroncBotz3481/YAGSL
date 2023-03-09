@@ -17,9 +17,9 @@ public class ADIS16470Swerve extends SwerveIMU
    */
   private final ADIS16470_IMU imu;
   /**
-   * Offset for the ADIS16470 yaw reading.
+   * Offset for the ADIS16470.
    */
-  private       double        yawOffset = 0;
+  private       Rotation3d    offset = new Rotation3d();
 
   /**
    * Construct the ADIS16470 imu and reset default configurations. Publish the gyro to the SmartDashboard.
@@ -27,6 +27,7 @@ public class ADIS16470Swerve extends SwerveIMU
   public ADIS16470Swerve()
   {
     imu = new ADIS16470_IMU();
+    offset = new Rotation3d();
     factoryDefault();
     SmartDashboard.putData(imu);
   }
@@ -37,7 +38,9 @@ public class ADIS16470Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    yawOffset = imu.getAngle() % 360;
+    offset = new Rotation3d(
+        Math.toRadians(imu.getYComplementaryAngle()), Math.toRadians(imu.getXComplementaryAngle()),
+        Math.toRadians(imu.getAngle()));
   }
 
   /**
@@ -50,27 +53,25 @@ public class ADIS16470Swerve extends SwerveIMU
   }
 
   /**
-   * Set the yaw in degrees.
+   * Set the gyro offset.
    *
-   * @param yaw Yaw angle in degrees.
+   * @param offset gyro offset as a {@link Rotation3d}.
    */
-  @Override
-  public void setYaw(double yaw)
+  public void setOffset(Rotation3d offset)
   {
-    yawOffset = (yaw % 360) + (imu.getAngle() % 360);
+    offset = getRotation3d();
   }
 
   /**
-   * Fetch the yaw/pitch/roll from the IMU.
+   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
    *
-   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
+   * @return {@link Rotation3d} from the IMU.
    */
-  @Override
-  public void getYawPitchRoll(double[] yprArray)
+  public Rotation3d getRawRotation3d()
   {
-    yprArray[0] = (imu.getAngle() % 360) - yawOffset;
-    yprArray[1] = imu.getXComplementaryAngle() % 360;
-    yprArray[2] = imu.getYComplementaryAngle() % 360;
+    return new Rotation3d(
+        Math.toRadians(imu.getYComplementaryAngle()), Math.toRadians(imu.getXComplementaryAngle()),
+        Math.toRadians(imu.getAngle()));
   }
 
   /**
@@ -78,11 +79,10 @@ public class ADIS16470Swerve extends SwerveIMU
    *
    * @return {@link Rotation3d} from the IMU.
    */
+  @Override
   public Rotation3d getRotation3d()
   {
-    return new Rotation3d(
-        imu.getYComplementaryAngle(), imu.getXComplementaryAngle(), imu.getAngle())
-        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
+    return getRawRotation3d().minus(offset);
   }
 
   /**

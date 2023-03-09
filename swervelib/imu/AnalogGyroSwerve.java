@@ -17,9 +17,9 @@ public class AnalogGyroSwerve extends SwerveIMU
    */
   private final AnalogGyro gyro;
   /**
-   * The yaw offset for the gyroscope.
+   * Offset for the analog gyro.
    */
-  private       double     yawOffset;
+  private       Rotation3d offset = new Rotation3d();
 
   /**
    * Analog port in which the gyroscope is connected. Can only be attached to analog ports 0 or 1.
@@ -34,8 +34,8 @@ public class AnalogGyroSwerve extends SwerveIMU
           "Analog Gyroscope must be attached to port 0 or 1 on the roboRIO.\n");
     }
     gyro = new AnalogGyro(channel);
-    SmartDashboard.putData(gyro);
     factoryDefault();
+    SmartDashboard.putData(gyro);
   }
 
   /**
@@ -44,7 +44,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    yawOffset = gyro.getAngle() % 360;
+    offset = new Rotation3d(0, 0, Math.toRadians(gyro.getAngle()));
   }
 
   /**
@@ -57,27 +57,23 @@ public class AnalogGyroSwerve extends SwerveIMU
   }
 
   /**
-   * Set the yaw in degrees.
+   * Set the gyro offset.
    *
-   * @param yaw Yaw angle in degrees.
+   * @param offset gyro offset as a {@link Rotation3d}.
    */
-  @Override
-  public void setYaw(double yaw)
+  public void setOffset(Rotation3d offset)
   {
-    yawOffset = (yaw % 360) + (gyro.getAngle() % 360);
+    offset = getRotation3d();
   }
 
   /**
-   * Fetch the yaw/pitch/roll from the IMU.
+   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
    *
-   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
+   * @return {@link Rotation3d} from the IMU.
    */
-  @Override
-  public void getYawPitchRoll(double[] yprArray)
+  public Rotation3d getRawRotation3d()
   {
-    yprArray[0] = (gyro.getAngle() % 360) - yawOffset;
-    yprArray[1] = 0;
-    yprArray[2] = 0;
+    return new Rotation3d(0, 0, Math.toRadians(gyro.getAngle()));
   }
 
   /**
@@ -85,10 +81,10 @@ public class AnalogGyroSwerve extends SwerveIMU
    *
    * @return {@link Rotation3d} from the IMU.
    */
+  @Override
   public Rotation3d getRotation3d()
   {
-    return new Rotation3d(0, 0, gyro.getAngle())
-        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
+    return getRawRotation3d().minus(offset);
   }
 
   /**

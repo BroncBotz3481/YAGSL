@@ -21,18 +21,18 @@ public abstract class SwerveIMU
   public abstract void clearStickyFaults();
 
   /**
-   * Set the yaw in degrees.
+   * Set the gyro offset.
    *
-   * @param yaw Yaw angle in degrees.
+   * @param offset gyro offset as a {@link Rotation3d}.
    */
-  public abstract void setYaw(double yaw);
+  public abstract void setOffset(Rotation3d offset);
 
   /**
-   * Fetch the yaw/pitch/roll from the IMU.
+   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
    *
-   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
+   * @return {@link Rotation3d} from the IMU.
    */
-  public abstract void getYawPitchRoll(double[] yprArray);
+  public abstract Rotation3d getRawRotation3d();
 
   /**
    * Fetch the {@link Rotation3d} from the IMU. Robot relative.
