@@ -59,7 +59,7 @@ public class PigeonSwerve extends SwerveIMU
    */
   public void setOffset(Rotation3d offset)
   {
-    offset = getRotation3d();
+    this.offset = offset;
   }
 
   /**

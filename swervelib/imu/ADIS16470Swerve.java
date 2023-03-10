@@ -59,7 +59,7 @@ public class ADIS16470Swerve extends SwerveIMU
    */
   public void setOffset(Rotation3d offset)
   {
-    offset = getRotation3d();
+    this.offset = offset;
   }
 
   /**

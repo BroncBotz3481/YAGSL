@@ -140,8 +140,10 @@ public class SwerveModule
    *
    * @param desiredState Desired swerve module state.
    * @param isOpenLoop   Whether to use open loop (direct percent) or direct velocity control.
+   * @param force        Disables optimizations that prevent movement in the angle motor and forces the desired state
+   *                     onto the swerve module.
    */
-  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop)
+  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop, boolean force)
   {
     SwerveModuleState simpleState =
         new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
@@ -173,15 +175,22 @@ public class SwerveModule
       lastVelocity = velocity;
     }
 
-    // Prevents module rotation if speed is less than 1%
-    double angle =
-        (Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01)
-         ? lastAngle
-         : desiredState.angle.getDegrees());
-    if (angle != lastAngle)
+    double angle = desiredState.angle.getDegrees();
+
+    // If we are forcing the angle
+    if (force)
     {
-      angleMotor.setReference(
-          angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+      angleMotor.setReference(angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+    } else
+    {
+      // Prevents module rotation if speed is less than 1%
+      angle = Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01) ? lastAngle : angle;
+      // Prevent module rotation if angle is the same as the previous angle.
+      if (angle != lastAngle)
+      {
+        angleMotor.setReference(
+            angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+      }
     }
     lastAngle = angle;
 
