@@ -2,7 +2,7 @@
 * In early 2023 `swerve-lib` created by SwerveDriveSpecialties officially became unmaintained after not being updated in 2022.
 * This library aims to simplify Swerve Drive implementations while not sacrificing speed or processing power.
 
-# Features
+# [Features](https://github.com/BroncBotz3481/YAGSL-Example/discussions/29)
 * The swerve drive is configurable via JSON files, and you can initialize the entire swerve drive with a similar line as the following.
 * Simulation support.
 ```java
