@@ -89,6 +89,15 @@ public abstract class SwerveMotor
   public abstract void setReference(double setpoint, double feedforward);
 
   /**
+   * Set the closed loop PID controller reference point.
+   *
+   * @param setpoint    Setpoint in meters per second or angle in degrees.
+   * @param feedforward Feedforward in volt-meter-per-second or kV.
+   * @param position    Only used on the angle motor, the position of the motor in degrees.
+   */
+  public abstract void setReference(double setpoint, double feedforward, double position);
+
+  /**
    * Get the velocity of the integrated encoder.
    *
    * @return velocity in meters per second or degrees per second.

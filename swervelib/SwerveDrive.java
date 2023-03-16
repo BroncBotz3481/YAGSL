@@ -95,9 +95,9 @@ public class SwerveDrive
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
-   * {@link SwerveDrive#setModuleStates} method. The {@link SwerveDrive#drive} method incorporates kinematics-- it takes
-   * a translation and rotation, as well as parameters for field-centric and closed-loop velocity control.
-   * {@link SwerveDrive#setModuleStates} takes a list of SwerveModuleStates and directly passes them to the modules.
+   * {@link SwerveDrive#setRawModuleStates} method. The {@link SwerveDrive#drive} method incorporates kinematics-- it
+   * takes a translation and rotation, as well as parameters for field-centric and closed-loop velocity control.
+   * {@link SwerveDrive#setRawModuleStates} takes a list of SwerveModuleStates and directly passes them to the modules.
    * This subsystem also handles odometry.
    *
    * @param config           The {@link SwerveDriveConfiguration} configuration to base the swerve drive off of.
@@ -246,7 +246,7 @@ public class SwerveDrive
     // Calculate required module states via kinematics
     SwerveModuleState2[] swerveModuleStates = kinematics.toSwerveModuleStates(velocity);
 
-    setModuleStates(swerveModuleStates, isOpenLoop);
+    setRawModuleStates(swerveModuleStates, isOpenLoop);
   }
 
   /**
@@ -255,7 +255,7 @@ public class SwerveDrive
    * @param desiredStates A list of SwerveModuleStates to send to the modules.
    * @param isOpenLoop    Whether to use closed-loop velocity control. Set to true to disable closed-loop.
    */
-  public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop)
+  private void setRawModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop)
   {
     // Desaturates wheel speeds
     SwerveKinematics2.desaturateWheelSpeeds(desiredStates, swerveDriveConfiguration.maxSpeed);
@@ -285,6 +285,17 @@ public class SwerveDrive
   }
 
   /**
+   * Set the module states (azimuth and velocity) directly. Used primarily for auto paths.
+   *
+   * @param desiredStates A list of SwerveModuleStates to send to the modules.
+   * @param isOpenLoop    Whether to use closed-loop velocity control. Set to true to disable closed-loop.
+   */
+  public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop)
+  {
+    setRawModuleStates(kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)), isOpenLoop);
+  }
+
+  /**
    * Set chassis speeds with closed-loop velocity control.
    *
    * @param chassisSpeeds Chassis speeds to set.
@@ -295,7 +306,7 @@ public class SwerveDrive
     SwerveDriveTelemetry.desiredChassisSpeeds[0] = chassisSpeeds.vxMetersPerSecond;
     SwerveDriveTelemetry.desiredChassisSpeeds[2] = Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond);
 
-    setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
+    setRawModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
   }
 
   /**
@@ -539,6 +550,9 @@ public class SwerveDrive
       swerveModule.setDesiredState(desiredState, false, true);
 
     }
+
+    // Update kinematics because we are not using setModuleStates
+    kinematics.toSwerveModuleStates(new ChassisSpeeds());
   }
 
   /**
@@ -649,7 +663,7 @@ public class SwerveDrive
   {
     for (SwerveModule module : swerveModules)
     {
-      module.synchronizeEncoders();
+      module.queueSynchronizeEncoders();
     }
   }
 
@@ -679,25 +693,17 @@ public class SwerveDrive
       swerveDrivePoseEstimator.resetPosition(
           robotPose.getRotation(), getModulePositions(), robotPose);
     }
-
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      imu.setOffset(new Rotation3d(0, 0, swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians()));
-      // Yaw reset recommended by Team 1622
-    } else
-    {
-      simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians());
-    }
   }
 
   /**
-   * Set the Gyroscope offset using a {@link Rotation3d} object.
+   * Set the expected gyroscope angle using a {@link Rotation3d} object. To reset gyro, set to a new
+   * {@link Rotation3d}.
    *
-   * @param gyro Gyroscope offset.
+   * @param gyro expected gyroscope angle.
    */
   public void setGyro(Rotation3d gyro)
   {
-    imu.setOffset(gyro);
+    imu.setOffset(imu.getRawRotation3d().minus(gyro));
   }
 
   /**
