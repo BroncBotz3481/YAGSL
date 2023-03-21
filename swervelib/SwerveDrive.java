@@ -4,6 +4,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -222,13 +223,16 @@ public class SwerveDrive
 
     // Heading Angular Velocity Deadband, might make a configuration option later.
     // Originally made by Team 1466 Webb Robotics.
-    if (Math.abs(rotation) < 0.01 && headingCorrection)
+    if (headingCorrection)
     {
-      velocity.omegaRadiansPerSecond =
-          swerveController.headingCalculate(lastHeadingRadians, getYaw().getRadians());
-    } else
-    {
-      lastHeadingRadians = getYaw().getRadians();
+      if (Math.abs(rotation) < 0.01)
+      {
+        velocity.omegaRadiansPerSecond =
+            swerveController.headingCalculate(lastHeadingRadians, getYaw().getRadians());
+      } else
+      {
+        lastHeadingRadians = getYaw().getRadians();
+      }
     }
 
     // Display commanded speed for testing
@@ -704,6 +708,31 @@ public class SwerveDrive
   public void setGyro(Rotation3d gyro)
   {
     imu.setOffset(imu.getRawRotation3d().minus(gyro));
+  }
+
+  /**
+   * Helper function to get the {@link SwerveDrive#swerveController} for the {@link SwerveDrive} which can be used to
+   * generate {@link ChassisSpeeds} for the robot to orient it correctly given axis or angles, and apply
+   * {@link edu.wpi.first.math.filter.SlewRateLimiter} to given inputs. Important functions to look at are
+   * {@link SwerveController#getTargetSpeeds(double, double, double, double)},
+   * {@link SwerveController#addSlewRateLimiters(SlewRateLimiter, SlewRateLimiter, SlewRateLimiter)},
+   * {@link SwerveController#getRawTargetSpeeds(double, double, double)}.
+   *
+   * @return {@link SwerveController} for the {@link SwerveDrive}.
+   */
+  public SwerveController getSwerveController()
+  {
+    return swerveController;
+  }
+
+  /**
+   * Get the {@link SwerveModule}s associated with the {@link SwerveDrive}.
+   *
+   * @return {@link SwerveModule} array specified by configurations.
+   */
+  public SwerveModule[] getModules()
+  {
+    return swerveDriveConfiguration.modules;
   }
 
   /**
