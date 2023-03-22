@@ -189,6 +189,12 @@ public class SwerveModule
       angle = Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01) ? lastAngle : angle;
     }
 
+    // Ensure the angle is above 0
+    while (angle < 0)
+    {
+      angle += 360;
+    }
+
     // Prevent module rotation if angle is the same as the previous angle.
     if (angle != lastAngle || synchronizeEncoderQueued)
     {
