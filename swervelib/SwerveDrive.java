@@ -700,6 +700,29 @@ public class SwerveDrive
   }
 
   /**
+   * Add a vision measurement to the {@link SwerveDrivePoseEstimator} and update the {@link SwerveIMU} gyro reading with
+   * the given timestamp of the vision measurement.
+   *
+   * @param robotPose                Robot {@link Pose2d} as measured by vision.
+   * @param timestamp                Timestamp the measurement was taken as time since startup, should be taken from
+   *                                 {@link Timer#getFPGATimestamp()} or similar sources.
+   * @param soft                     Add vision estimate using the
+   *                                 {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double)} function, or
+   *                                 hard reset odometry with the given position with
+   *                                 {@link edu.wpi.first.math.kinematics.SwerveDriveOdometry#resetPosition(Rotation2d,
+   *                                 SwerveModulePosition[], Pose2d)}.
+   * @param visionMeasurementStdDevs Vision measurement standard deviation that will be sent to the
+   *                                 {@link SwerveDrivePoseEstimator}.
+   */
+  public void addVisionMeasurement(Pose2d robotPose, double timestamp, boolean soft,
+                                   Matrix<N3, N1> visionMeasurementStdDevs)
+  {
+    this.visionMeasurementStdDevs = visionMeasurementStdDevs;
+    addVisionMeasurement(robotPose, timestamp, soft, 1);
+  }
+
+
+  /**
    * Set the expected gyroscope angle using a {@link Rotation3d} object. To reset gyro, set to a new
    * {@link Rotation3d}.
    *

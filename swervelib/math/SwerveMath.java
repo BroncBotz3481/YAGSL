@@ -11,6 +11,8 @@ import swervelib.SwerveController;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveModuleConfiguration;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 /**
  * Mathematical functions which pertain to swerve drive.
@@ -205,8 +207,10 @@ public class SwerveMath
 
     double horizontalDistance = projectedHorizontalCg.plus(projectedWheelbaseEdge).getNorm();
     double maxAccel           = 9.81 * horizontalDistance / robotCG.getZ();
-
-    SmartDashboard.putNumber("calcMaxAccel", maxAccel);
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
+    {
+      SmartDashboard.putNumber("calcMaxAccel", maxAccel);
+    }
     return maxAccel;
   }
 
@@ -236,12 +240,18 @@ public class SwerveMath
   {
     // Get the robot's current field-relative velocity
     Translation2d currentVelocity = SwerveController.getTranslation2d(fieldVelocity);
-    SmartDashboard.putNumber("currentVelocity", currentVelocity.getX());
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
+    {
+      SmartDashboard.putNumber("currentVelocity", currentVelocity.getX());
+    }
 
     // Calculate the commanded change in velocity by subtracting current velocity
     // from commanded velocity
     Translation2d deltaV = commandedVelocity.minus(currentVelocity);
-    SmartDashboard.putNumber("deltaV", deltaV.getX());
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
+    {
+      SmartDashboard.putNumber("deltaV", deltaV.getX());
+    }
 
     // Creates an acceleration vector with the direction of delta V and a magnitude
     // of the maximum allowed acceleration in that direction
