@@ -272,18 +272,18 @@ public class SwerveDrive
       if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
       {
         SwerveDriveTelemetry.desiredStates[module.moduleNumber *
-                                           2] = desiredStates[module.moduleNumber].angle.getDegrees();
+                                           2] = module.lastState.angle.getDegrees();
         SwerveDriveTelemetry.desiredStates[(module.moduleNumber * 2) +
-                                           1] = desiredStates[module.moduleNumber].speedMetersPerSecond;
+                                           1] = module.lastState.speedMetersPerSecond;
       }
       if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
       {
         SmartDashboard.putNumber(
-            "Module " + module.moduleNumber + " Speed Setpoint: ",
-            desiredStates[module.moduleNumber].speedMetersPerSecond);
+            "Module[" + module.moduleNumber + "] Speed Setpoint: ",
+            module.lastState.speedMetersPerSecond);
         SmartDashboard.putNumber(
-            "Module " + module.moduleNumber + " Angle Setpoint: ",
-            desiredStates[module.moduleNumber].angle.getDegrees());
+            "Module[" + module.moduleNumber + "] Angle Setpoint: ",
+            module.lastState.angle.getDegrees());
       }
     }
   }
@@ -531,6 +531,47 @@ public class SwerveDrive
     {
       swerveModule.setMotorBrake(brake);
     }
+  }
+
+  /**
+   * Set the maximum speed of the drive motors, modified {@link SwerveControllerConfiguration#maxSpeed} and
+   * {@link SwerveDriveConfiguration#maxSpeed} which is used for the
+   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState2[], boolean)} function and
+   * {@link SwerveController#getTargetSpeeds(double, double, double, double, double)} functions. This function overrides
+   * what was placed in the JSON and could damage your motor/robot if set too high or unachievable rates.
+   *
+   * @param maximumSpeed            Maximum speed for the drive motors in meters / second.
+   * @param updateModuleFeedforward Update the swerve module feedforward to account for the new maximum speed. This
+   *                                should be true unless you have replaced the drive motor feedforward with
+   *                                {@link SwerveDrive#replaceSwerveModuleFeedforward(SimpleMotorFeedforward)}
+   */
+  public void setMaximumSpeed(double maximumSpeed, boolean updateModuleFeedforward)
+  {
+    swerveDriveConfiguration.maxSpeed = maximumSpeed;
+    swerveController.config.maxSpeed = maximumSpeed;
+    for (SwerveModule module : swerveModules)
+    {
+      module.configuration.maxSpeed = maximumSpeed;
+      if (updateModuleFeedforward)
+      {
+        module.feedforward = module.configuration.createDriveFeedforward();
+      }
+    }
+  }
+
+  /**
+   * Set the maximum speed of the drive motors, modified {@link SwerveControllerConfiguration#maxSpeed} and
+   * {@link SwerveDriveConfiguration#maxSpeed} which is used for the
+   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState2[], boolean)} function and
+   * {@link SwerveController#getTargetSpeeds(double, double, double, double, double)} functions. This function overrides
+   * what was placed in the JSON and could damage your motor/robot if set too high or unachievable rates. Overwrites the
+   * {@link SwerveModule#feedforward}.
+   *
+   * @param maximumSpeed Maximum speed for the drive motors in meters / second.
+   */
+  public void setMaximumSpeed(double maximumSpeed)
+  {
+    setMaximumSpeed(maximumSpeed, true);
   }
 
   /**

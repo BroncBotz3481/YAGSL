@@ -37,6 +37,12 @@ public class PhysicalPropertiesJson
    * Angle motor free speed rotations per minute.
    */
   public double            angleMotorFreeSpeedRPM;
+  /**
+   * Angle motor kV used for second order kinematics to tune the feedforward, this variable should be adjusted so that
+   * your drive train does not drift towards the direction you are rotating while you translate. When set to 0 the
+   * calculated kV will be used.
+   */
+  public double            angleMotorsKV                  = 0;
 
   /**
    * Create the physical characteristics based off the parsed data.
@@ -58,7 +64,8 @@ public class PhysicalPropertiesJson
         rampRate.drive,
         rampRate.angle,
         encoderPulsePerRotation.drive,
-        encoderPulsePerRotation.angle);
+        encoderPulsePerRotation.angle,
+        angleMotorsKV);
   }
 }
 

@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.Timer;
 import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.math.SwerveMath;
 import swervelib.parser.PIDFConfig;
 import swervelib.simulation.ctre.PhysicsSim;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -271,50 +272,6 @@ public class TalonFXSwerve extends SwerveMotor
   }
 
   /**
-   * Put an angle within the the 360 deg scope of a reference. For example, given a scope reference of 756 degrees,
-   * assumes the full scope is (720-1080), and places an angle of 22 degrees into it, returning 742 deg.
-   *
-   * @param scopeReference Current Angle (deg)
-   * @param newAngle       Target Angle (deg)
-   * @return Closest angle within scope (deg)
-   */
-  private double placeInAppropriate0To360Scope(double scopeReference, double newAngle)
-  {
-    double lowerBound;
-    double upperBound;
-    double lowerOffset = (scopeReference % 360);
-
-    // Create the interval from the reference angle.
-    if (lowerOffset >= 0)
-    {
-      lowerBound = scopeReference - lowerOffset;
-      upperBound = scopeReference + (360 - lowerOffset);
-    } else
-    {
-      upperBound = scopeReference - lowerOffset;
-      lowerBound = scopeReference - (360 + lowerOffset);
-    }
-    // Put the angle in the interval.
-    while (newAngle < lowerBound)
-    {
-      newAngle += 360;
-    }
-    while (newAngle > upperBound)
-    {
-      newAngle -= 360;
-    }
-    // Smooth the transition between interval boundaries.
-    if (newAngle - scopeReference > 180)
-    {
-      newAngle -= 360;
-    } else if (newAngle - scopeReference < -180)
-    {
-      newAngle += 360;
-    }
-    return newAngle;
-  }
-
-  /**
    * Convert the setpoint into native sensor units.
    *
    * @param setpoint Setpoint to mutate. In meters per second or degrees.
@@ -324,7 +281,7 @@ public class TalonFXSwerve extends SwerveMotor
   public double convertToNativeSensorUnits(double setpoint, double position)
   {
     setpoint =
-        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(position, setpoint);
+        isDriveMotor ? setpoint * .1 : SwerveMath.placeInAppropriate0To360Scope(position, setpoint);
     return setpoint / positionConversionFactor;
   }
 

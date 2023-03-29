@@ -4,7 +4,6 @@ import static swervelib.math.SwerveMath.calculateAngleKV;
 import static swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
 import static swervelib.math.SwerveMath.calculateMaxAcceleration;
 import static swervelib.math.SwerveMath.calculateMetersPerRotation;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -35,7 +34,7 @@ public class SwerveModuleConfiguration
   /**
    * Maximum robot speed in meters per second.
    */
-  public final double                              maxSpeed;
+  public       double                              maxSpeed;
   /**
    * PIDF configuration options for the angle motor closed-loop PID controller.
    */
@@ -116,11 +115,11 @@ public class SwerveModuleConfiguration
     this.anglePIDF = anglePIDF;
     this.velocityPIDF = velocityPIDF;
     this.maxSpeed = maxSpeed;
-    this.angleKV =
-        calculateAngleKV(
-            physicalCharacteristics.optimalVoltage,
-            angleMotorFreeSpeedRPM,
-            physicalCharacteristics.angleGearRatio);
+    this.angleKV = physicalCharacteristics.angleMotorKV == 0 ?
+                   calculateAngleKV(
+                       physicalCharacteristics.optimalVoltage,
+                       angleMotorFreeSpeedRPM,
+                       physicalCharacteristics.angleGearRatio) : physicalCharacteristics.angleMotorKV;
     this.physicalCharacteristics = physicalCharacteristics;
     this.angleMotorEncoderPulsePerRevolution = angleMotorEncoderPulsePerRevolution;
   }
