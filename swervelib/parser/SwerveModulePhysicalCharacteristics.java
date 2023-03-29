@@ -71,6 +71,8 @@ public class SwerveModulePhysicalCharacteristics
    *                                       overdrawing power and power loss).
    * @param driveEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
    * @param angleEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
+   * @param angleMotorKV                   The kV applied to the steering motor to ensure your drivetrain does not drift
+   *                                       towards a direction when rotating while translating.
    */
   public SwerveModulePhysicalCharacteristics(
       double driveGearRatio,
