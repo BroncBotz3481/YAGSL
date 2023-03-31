@@ -112,6 +112,20 @@ public class SwerveController
   }
 
   /**
+   * Get the angle in radians based off of the heading joysticks.
+   *
+   * @param headingX X joystick which controls the angle of the robot.
+   * @param headingY Y joystick which controls the angle of the robot.
+   * @return angle in radians from the joystick.
+   */
+  public double getJoystickAngle(double headingX, double headingY)
+  {
+    lastAngleScalar =
+        withinHypotDeadband(headingX, headingY) ? lastAngleScalar : Math.atan2(headingX, headingY);
+    return lastAngleScalar;
+  }
+
+  /**
    * Get the chassis speeds based on controller input of 2 joysticks. One for speeds in which direction. The other for
    * the angle of the robot.
    *
