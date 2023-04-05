@@ -194,7 +194,6 @@ public class SwerveModule
     {
       // Synchronize encoders if queued and send in the current position as the value from the absolute encoder.
       double feedforward = Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV;
-      System.out.println((float) (Math.toDegrees(0) * configuration.angleKV));
       if (absoluteEncoder != null && synchronizeEncoderQueued)
       {
         double absoluteEncoderPosition = getAbsolutePosition();
