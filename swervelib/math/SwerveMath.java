@@ -203,6 +203,7 @@ public class SwerveMath
    * Logical inverse of the Pose exponential from 254. Taken from team 3181.
    *
    * @param transform Pose to perform the log on.
+   * @return {@link Twist2d} of the transformed pose.
    */
   public static Twist2d PoseLog(final Pose2d transform)
   {
