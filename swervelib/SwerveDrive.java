@@ -78,23 +78,28 @@ public class SwerveDrive
   /**
    * Invert odometry readings of drive motor positions, used as a patch for debugging currently.
    */
-  public        boolean                  invertOdometry               = false;
+  public  boolean             invertOdometry               = false;
+  /**
+   * Correct chassis velocity in {@link SwerveDrive#drive(Translation2d, double, boolean, boolean)} using 254's
+   * correction.
+   */
+  public  boolean             chassisVelocityCorrection    = true;
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
-  private       SwerveIMU                imu;
+  private SwerveIMU           imu;
   /**
    * Simulation of the swerve drive.
    */
-  private       SwerveIMUSimulation      simIMU;
+  private SwerveIMUSimulation simIMU;
   /**
    * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
-  private       int                      moduleSynchronizationCounter = 0;
+  private int                 moduleSynchronizationCounter = 0;
   /**
    * The last heading set in radians.
    */
-  private       double                   lastHeadingRadians           = 0;
+  private double              lastHeadingRadians           = 0;
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
@@ -225,14 +230,17 @@ public class SwerveDrive
 
     // Thank you to Jared Russell FRC254 for Open Loop Compensation Code
     // https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5
-    double dtConstant = 0.009;
-    Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
-                                     velocity.vyMetersPerSecond * dtConstant,
-                                     Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
-    Twist2d twistVel = SwerveMath.PoseLog(robotPoseVel);
+    if (chassisVelocityCorrection)
+    {
+      double dtConstant = 0.009;
+      Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
+                                       velocity.vyMetersPerSecond * dtConstant,
+                                       Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
+      Twist2d twistVel = SwerveMath.PoseLog(robotPoseVel);
 
-    velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
-                                 twistVel.dtheta / dtConstant);
+      velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
+                                   twistVel.dtheta / dtConstant);
+    }
 
     // Heading Angular Velocity Deadband, might make a configuration option later.
     // Originally made by Team 1466 Webb Robotics.
@@ -855,6 +863,36 @@ public class SwerveDrive
     {
       module.configuration.driveMotor.setPosition(0);
     }
+  }
+
+  /**
+   * Enable second order kinematics for simulation and modifying the feedforward. Second order kinematics could increase
+   * accuracy in odometry.
+   *
+   * @param moduleFeedforward Module feedforward to apply should be between [-1, 1] excluding 0.
+   */
+  public void enableSecondOrderKinematics(double moduleFeedforward)
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.configuration.moduleSteerFFCL = moduleFeedforward;
+    }
+  }
+
+  /**
+   * Enable second order kinematics for tracking purposes but completely untuned.
+   */
+  public void enableSecondOrderKinematics()
+  {
+    enableSecondOrderKinematics(-0.00000000000000001);
+  }
+
+  /**
+   * Disable second order kinematics.
+   */
+  public void disableSecondOrderKinematics()
+  {
+    enableSecondOrderKinematics(0);
   }
 
 }
