@@ -28,6 +28,7 @@ import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveMath;
 import swervelib.math.SwerveModuleState2;
+import swervelib.math.SwervePoseEstimator2;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
@@ -51,7 +52,7 @@ public class SwerveDrive
   /**
    * Swerve odometry.
    */
-  public final  SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+  public final  SwervePoseEstimator2     swerveDrivePoseEstimator;
   /**
    * Swerve modules.
    */
@@ -129,7 +130,7 @@ public class SwerveDrive
 
     //    odometry = new SwerveDriveOdometry(kinematics, getYaw(), getModulePositions());
     swerveDrivePoseEstimator =
-        new SwerveDrivePoseEstimator(
+        new SwervePoseEstimator2(
             kinematics,
             getYaw(),
             getModulePositions(),
@@ -685,7 +686,7 @@ public class SwerveDrive
   public void updateOdometry()
   {
     // Update odometry
-    swerveDrivePoseEstimator.update(getYaw(), getModulePositions());
+    swerveDrivePoseEstimator.update(getYaw(), getPitch(), getRoll(), getModulePositions());
 
     // Update angle accumulator if the robot is simulated
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
