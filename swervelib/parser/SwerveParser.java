@@ -142,7 +142,8 @@ public class SwerveParser
               pidfPropertiesJson.angle,
               pidfPropertiesJson.drive,
               maxSpeedMPS,
-              physicalPropertiesJson.createPhysicalProperties(swerveDriveJson.optimalVoltage));
+              physicalPropertiesJson.createPhysicalProperties(swerveDriveJson.optimalVoltage),
+              swerveDriveJson.modules[i]);
     }
     SwerveDriveConfiguration swerveDriveConfiguration =
         new SwerveDriveConfiguration(

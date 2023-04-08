@@ -1,9 +1,9 @@
 package swervelib.parser;
 
-import static swervelib.math.SwerveMath.calculateAngleKV;
 import static swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
 import static swervelib.math.SwerveMath.calculateMaxAcceleration;
 import static swervelib.math.SwerveMath.calculateMetersPerRotation;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -46,7 +46,7 @@ public class SwerveModuleConfiguration
   /**
    * Angle volt-meter-per-second.
    */
-  public       double                              angleKV;
+  public       double                              moduleSteerFFCL;
   /**
    * The integrated encoder pulse per revolution.
    */
@@ -67,6 +67,10 @@ public class SwerveModuleConfiguration
    * The Absolute Encoder for the swerve module.
    */
   public SwerveAbsoluteEncoder absoluteEncoder;
+  /**
+   * Name for the swerve module for telemetry.
+   */
+  public String                name;
 
   /**
    * Construct a configuration object for swerve modules.
@@ -85,7 +89,6 @@ public class SwerveModuleConfiguration
    * @param maxSpeed                            Maximum speed in meters per second.
    * @param physicalCharacteristics             Physical characteristics of the swerve module.
    * @param angleMotorEncoderPulsePerRevolution The encoder pulse per revolution for the angle motor encoder.
-   * @param angleMotorFreeSpeedRPM              The free speed RPM of the angle motor.
    */
   public SwerveModuleConfiguration(
       SwerveMotor driveMotor,
@@ -102,7 +105,7 @@ public class SwerveModuleConfiguration
       boolean driveMotorInverted,
       boolean angleMotorInverted,
       double angleMotorEncoderPulsePerRevolution,
-      double angleMotorFreeSpeedRPM)
+      String name)
   {
     this.driveMotor = driveMotor;
     this.angleMotor = angleMotor;
@@ -115,13 +118,10 @@ public class SwerveModuleConfiguration
     this.anglePIDF = anglePIDF;
     this.velocityPIDF = velocityPIDF;
     this.maxSpeed = maxSpeed;
-    this.angleKV = physicalCharacteristics.angleMotorKV == 0 ?
-                   calculateAngleKV(
-                       physicalCharacteristics.optimalVoltage,
-                       angleMotorFreeSpeedRPM,
-                       physicalCharacteristics.angleGearRatio) : physicalCharacteristics.angleMotorKV;
+    this.moduleSteerFFCL = physicalCharacteristics.moduleSteerFFCL;
     this.physicalCharacteristics = physicalCharacteristics;
     this.angleMotorEncoderPulsePerRevolution = angleMotorEncoderPulsePerRevolution;
+    this.name = name;
   }
 
   /**
@@ -138,6 +138,7 @@ public class SwerveModuleConfiguration
    * @param velocityPIDF            Velocity PIDF configuration.
    * @param maxSpeed                Maximum robot speed in meters per second.
    * @param physicalCharacteristics Physical characteristics of the swerve module.
+   * @param name                    Name for the module.
    */
   public SwerveModuleConfiguration(
       SwerveMotor driveMotor,
@@ -149,7 +150,8 @@ public class SwerveModuleConfiguration
       PIDFConfig anglePIDF,
       PIDFConfig velocityPIDF,
       double maxSpeed,
-      SwerveModulePhysicalCharacteristics physicalCharacteristics)
+      SwerveModulePhysicalCharacteristics physicalCharacteristics,
+      String name)
   {
     this(
         driveMotor,
@@ -166,7 +168,7 @@ public class SwerveModuleConfiguration
         false,
         false,
         physicalCharacteristics.angleEncoderPulsePerRotation,
-        physicalCharacteristics.angleMotorFreeSpeedRPM);
+        name);
   }
 
   /**

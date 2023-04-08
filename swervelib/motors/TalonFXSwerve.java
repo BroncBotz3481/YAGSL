@@ -1,9 +1,10 @@
 package swervelib.motors;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.Timer;
@@ -101,6 +102,8 @@ public class TalonFXSwerve extends SwerveMotor
     {
       motor.configFactoryDefault();
       motor.setSensorPhase(true);
+      motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
+      motor.configNeutralDeadband(0.001);
     }
   }
 
@@ -314,11 +317,21 @@ public class TalonFXSwerve extends SwerveMotor
 
     burnFlash();
 
-    motor.set(
-        isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
-        convertToNativeSensorUnits(setpoint, position),
-        DemandType.ArbitraryFeedForward,
-        feedforward / nominalVoltage);
+    if (isDriveMotor)
+    {
+      motor.set(
+          TalonFXControlMode.Velocity,
+          convertToNativeSensorUnits(setpoint, position),
+          DemandType.ArbitraryFeedForward,
+          feedforward / nominalVoltage);
+    } else
+    {
+      motor.set(
+          TalonFXControlMode.Position,
+          convertToNativeSensorUnits(setpoint, position),
+          DemandType.ArbitraryFeedForward,
+          feedforward);
+    }
   }
 
   /**

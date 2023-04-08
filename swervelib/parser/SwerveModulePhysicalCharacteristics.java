@@ -43,15 +43,11 @@ public class SwerveModulePhysicalCharacteristics
    */
   public final double wheelGripCoefficientOfFriction;
   /**
-   * Free speed rotations per minute of the motor, as described by the vendor.
-   */
-  public final double angleMotorFreeSpeedRPM;
-  /**
    * Angle motor kV used for second order kinematics to tune the feedforward, this variable should be adjusted so that
    * your drive train does not drift towards the direction you are rotating while you translate. When set to 0 the
    * calculated kV will be used.
    */
-  public final double angleMotorKV;
+  public final double moduleSteerFFCL;
 
   /**
    * Construct the swerve module physical characteristics.
@@ -59,7 +55,6 @@ public class SwerveModulePhysicalCharacteristics
    * @param driveGearRatio                 Gear ratio of the drive motor. Number of motor rotations to rotate the
    *                                       wheel.
    * @param angleGearRatio                 Gear ratio of the angle motor. Number of motor rotations to spin the wheel.
-   * @param angleMotorFreeSpeedRPM         Motor free speed rotation per minute.
    * @param wheelDiameter                  Wheel diameter in meters.
    * @param wheelGripCoefficientOfFriction Wheel grip coefficient of friction on carpet given by manufacturer.
    * @param optimalVoltage                 Optimal robot voltage.
@@ -71,13 +66,12 @@ public class SwerveModulePhysicalCharacteristics
    *                                       overdrawing power and power loss).
    * @param driveEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
    * @param angleEncoderPulsePerRotation   The number of encoder pulses per motor rotation, 1 for integrated encoders.
-   * @param angleMotorKV                   The kV applied to the steering motor to ensure your drivetrain does not drift
+   * @param moduleSteerFFCL                The kV applied to the steering motor to ensure your drivetrain does not drift
    *                                       towards a direction when rotating while translating.
    */
   public SwerveModulePhysicalCharacteristics(
       double driveGearRatio,
       double angleGearRatio,
-      double angleMotorFreeSpeedRPM,
       double wheelDiameter,
       double wheelGripCoefficientOfFriction,
       double optimalVoltage,
@@ -87,12 +81,11 @@ public class SwerveModulePhysicalCharacteristics
       double angleMotorRampRate,
       int driveEncoderPulsePerRotation,
       int angleEncoderPulsePerRotation,
-      double angleMotorKV)
+      double moduleSteerFFCL)
   {
     this.wheelGripCoefficientOfFriction = wheelGripCoefficientOfFriction;
     this.optimalVoltage = optimalVoltage;
 
-    this.angleMotorFreeSpeedRPM = angleMotorFreeSpeedRPM;
     this.angleGearRatio = angleGearRatio;
     this.driveGearRatio = driveGearRatio;
     this.angleEncoderPulsePerRotation = angleEncoderPulsePerRotation;
@@ -103,7 +96,7 @@ public class SwerveModulePhysicalCharacteristics
     this.angleMotorCurrentLimit = angleMotorCurrentLimit;
     this.driveMotorRampRate = driveMotorRampRate;
     this.angleMotorRampRate = angleMotorRampRate;
-    this.angleMotorKV = angleMotorKV;
+    this.moduleSteerFFCL = moduleSteerFFCL;
   }
 
   /**
@@ -113,7 +106,6 @@ public class SwerveModulePhysicalCharacteristics
    *
    * @param driveGearRatio               Gear ratio of the drive motor. Number of motor rotations to rotate the wheel.
    * @param angleGearRatio               Gear ratio of the angle motor. Number of motor rotations to spin the wheel.
-   * @param angleMotorFreeSpeedRPM       Motor free speed rotation per minute.
    * @param wheelDiameter                Wheel diameter in meters.
    * @param driveMotorRampRate           The time in seconds to go from 0 to full throttle on the motor. (Prevents over
    *                                     drawing power from battery)
@@ -125,7 +117,6 @@ public class SwerveModulePhysicalCharacteristics
   public SwerveModulePhysicalCharacteristics(
       double driveGearRatio,
       double angleGearRatio,
-      double angleMotorFreeSpeedRPM,
       double wheelDiameter,
       double driveMotorRampRate,
       double angleMotorRampRate,
@@ -135,7 +126,6 @@ public class SwerveModulePhysicalCharacteristics
     this(
         driveGearRatio,
         angleGearRatio,
-        angleMotorFreeSpeedRPM,
         wheelDiameter,
         1.19,
         12,
@@ -144,6 +134,6 @@ public class SwerveModulePhysicalCharacteristics
         driveMotorRampRate,
         angleMotorRampRate,
         driveEncoderPulsePerRotation,
-        angleEncoderPulsePerRotation, 0);
+        angleEncoderPulsePerRotation, -0.30);
   }
 }

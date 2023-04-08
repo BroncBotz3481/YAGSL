@@ -46,17 +46,16 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
    * Swerve module states.
    */
   private final SwerveModuleState2[] m_moduleStates;
+  private final Timer                m_moduleAccelTimer    = new Timer();
   /**
    * Previous CoR
    */
   private       Translation2d        m_prevCoR             = new Translation2d();
-  private       ChassisSpeeds m_prevChassisSpeeds   = new ChassisSpeeds();
-  private final Timer         m_moduleAccelTimer    = new Timer();
-  private       double        m_prevModuleAccelTime = 0.0;
+  private       ChassisSpeeds        m_prevChassisSpeeds   = new ChassisSpeeds();
+  private       double               m_prevModuleAccelTime = 0.0;
 
   /**
-   * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations as
-   * Translation2ds.
+   * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations as Translation2ds.
    * The order in which you pass in the wheel locations is the same order that you will receive the module states when
    * performing inverse kinematics. It is also expected that you pass in the module states in the same order when
    * calling the forward kinematics methods.
@@ -165,13 +164,11 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
   }
 
   /**
-   * Performs inverse kinematics to return the module states from a desired chassis velocity. This method is often
-   * used
+   * Performs inverse kinematics to return the module states from a desired chassis velocity. This method is often used
    * to convert joystick values into module speeds and angles.
    *
    * <p>This function also supports variable centers of rotation. During normal operations, the
-   * center of rotation is usually the same as the physical center of the robot; therefore, the argument is
-   * defaulted to
+   * center of rotation is usually the same as the physical center of the robot; therefore, the argument is defaulted to
    * that use case. However, if you wish to change the center of rotation for evasive maneuvers, vision alignment, or
    * for any other use case, you can do so.
    *
@@ -179,10 +176,8 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
    * the previously calculated module angle will be maintained.
    *
    * @param chassisSpeeds          The desired chassis speed.
-   * @param centerOfRotationMeters The center of rotation. For example, if you set the center of rotation at one
-   *                               corner
-   *                               of the robot and provide a chassis speed that only has a dtheta component, the
-   *                               robot
+   * @param centerOfRotationMeters The center of rotation. For example, if you set the center of rotation at one corner
+   *                               of the robot and provide a chassis speed that only has a dtheta component, the robot
    *                               will rotate around that corner.
    * @return An array containing the module states. Use caution because these module states are not normalized.
    * Sometimes, a user input may cause one of the module speeds to go above the attainable max velocity. Use the

@@ -3,7 +3,6 @@ package swervelib;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
@@ -100,8 +99,7 @@ public class SwerveModule
     }
 
     // Config angle motor/controller
-    angleMotor.configureIntegratedEncoder(
-        moduleConfiguration.getPositionEncoderConversion(false));
+    angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
     angleMotor.configurePIDWrapping(-180, 180);
     angleMotor.setInverted(moduleConfiguration.angleMotorInverted);
@@ -146,16 +144,11 @@ public class SwerveModule
    */
   public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop, boolean force)
   {
-//    SwerveModuleState simpleState =
-//        new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
-//    simpleState = SwerveModuleState.optimize(simpleState, getState().angle);
-//    desiredState =
-//        new SwerveModuleState2(
-//            simpleState.speedMetersPerSecond, simpleState.angle, desiredState.omegaRadPerSecond);
-    // Taken from https://github.com/pittsfordrobotics/REVSwerve2023/blob/a13156d573b6390c2130edb741cc7381c4d31583/src/main/java/com/team3181/frc2023/subsystems/swerve/Swerve.java#L101
-    desiredState = SwerveMath.optimize(desiredState, getState().angle,
-                                       Units.radiansToDegrees(lastState.omegaRadPerSecond * configuration.angleKV) *
-                                       0.065); // I am unsure of what the 0.065 represents
+    desiredState = SwerveModuleState2.optimize(desiredState,
+                                               Rotation2d.fromDegrees(getAbsolutePosition()),
+                                               lastState,
+                                               configuration.moduleSteerFFCL);
+
     if (isOpenLoop)
     {
       double percentOutput = desiredState.speedMetersPerSecond / configuration.maxSpeed;
@@ -173,41 +166,34 @@ public class SwerveModule
     if (!force)
     {
       // Prevents module rotation if speed is less than 1%
-      SwerveMath.antiJitter(desiredState, lastState, configuration.maxSpeed);
-    } else
-    {
-      desiredState.omegaRadPerSecond = 0;
+      SwerveMath.antiJitter(desiredState, lastState, Math.min(configuration.maxSpeed, 4));
     }
 
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
     {
-      SmartDashboard.putNumber(
-          "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
-      SmartDashboard.putNumber(
-          "Optimized " + moduleNumber + " Angle Setpoint: ", desiredState.angle.getDegrees());
-      SmartDashboard.putNumber(
-          "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
+      SmartDashboard.putNumber("Module[" + configuration.name + "] Speed Setpoint:", desiredState.speedMetersPerSecond);
+      SmartDashboard.putNumber("Module[" + configuration.name + "] Angle Setpoint:", desiredState.angle.getDegrees());
+      SmartDashboard.putNumber("Module[" + configuration.name + "] Omega:",
+                               Math.toDegrees(desiredState.omegaRadPerSecond));
     }
 
     // Prevent module rotation if angle is the same as the previous angle.
     if (desiredState.angle != lastState.angle || synchronizeEncoderQueued)
     {
+      double moduleFF = desiredState.omegaRadPerSecond * configuration.moduleSteerFFCL;
       // Synchronize encoders if queued and send in the current position as the value from the absolute encoder.
-      double feedforward = Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV;
       if (absoluteEncoder != null && synchronizeEncoderQueued)
       {
         double absoluteEncoderPosition = getAbsolutePosition();
         angleMotor.setPosition(absoluteEncoderPosition);
-        angleMotor.setReference(desiredState.angle.getDegrees(),
-                                feedforward,
-                                absoluteEncoderPosition);
+        angleMotor.setReference(desiredState.angle.getDegrees(), moduleFF, absoluteEncoderPosition);
         synchronizeEncoderQueued = false;
       } else
       {
-        angleMotor.setReference(desiredState.angle.getDegrees(),
-                                feedforward);
+        angleMotor.setReference(desiredState.angle.getDegrees(), moduleFF);
       }
     }
+
     lastState = desiredState;
 
     if (SwerveDriveTelemetry.isSimulation)
@@ -223,7 +209,7 @@ public class SwerveModule
    */
   public void setAngle(double angle)
   {
-    angleMotor.setReference(angle, configuration.angleKV);
+    angleMotor.setReference(angle, configuration.moduleSteerFFCL);
     lastState.angle = Rotation2d.fromDegrees(angle);
   }
 
@@ -268,7 +254,7 @@ public class SwerveModule
     }
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
     {
-      SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
+      SmartDashboard.putNumber("Module[" + configuration.name + "] Angle", azimuth.getDegrees());
     }
     return new SwerveModulePosition(position, azimuth);
   }

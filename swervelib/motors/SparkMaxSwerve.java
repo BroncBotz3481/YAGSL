@@ -311,7 +311,8 @@ public class SparkMaxSwerve extends SwerveMotor
       pid.setReference(
           setpoint,
           ControlType.kPosition,
-          pidSlot);
+          pidSlot,
+          feedforward);
     }
   }
 
