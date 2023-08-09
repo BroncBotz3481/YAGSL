@@ -19,13 +19,16 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
   /**
    * Create the {@link AbsoluteEncoder} object as a duty cycle. from the {@link CANSparkMax} motor.
    *
-   * @param motor Motor to create the encoder from.
+   * @param motor            Motor to create the encoder from.
+   * @param conversionFactor The conversion factor to set if the output is not from 0 to 360.
    */
-  public SparkMaxEncoderSwerve(SwerveMotor motor)
+  public SparkMaxEncoderSwerve(SwerveMotor motor, int conversionFactor)
   {
     if (motor.getMotor() instanceof CANSparkMax)
     {
       encoder = ((CANSparkMax) motor.getMotor()).getAbsoluteEncoder(Type.kDutyCycle);
+      encoder.setVelocityConversionFactor(conversionFactor);
+      encoder.setPositionConversionFactor(conversionFactor);
     } else
     {
       throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");

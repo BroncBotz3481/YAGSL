@@ -1,61 +1,59 @@
 package swervelib.encoders;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import swervelib.motors.SwerveMotor;
+import com.reduxrobotics.sensors.canandcoder.CANandcoder;
 
 /**
- * SparkMax absolute encoder, attached through the data port.
+ * HELIUM {@link CANandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
  */
-public class CanAndCoderSwerve extends SwerveAbsoluteEncoder {
+public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
+{
 
   /**
-   * The {@link AbsoluteEncoder} representing the duty cycle encoder attached to
-   * the SparkMax.
+   * The {@link CANandcoder} representing the CANandCoder on the CAN bus.
    */
-  public AbsoluteEncoder encoder;
+  public  CANandcoder encoder;
+  /**
+   * Inversion state of the encoder.
+   */
+  private boolean     inverted = false;
 
   /**
-   * Create the {@link AbsoluteEncoder} object as a duty cycle. from the
-   * {@link CANSparkMax} motor.
+   * Create the {@link CANandcoder}
    *
-   * @param motor Motor to create the encoder from.
+   * @param canid The CAN ID whenever the CANandCoder is operating on the CANBus.
    */
-  public CanAndCoderSwerve(SwerveMotor motor) {
-    if (motor.getMotor() instanceof CANSparkMax) {
-      encoder = ((CANSparkMax) motor.getMotor()).getAbsoluteEncoder(Type.kDutyCycle);
-      encoder.setPositionConversionFactor(360);
-      encoder.setVelocityConversionFactor(360);
-    } else {
-      throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");
-    }
+  public CanAndCoderSwerve(int canid)
+  {
+    encoder = new CANandcoder(canid);
   }
 
   /**
    * Reset the encoder to factory defaults.
    */
   @Override
-  public void factoryDefault() {
-    // Do nothing
+  public void factoryDefault()
+  {
+    encoder.resetFactoryDefaults(false);
   }
 
   /**
    * Clear sticky faults on the encoder.
    */
   @Override
-  public void clearStickyFaults() {
-    // Do nothing
+  public void clearStickyFaults()
+  {
+    encoder.clearStickyFaults();
   }
 
   /**
-   * Configure the absolute encoder to read from [0, 360) per second.
+   * Configure the CANandCoder to read from [0, 360) per second.
    *
    * @param inverted Whether the encoder is inverted.
    */
   @Override
-  public void configure(boolean inverted) {
-    encoder.setInverted(inverted);
+  public void configure(boolean inverted)
+  {
+    this.inverted = inverted;
   }
 
   /**
@@ -64,8 +62,9 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder {
    * @return Absolute position in degrees from [0, 360).
    */
   @Override
-  public double getAbsolutePosition() {
-    return encoder.getPosition();
+  public double getAbsolutePosition()
+  {
+    return (inverted ? -1.0 : 1.0) * encoder.getPosition() * 360;
   }
 
   /**
@@ -74,7 +73,8 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder {
    * @return Absolute encoder object.
    */
   @Override
-  public Object getAbsoluteEncoder() {
+  public Object getAbsoluteEncoder()
+  {
     return encoder;
   }
 }

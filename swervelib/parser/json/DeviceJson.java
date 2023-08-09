@@ -49,27 +49,16 @@ public class DeviceJson
    */
   public SwerveAbsoluteEncoder createEncoder(SwerveMotor motor)
   {
-    SwerveAbsoluteEncoder attachedChoice = null;
     switch (type)
     {
       case "none":
       case "integrated":
       case "attached":
-        if (motor instanceof SparkMaxBrushedMotorSwerve || motor instanceof SparkMaxSwerve)
-        {
-          attachedChoice = new SparkMaxEncoderSwerve(motor);
-          motor.setAbsoluteEncoder(attachedChoice);
-        } else if (motor instanceof TalonFXSwerve || motor instanceof TalonSRXSwerve)
-        {
-          motor.setAbsoluteEncoder(null);
-        } else
-        {
-          throw new RuntimeException(
-              "Could not create absolute encoder from data port of " + type + " id " + id);
-        }
-        return attachedChoice;
+        return null;
       case "canandcoder":
-        return new CanAndCoderSwerve(motor);
+        return new SparkMaxEncoderSwerve(motor, 360);
+      case "canandcoder_can":
+        return new CanAndCoderSwerve(id);
       case "thrifty":
       case "throughbore":
       case "dutycycle":
@@ -159,5 +148,25 @@ public class DeviceJson
       default:
         throw new RuntimeException(type + " is not a recognized absolute encoder type.");
     }
+  }
+
+  /**
+   * Create a {@link SwerveAbsoluteEncoder} from the data port on the motor controller.
+   *
+   * @param motor The motor to create the absolute encoder from.
+   * @return {@link SwerveAbsoluteEncoder} from the motor controller.
+   */
+  public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor)
+  {
+    switch (type)
+    {
+      case "sparkmax":
+        return new SparkMaxEncoderSwerve(motor, 1);
+      case "falcon":
+      case "talonfx":
+        return null;
+    }
+    throw new RuntimeException(
+        "Could not create absolute encoder from data port of " + type + " id " + id);
   }
 }
