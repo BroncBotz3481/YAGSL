@@ -224,6 +224,13 @@ public class SwervePoseEstimator2 // extends SwerveDrivePoseEstimator
         sample.get().modulePositions,
         sample.get().poseMeters.exp(scaledTwist));
 
+    // Step 6: Record the current pose to allow multiple measurements from the same timestamp
+//    m_poseBuffer.addSample(
+//        timestampSeconds,
+//        new InterpolationRecord(
+//            getEstimatedPosition(), sample.get().gyroAngle, sample.get().gyroPitch, sample.get().gyroRoll,
+//            sample.get().modulePositions));
+
     // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :

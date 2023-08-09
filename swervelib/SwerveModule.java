@@ -38,23 +38,28 @@ public class SwerveModule
   /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back right.
    */
-  public        int                    moduleNumber;
+  public  int                    moduleNumber;
   /**
    * Feedforward for drive motor during closed loop control.
    */
-  public        SimpleMotorFeedforward feedforward;
+  public  SimpleMotorFeedforward feedforward;
   /**
    * Last swerve module state applied.
    */
-  public        SwerveModuleState2     lastState;
+  public  SwerveModuleState2     lastState;
+  /**
+   * Enable {@link SwerveModuleState2} optimizations so the angle is reversed and speed is reversed to ensure the module
+   * never turns more than 90deg.
+   */
+  public  boolean                moduleStateOptimization  = true;
   /**
    * Simulated swerve module.
    */
-  private       SwerveModuleSimulation simModule;
+  private SwerveModuleSimulation simModule;
   /**
    * Encoder synchronization queued.
    */
-  private       boolean                synchronizeEncoderQueued = false;
+  private boolean                synchronizeEncoderQueued = false;
 
   /**
    * Construct the swerve module and initialize the swerve module motors and absolute encoder.
@@ -144,10 +149,13 @@ public class SwerveModule
    */
   public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop, boolean force)
   {
-    desiredState = SwerveModuleState2.optimize(desiredState,
-                                               Rotation2d.fromDegrees(getAbsolutePosition()),
-                                               lastState,
-                                               configuration.moduleSteerFFCL);
+    if (moduleStateOptimization)
+    {
+      desiredState = SwerveModuleState2.optimize(desiredState,
+                                                 Rotation2d.fromDegrees(getAbsolutePosition()),
+                                                 lastState,
+                                                 configuration.moduleSteerFFCL);
+    }
 
     if (isOpenLoop)
     {

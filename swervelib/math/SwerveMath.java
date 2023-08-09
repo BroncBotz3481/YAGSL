@@ -89,7 +89,7 @@ public class SwerveMath
   public static double calculateMaxAngularVelocity(
       double maxSpeed, double furthestModuleX, double furthestModuleY)
   {
-    return maxSpeed / Math.hypot(furthestModuleX, furthestModuleY);
+    return maxSpeed / new Rotation2d(furthestModuleX, furthestModuleY).getRadians();
   }
 
   /**
