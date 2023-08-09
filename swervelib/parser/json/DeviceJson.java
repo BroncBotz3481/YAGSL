@@ -169,4 +169,24 @@ public class DeviceJson
     throw new RuntimeException(
         "Could not create absolute encoder from data port of " + type + " id " + id);
   }
+
+  /**
+   * Get the encoder pulse per rotation based off of the encoder type.
+   *
+   * @param angleEncoderPulsePerRotation The configured pulse per rotation.
+   * @return The correct pulse per rotation based off of the encoder type.
+   */
+  public int getPulsePerRotation(int angleEncoderPulsePerRotation)
+  {
+    switch (type)
+    {
+      case "canandcoder":
+        return 360;
+      case "falcon":
+      case "talonfx":
+        return 2048;
+      default:
+        return angleEncoderPulsePerRotation;
+    }
+  }
 }

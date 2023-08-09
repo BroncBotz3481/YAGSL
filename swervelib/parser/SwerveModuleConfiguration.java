@@ -3,7 +3,6 @@ package swervelib.parser;
 import static swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
 import static swervelib.math.SwerveMath.calculateMaxAcceleration;
 import static swervelib.math.SwerveMath.calculateMetersPerRotation;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -200,7 +199,7 @@ public class SwerveModuleConfiguration
            ? calculateMetersPerRotation(
         physicalCharacteristics.wheelDiameter,
         physicalCharacteristics.driveGearRatio,
-        angleMotorEncoderPulsePerRevolution)
+        physicalCharacteristics.driveEncoderPulsePerRotation)
            : calculateDegreesPerSteeringRotation(
                physicalCharacteristics.angleGearRatio,
                angleMotorEncoderPulsePerRevolution);
