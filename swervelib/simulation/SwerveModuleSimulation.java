@@ -2,8 +2,8 @@ package swervelib.simulation;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import swervelib.math.SwerveModuleState2;
 
 /**
  * Class to hold simulation data for {@link swervelib.SwerveModule}
@@ -15,27 +15,27 @@ public class SwerveModuleSimulation
   /**
    * Main timer to simulate the passage of time.
    */
-  private final Timer              timer;
+  private final Timer             timer;
   /**
    * Time delta since last update
    */
-  private       double             dt;
+  private       double            dt;
   /**
    * Fake motor position.
    */
-  private       double             fakePos;
+  private       double            fakePos;
   /**
    * The fake speed of the previous state, used to calculate {@link SwerveModuleSimulation#fakePos}.
    */
-  private       double             fakeSpeed;
+  private       double            fakeSpeed;
   /**
    * Last time queried.
    */
-  private       double             lastTime;
+  private       double            lastTime;
   /**
    * Current simulated swerve module state.
    */
-  private       SwerveModuleState2 state;
+  private       SwerveModuleState state;
 
   /**
    * Create simulation class and initialize module at 0.
@@ -45,7 +45,7 @@ public class SwerveModuleSimulation
     timer = new Timer();
     timer.start();
     lastTime = timer.get();
-    state = new SwerveModuleState2(0, Rotation2d.fromDegrees(0), 0);
+    state = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
     fakeSpeed = 0;
     fakePos = 0;
     dt = 0;
@@ -57,7 +57,7 @@ public class SwerveModuleSimulation
    *
    * @param desiredState State the swerve module is set to.
    */
-  public void updateStateAndPosition(SwerveModuleState2 desiredState)
+  public void updateStateAndPosition(SwerveModuleState desiredState)
   {
     dt = timer.get() - lastTime;
     lastTime = timer.get();
@@ -76,16 +76,15 @@ public class SwerveModuleSimulation
   public SwerveModulePosition getPosition()
   {
 
-    return new SwerveModulePosition(
-        fakePos, state.angle.plus(new Rotation2d(state.omegaRadPerSecond * dt)));
+    return new SwerveModulePosition(fakePos, state.angle);
   }
 
   /**
-   * Get the {@link SwerveModuleState2} of the simulated module.
+   * Get the {@link SwerveModuleState} of the simulated module.
    *
-   * @return {@link SwerveModuleState2} of the simulated module.
+   * @return {@link SwerveModuleState} of the simulated module.
    */
-  public SwerveModuleState2 getState()
+  public SwerveModuleState getState()
   {
     return state;
   }

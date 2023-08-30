@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.List;
 import swervelib.SwerveController;
@@ -365,16 +366,15 @@ public class SwerveMath
   /**
    * Perform anti-jitter within modules if the speed requested is too low.
    *
-   * @param moduleState     Current {@link SwerveModuleState2} requested.
-   * @param lastModuleState Previous {@link SwerveModuleState2} used.
+   * @param moduleState     Current {@link SwerveModuleState} requested.
+   * @param lastModuleState Previous {@link SwerveModuleState} used.
    * @param maxSpeed        Maximum speed of the modules, should be in {@link SwerveDriveConfiguration#maxSpeed}.
    */
-  public static void antiJitter(SwerveModuleState2 moduleState, SwerveModuleState2 lastModuleState, double maxSpeed)
+  public static void antiJitter(SwerveModuleState moduleState, SwerveModuleState lastModuleState, double maxSpeed)
   {
     if (Math.abs(moduleState.speedMetersPerSecond) <= (maxSpeed * 0.01))
     {
       moduleState.angle = lastModuleState.angle;
-      moduleState.omegaRadPerSecond = lastModuleState.omegaRadPerSecond;
     }
   }
 }

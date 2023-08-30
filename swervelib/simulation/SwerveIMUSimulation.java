@@ -4,11 +4,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import java.util.Optional;
-import swervelib.math.SwerveKinematics2;
-import swervelib.math.SwerveModuleState2;
 
 /**
  * Simulation for {@link swervelib.SwerveDrive} IMU.
@@ -93,17 +93,18 @@ public class SwerveIMUSimulation
    * Update the odometry of the simulated {@link swervelib.SwerveDrive} and post the {@link swervelib.SwerveModule}
    * states to the {@link Field2d}.
    *
-   * @param kinematics  {@link SwerveKinematics2} of the swerve drive.
-   * @param states      {@link SwerveModuleState2} array of the module states.
+   * @param kinematics  {@link SwerveDriveKinematics} of the swerve drive.
+   * @param states      {@link SwerveModuleState} array of the module states.
    * @param modulePoses {@link Pose2d} representing the swerve modules.
    * @param field       {@link Field2d} to update.
    */
   public void updateOdometry(
-      SwerveKinematics2 kinematics,
-      SwerveModuleState2[] states,
+      SwerveDriveKinematics kinematics,
+      SwerveModuleState[] states,
       Pose2d[] modulePoses,
       Field2d field)
   {
+
     angle += kinematics.toChassisSpeeds(states).omegaRadiansPerSecond * (timer.get() - lastTime);
     lastTime = timer.get();
     field.getObject("XModules").setPoses(modulePoses);

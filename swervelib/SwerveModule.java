@@ -3,10 +3,10 @@ package swervelib;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
-import swervelib.math.SwerveModuleState2;
 import swervelib.motors.SwerveMotor;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.simulation.SwerveModuleSimulation;
@@ -46,9 +46,9 @@ public class SwerveModule
   /**
    * Last swerve module state applied.
    */
-  public  SwerveModuleState2     lastState;
+  public  SwerveModuleState      lastState;
   /**
-   * Enable {@link SwerveModuleState2} optimizations so the angle is reversed and speed is reversed to ensure the module
+   * Enable {@link SwerveModuleState} optimizations so the angle is reversed and speed is reversed to ensure the module
    * never turns more than 90deg.
    */
   public  boolean                moduleStateOptimization  = true;
@@ -147,14 +147,12 @@ public class SwerveModule
    * @param force        Disables optimizations that prevent movement in the angle motor and forces the desired state
    *                     onto the swerve module.
    */
-  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop, boolean force)
+  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean force)
   {
     if (moduleStateOptimization)
     {
-      desiredState = SwerveModuleState2.optimize(desiredState,
-                                                 Rotation2d.fromDegrees(getAbsolutePosition()),
-                                                 lastState,
-                                                 configuration.moduleSteerFFCL);
+      desiredState = SwerveModuleState.optimize(desiredState,
+                                                Rotation2d.fromDegrees(getAbsolutePosition()));
     }
 
     if (isOpenLoop)
@@ -181,24 +179,21 @@ public class SwerveModule
     {
       SmartDashboard.putNumber("Module[" + configuration.name + "] Speed Setpoint:", desiredState.speedMetersPerSecond);
       SmartDashboard.putNumber("Module[" + configuration.name + "] Angle Setpoint:", desiredState.angle.getDegrees());
-      SmartDashboard.putNumber("Module[" + configuration.name + "] Omega:",
-                               Math.toDegrees(desiredState.omegaRadPerSecond));
     }
 
     // Prevent module rotation if angle is the same as the previous angle.
     if (desiredState.angle != lastState.angle || synchronizeEncoderQueued)
     {
-      double moduleFF = desiredState.omegaRadPerSecond * configuration.moduleSteerFFCL;
       // Synchronize encoders if queued and send in the current position as the value from the absolute encoder.
       if (absoluteEncoder != null && synchronizeEncoderQueued)
       {
         double absoluteEncoderPosition = getAbsolutePosition();
         angleMotor.setPosition(absoluteEncoderPosition);
-        angleMotor.setReference(desiredState.angle.getDegrees(), moduleFF, absoluteEncoderPosition);
+        angleMotor.setReference(desiredState.angle.getDegrees(), 0, absoluteEncoderPosition);
         synchronizeEncoderQueued = false;
       } else
       {
-        angleMotor.setReference(desiredState.angle.getDegrees(), moduleFF);
+        angleMotor.setReference(desiredState.angle.getDegrees(), 0);
       }
     }
 
@@ -226,7 +221,7 @@ public class SwerveModule
    *
    * @return Current SwerveModule state.
    */
-  public SwerveModuleState2 getState()
+  public SwerveModuleState getState()
   {
     double     velocity;
     Rotation2d azimuth;
@@ -240,7 +235,7 @@ public class SwerveModule
     {
       return simModule.getState();
     }
-    return new SwerveModuleState2(velocity, azimuth, omega);
+    return new SwerveModuleState(velocity, azimuth);
   }
 
   /**
