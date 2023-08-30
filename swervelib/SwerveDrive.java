@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
@@ -58,6 +60,14 @@ public class SwerveDrive
    * Swerve modules.
    */
   private final SwerveModule[]           swerveModules;
+  /**
+   * WPILib {@link Notifier} to keep odometry up to date.
+   */
+  private final Notifier                 odometryThread;
+  /**
+   * Odometry lock to ensure thread safety.
+   */
+  private final Lock                     odometryLock                 = new ReentrantLock();
   /**
    * Field object.
    */
@@ -101,10 +111,6 @@ public class SwerveDrive
    * The last heading set in radians.
    */
   private       double                   lastHeadingRadians           = 0;
-  /**
-   * WPILib {@link Notifier} to keep odometry up to date.
-   */
-  private final Notifier                 odometryThread;
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
@@ -720,6 +726,7 @@ public class SwerveDrive
    */
   public void updateOdometry()
   {
+    odometryLock.lock();
     // Update odometry
     swerveDrivePoseEstimator.update(getYaw(), getModulePositions());
 
@@ -780,6 +787,7 @@ public class SwerveDrive
     {
       SwerveDriveTelemetry.updateData();
     }
+    odometryLock.unlock();
   }
 
   /**

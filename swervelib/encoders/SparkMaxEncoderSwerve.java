@@ -2,7 +2,10 @@ package swervelib.encoders;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import edu.wpi.first.wpilibj.DriverStation;
+import java.util.function.Supplier;
 import swervelib.motors.SwerveMotor;
 
 /**
@@ -27,12 +30,29 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
     if (motor.getMotor() instanceof CANSparkMax)
     {
       encoder = ((CANSparkMax) motor.getMotor()).getAbsoluteEncoder(Type.kDutyCycle);
-      encoder.setVelocityConversionFactor(conversionFactor);
-      encoder.setPositionConversionFactor(conversionFactor);
+      configureSparkMax(() -> encoder.setVelocityConversionFactor(conversionFactor));
+      configureSparkMax(() -> encoder.setPositionConversionFactor(conversionFactor));
     } else
     {
       throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");
     }
+  }
+
+  /**
+   * Run the configuration until it succeeds or times out.
+   *
+   * @param config Lambda supplier returning the error state.
+   */
+  private void configureSparkMax(Supplier<REVLibError> config)
+  {
+    for (int i = 0; i < maximumRetries; i++)
+    {
+      if (config.get() == REVLibError.kOk)
+      {
+        return;
+      }
+    }
+    DriverStation.reportWarning("Failure configuring encoder", true);
   }
 
   /**

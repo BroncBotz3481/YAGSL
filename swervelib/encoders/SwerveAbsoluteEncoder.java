@@ -7,9 +7,13 @@ public abstract class SwerveAbsoluteEncoder
 {
 
   /**
+   * The maximum amount of times the swerve encoder will attempt to configure itself if failures occur.
+   */
+  public final int     maximumRetries = 5;
+  /**
    * Last angle reading was faulty.
    */
-  public boolean readingError = false;
+  public       boolean readingError   = false;
 
   /**
    * Reset the encoder to factory defaults.
