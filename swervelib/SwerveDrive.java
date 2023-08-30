@@ -601,7 +601,9 @@ public class SwerveDrive
   public void setMaximumSpeed(double maximumSpeed, boolean updateModuleFeedforward)
   {
     swerveDriveConfiguration.maxSpeed = maximumSpeed;
+//    swerveDriveConfiguration.attainableMaxTranslationalSpeedMetersPerSecond = maximumSpeed;
     swerveController.config.maxSpeed = maximumSpeed;
+//    swerveDriveConfiguration.attainableMaxRotationalVelocityRadiansPerSecond = swerveController.config.maxAngularVelocity;
     for (SwerveModule module : swerveModules)
     {
       module.configuration.maxSpeed = maximumSpeed;
