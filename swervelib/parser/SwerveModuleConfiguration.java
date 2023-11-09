@@ -1,13 +1,9 @@
 package swervelib.parser;
 
-import static swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
-import static swervelib.math.SwerveMath.calculateMaxAcceleration;
-import static swervelib.math.SwerveMath.calculateMetersPerRotation;
-
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.motors.SwerveMotor;
+import swervelib.parser.json.MotorConfigDouble;
 
 /**
  * Swerve Module configuration class which is used to configure {@link swervelib.SwerveModule}.
@@ -15,6 +11,13 @@ import swervelib.motors.SwerveMotor;
 public class SwerveModuleConfiguration
 {
 
+  /**
+   * Conversion factor for drive motor onboard PID's and angle PID's. Use
+   * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} and
+   * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)} respectively to calculate the
+   * conversion factors.
+   */
+  public final MotorConfigDouble conversionFactors;
   /**
    * Angle offset in degrees for the Swerve Module.
    */
@@ -32,10 +35,6 @@ public class SwerveModuleConfiguration
    */
   public final boolean                             angleMotorInverted;
   /**
-   * Maximum robot speed in meters per second.
-   */
-  public       double                              maxSpeed;
-  /**
    * PIDF configuration options for the angle motor closed-loop PID controller.
    */
   public       PIDFConfig                          anglePIDF;
@@ -43,14 +42,6 @@ public class SwerveModuleConfiguration
    * PIDF configuration options for the drive motor closed-loop PID controller.
    */
   public       PIDFConfig                          velocityPIDF;
-  /**
-   * Angle volt-meter-per-second.
-   */
-  public       double                              moduleSteerFFCL;
-  /**
-   * The integrated encoder pulse per revolution.
-   */
-  public       double                              angleMotorEncoderPulsePerRevolution = 0;
   /**
    * Swerve module location relative to the robot.
    */
@@ -75,41 +66,39 @@ public class SwerveModuleConfiguration
   /**
    * Construct a configuration object for swerve modules.
    *
-   * @param driveMotor                          Drive {@link SwerveMotor}.
-   * @param angleMotor                          Angle {@link SwerveMotor}
-   * @param absoluteEncoder                     Absolute encoder {@link SwerveAbsoluteEncoder}.
-   * @param angleOffset                         Absolute angle offset to 0.
-   * @param absoluteEncoderInverted             Absolute encoder inverted.
-   * @param angleMotorInverted                  State of inversion of the angle motor.
-   * @param driveMotorInverted                  Drive motor inverted.
-   * @param xMeters                             Module location in meters from the center horizontally.
-   * @param yMeters                             Module location in meters from center vertically.
-   * @param anglePIDF                           Angle PIDF configuration.
-   * @param velocityPIDF                        Velocity PIDF configuration.
-   * @param maxSpeed                            Maximum speed in meters per second.
-   * @param physicalCharacteristics             Physical characteristics of the swerve module.
-   * @param angleMotorEncoderPulsePerRevolution The encoder pulse per revolution for the angle motor encoder.
-   * @param name                                The name for the swerve module.
+   * @param driveMotor              Drive {@link SwerveMotor}.
+   * @param angleMotor              Angle {@link SwerveMotor}
+   * @param absoluteEncoder         Absolute encoder {@link SwerveAbsoluteEncoder}.
+   * @param angleOffset             Absolute angle offset to 0.
+   * @param absoluteEncoderInverted Absolute encoder inverted.
+   * @param angleMotorInverted      State of inversion of the angle motor.
+   * @param driveMotorInverted      Drive motor inverted.
+   * @param xMeters                 Module location in meters from the center horizontally.
+   * @param yMeters                 Module location in meters from center vertically.
+   * @param anglePIDF               Angle PIDF configuration.
+   * @param velocityPIDF            Velocity PIDF configuration.
+   * @param physicalCharacteristics Physical characteristics of the swerve module.
+   * @param name                    The name for the swerve module.
    */
   public SwerveModuleConfiguration(
       SwerveMotor driveMotor,
       SwerveMotor angleMotor,
+      MotorConfigDouble conversionFactors,
       SwerveAbsoluteEncoder absoluteEncoder,
       double angleOffset,
       double xMeters,
       double yMeters,
       PIDFConfig anglePIDF,
       PIDFConfig velocityPIDF,
-      double maxSpeed,
       SwerveModulePhysicalCharacteristics physicalCharacteristics,
       boolean absoluteEncoderInverted,
       boolean driveMotorInverted,
       boolean angleMotorInverted,
-      double angleMotorEncoderPulsePerRevolution,
       String name)
   {
     this.driveMotor = driveMotor;
     this.angleMotor = angleMotor;
+    this.conversionFactors = conversionFactors;
     this.absoluteEncoder = absoluteEncoder;
     this.angleOffset = angleOffset;
     this.absoluteEncoderInverted = absoluteEncoderInverted;
@@ -118,10 +107,7 @@ public class SwerveModuleConfiguration
     this.moduleLocation = new Translation2d(xMeters, yMeters);
     this.anglePIDF = anglePIDF;
     this.velocityPIDF = velocityPIDF;
-    this.maxSpeed = maxSpeed;
-    this.moduleSteerFFCL = physicalCharacteristics.moduleSteerFFCL;
     this.physicalCharacteristics = physicalCharacteristics;
-    this.angleMotorEncoderPulsePerRevolution = angleMotorEncoderPulsePerRevolution;
     this.name = name;
   }
 
@@ -131,78 +117,45 @@ public class SwerveModuleConfiguration
    *
    * @param driveMotor              Drive {@link SwerveMotor}.
    * @param angleMotor              Angle {@link SwerveMotor}
+   * @param conversionFactors       Conversion factors for angle/azimuth motors drive factors.
    * @param absoluteEncoder         Absolute encoder {@link SwerveAbsoluteEncoder}.
    * @param angleOffset             Absolute angle offset to 0.
    * @param xMeters                 Module location in meters from the center horizontally.
    * @param yMeters                 Module location in meters from center vertically.
    * @param anglePIDF               Angle PIDF configuration.
    * @param velocityPIDF            Velocity PIDF configuration.
-   * @param maxSpeed                Maximum robot speed in meters per second.
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    * @param name                    Name for the module.
    */
   public SwerveModuleConfiguration(
       SwerveMotor driveMotor,
       SwerveMotor angleMotor,
+      MotorConfigDouble conversionFactors,
       SwerveAbsoluteEncoder absoluteEncoder,
       double angleOffset,
       double xMeters,
       double yMeters,
       PIDFConfig anglePIDF,
       PIDFConfig velocityPIDF,
-      double maxSpeed,
       SwerveModulePhysicalCharacteristics physicalCharacteristics,
       String name)
   {
     this(
         driveMotor,
         angleMotor,
+        conversionFactors,
         absoluteEncoder,
         angleOffset,
         xMeters,
         yMeters,
         anglePIDF,
         velocityPIDF,
-        maxSpeed,
         physicalCharacteristics,
         false,
         false,
         false,
-        physicalCharacteristics.angleEncoderPulsePerRotation,
         name);
   }
 
-  /**
-   * Create the drive feedforward for swerve modules.
-   *
-   * @return Drive feedforward for drive motor on a swerve module.
-   */
-  public SimpleMotorFeedforward createDriveFeedforward()
-  {
-    double kv = physicalCharacteristics.optimalVoltage / maxSpeed;
-    /// ^ Volt-seconds per meter (max voltage divided by max speed)
-    double ka =
-        physicalCharacteristics.optimalVoltage
-        / calculateMaxAcceleration(physicalCharacteristics.wheelGripCoefficientOfFriction);
-    /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
-    return new SimpleMotorFeedforward(0, kv, ka);
-  }
 
-  /**
-   * Get the encoder conversion for position encoders.
-   *
-   * @param isDriveMotor For the drive motor.
-   * @return Position encoder conversion factor.
-   */
-  public double getPositionEncoderConversion(boolean isDriveMotor)
-  {
-    return isDriveMotor
-           ? calculateMetersPerRotation(
-        physicalCharacteristics.wheelDiameter,
-        physicalCharacteristics.driveGearRatio,
-        physicalCharacteristics.driveEncoderPulsePerRotation)
-           : calculateDegreesPerSteeringRotation(
-               physicalCharacteristics.angleGearRatio,
-               angleMotorEncoderPulsePerRevolution);
-  }
 }

@@ -12,11 +12,11 @@ public abstract class SwerveMotor
   /**
    * The maximum amount of times the swerve motor will attempt to configure a motor if failures occur.
    */
-  public final int maximumRetries = 5;
+  public final int     maximumRetries = 5;
   /**
    * Whether the swerve motor is a drive motor.
    */
-  protected boolean isDriveMotor;
+  protected    boolean isDriveMotor;
 
   /**
    * Configure the factory defaults.

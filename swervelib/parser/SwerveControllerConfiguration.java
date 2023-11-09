@@ -18,10 +18,6 @@ public class SwerveControllerConfiguration
   public final double
                           angleJoyStickRadiusDeadband; // Deadband for the minimum hypot for the heading joystick.
   /**
-   * Maximum robot speed in meters per second.
-   */
-  public       double     maxSpeed;
-  /**
    * Maximum angular velocity in rad/s
    */
   public       double     maxAngularVelocity;
@@ -29,19 +25,20 @@ public class SwerveControllerConfiguration
   /**
    * Construct the swerve controller configuration.
    *
-   * @param driveCfg                    Drive configuration.
    * @param headingPIDF                 Heading PIDF configuration.
    * @param angleJoyStickRadiusDeadband Deadband on radius of angle joystick.
+   * @param maxSpeedMPS                 Maximum speed in meters per second for angular velocity, remember if you have
+   *                                    feet per second use {@link edu.wpi.first.math.util.Units#feetToMeters(double)}.
    */
   public SwerveControllerConfiguration(
       SwerveDriveConfiguration driveCfg,
       PIDFConfig headingPIDF,
-      double angleJoyStickRadiusDeadband)
+      double angleJoyStickRadiusDeadband,
+      double maxSpeedMPS)
   {
-    this.maxSpeed = driveCfg.maxSpeed;
     this.maxAngularVelocity =
         calculateMaxAngularVelocity(
-            driveCfg.maxSpeed,
+            maxSpeedMPS,
             Math.abs(driveCfg.moduleLocationsMeters[0].getX()),
             Math.abs(driveCfg.moduleLocationsMeters[0].getY()));
     this.headingPIDF = headingPIDF;
@@ -54,9 +51,11 @@ public class SwerveControllerConfiguration
    *
    * @param driveCfg    Drive configuration.
    * @param headingPIDF Heading PIDF configuration.
+   * @param maxSpeedMPS Maximum speed in meters per second for angular velocity, remember if you have feet per second
+   *                    use {@link edu.wpi.first.math.util.Units#feetToMeters(double)}.
    */
-  public SwerveControllerConfiguration(SwerveDriveConfiguration driveCfg, PIDFConfig headingPIDF)
+  public SwerveControllerConfiguration(SwerveDriveConfiguration driveCfg, PIDFConfig headingPIDF, double maxSpeedMPS)
   {
-    this(driveCfg, headingPIDF, 0.5);
+    this(driveCfg, headingPIDF, 0.5, maxSpeedMPS);
   }
 }

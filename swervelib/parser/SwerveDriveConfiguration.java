@@ -1,5 +1,6 @@
 package swervelib.parser;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import swervelib.SwerveModule;
 import swervelib.imu.SwerveIMU;
@@ -13,69 +14,69 @@ public class SwerveDriveConfiguration
   /**
    * Swerve Module locations.
    */
-  public Translation2d[] moduleLocationsMeters;
+  public Translation2d[]                     moduleLocationsMeters;
   /**
    * Swerve IMU
    */
-  public SwerveIMU       imu;
+  public SwerveIMU                           imu;
   /**
    * Invert the imu measurements.
    */
-  public boolean         invertedIMU = false;
-  /**
-   * Max module speed in meters per second.
-   */
-  public double          maxSpeed, attainableMaxTranslationalSpeedMetersPerSecond,
-      attainableMaxRotationalVelocityRadiansPerSecond;
+  public boolean                             invertedIMU = false;
   /**
    * Number of modules on the robot.
    */
-  public int            moduleCount;
+  public int                                 moduleCount;
   /**
    * Swerve Modules.
    */
-  public SwerveModule[] modules;
+  public SwerveModule[]                      modules;
+  /**
+   * Physical characteristics of the swerve drive from physicalproperties.json.
+   */
+  public SwerveModulePhysicalCharacteristics physicalCharacteristics;
 
   /**
    * Create swerve drive configuration.
    *
-   * @param moduleConfigs Module configuration.
-   * @param swerveIMU     Swerve IMU.
-   * @param maxSpeed      Max speed of the robot in meters per second.
-   * @param invertedIMU   Invert the IMU.
+   * @param moduleConfigs    Module configuration.
+   * @param swerveIMU        Swerve IMU.
+   * @param invertedIMU      Invert the IMU.
+   * @param driveFeedforward The drive motor feedforward to use for the {@link SwerveModule}.
    */
   public SwerveDriveConfiguration(
       SwerveModuleConfiguration[] moduleConfigs,
       SwerveIMU swerveIMU,
-      double maxSpeed,
-      boolean invertedIMU)
+      boolean invertedIMU,
+      SimpleMotorFeedforward driveFeedforward,
+      SwerveModulePhysicalCharacteristics physicalCharacteristics)
   {
     this.moduleCount = moduleConfigs.length;
     this.imu = swerveIMU;
-    this.maxSpeed = maxSpeed;
-    this.attainableMaxRotationalVelocityRadiansPerSecond = 0;
-    this.attainableMaxTranslationalSpeedMetersPerSecond = 0;
     this.invertedIMU = invertedIMU;
-    this.modules = createModules(moduleConfigs);
+    this.modules = createModules(moduleConfigs, driveFeedforward);
     this.moduleLocationsMeters = new Translation2d[moduleConfigs.length];
     for (SwerveModule module : modules)
     {
       this.moduleLocationsMeters[module.moduleNumber] = module.configuration.moduleLocation;
     }
+    this.physicalCharacteristics = physicalCharacteristics;
   }
 
   /**
    * Create modules based off of the SwerveModuleConfiguration.
    *
-   * @param swerves Swerve constants.
+   * @param swerves          Swerve constants.
+   * @param driveFeedforward Drive feedforward created using
+   *                         {@link swervelib.math.SwerveMath#createDriveFeedforward(double, double, double)}.
    * @return Swerve Modules.
    */
-  public SwerveModule[] createModules(SwerveModuleConfiguration[] swerves)
+  public SwerveModule[] createModules(SwerveModuleConfiguration[] swerves, SimpleMotorFeedforward driveFeedforward)
   {
     SwerveModule[] modArr = new SwerveModule[swerves.length];
     for (int i = 0; i < swerves.length; i++)
     {
-      modArr[i] = new SwerveModule(i, swerves[i]);
+      modArr[i] = new SwerveModule(i, swerves[i], driveFeedforward);
     }
     return modArr;
   }

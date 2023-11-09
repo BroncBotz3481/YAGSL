@@ -2,12 +2,13 @@ package swervelib.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
+import swervelib.math.SwerveMath;
 import swervelib.parser.json.ControllerPropertiesJson;
 import swervelib.parser.json.ModuleJson;
 import swervelib.parser.json.PIDFPropertiesJson;
@@ -127,11 +128,78 @@ public class SwerveParser
   /**
    * Create {@link SwerveDrive} from JSON configuration directory.
    *
+   * @param maxSpeed Maximum speed of the robot in meters per second, used for both angular acceleration used in
+   *                 {@link swervelib.SwerveController} and drive feedforward in
+   *                 {@link SwerveMath#createDriveFeedforward(double, double, double)}.
    * @return {@link SwerveDrive} instance.
    */
-  public SwerveDrive createSwerveDrive()
+  public SwerveDrive createSwerveDrive(double maxSpeed)
   {
-    double maxSpeedMPS = Units.feetToMeters(swerveDriveJson.maxSpeed);
+    return createSwerveDrive(SwerveMath.createDriveFeedforward(physicalPropertiesJson.optimalVoltage,
+                                                               maxSpeed,
+                                                               physicalPropertiesJson.wheelGripCoefficientOfFriction),
+                             maxSpeed);
+  }
+
+  /**
+   * Create {@link SwerveDrive} from JSON configuration directory.
+   *
+   * @param maxSpeed                   Maximum speed of the robot in meters per second, used for both angular
+   *                                   acceleration used in {@link swervelib.SwerveController} and drive feedforward in
+   *                                   {@link SwerveMath#createDriveFeedforward(double, double, double)}.
+   * @param angleMotorConversionFactor Angle (AKA azimuth) motor conversion factor to convert motor controller PID loop
+   *                                   units to degrees, usually created using
+   *                                   {@link SwerveMath#calculateDegreesPerSteeringRotation(double, double)}.
+   * @param driveMotorConversion       Drive motor conversion factor to convert motor controller PID loop units to
+   *                                   meters per rotation, usually created using
+   *                                   {@link SwerveMath#calculateMetersPerRotation(double, double, double)}.
+   * @return {@link SwerveDrive} instance.
+   */
+  public SwerveDrive createSwerveDrive(double maxSpeed, double angleMotorConversionFactor, double driveMotorConversion)
+  {
+    physicalPropertiesJson.conversionFactor.angle = angleMotorConversionFactor;
+    physicalPropertiesJson.conversionFactor.drive = driveMotorConversion;
+    return createSwerveDrive(SwerveMath.createDriveFeedforward(physicalPropertiesJson.optimalVoltage,
+                                                               maxSpeed,
+                                                               physicalPropertiesJson.wheelGripCoefficientOfFriction),
+                             maxSpeed);
+  }
+
+  /**
+   * Create {@link SwerveDrive} from JSON configuration directory.
+   *
+   * @param driveFeedforward           Drive feedforward to use for swerve modules, should be created using
+   *                                   {@link swervelib.math.SwerveMath#createDriveFeedforward(double, double,
+   *                                   double)}.
+   * @param maxSpeed                   Maximum speed of the robot in meters per second for normal+angular acceleration
+   *                                   in {@link swervelib.SwerveController} of the robot.
+   * @param angleMotorConversionFactor Angle (AKA azimuth) motor conversion factor to convert motor controller PID loop
+   *                                   units to degrees, usually created using
+   *                                   {@link SwerveMath#calculateDegreesPerSteeringRotation(double, double)}.
+   * @param driveMotorConversion       Drive motor conversion factor to convert motor controller PID loop units to
+   *                                   meters per rotation, usually created using
+   *                                   {@link SwerveMath#calculateMetersPerRotation(double, double, double)}.
+   * @return {@link SwerveDrive} instance.
+   */
+  public SwerveDrive createSwerveDrive(SimpleMotorFeedforward driveFeedforward, double maxSpeed,
+                                       double angleMotorConversionFactor, double driveMotorConversion)
+  {
+    physicalPropertiesJson.conversionFactor.angle = angleMotorConversionFactor;
+    physicalPropertiesJson.conversionFactor.drive = driveMotorConversion;
+    return createSwerveDrive(driveFeedforward, maxSpeed);
+  }
+
+  /**
+   * Create {@link SwerveDrive} from JSON configuration directory.
+   *
+   * @param driveFeedforward Drive feedforward to use for swerve modules, should be created using
+   *                         {@link swervelib.math.SwerveMath#createDriveFeedforward(double, double, double)}.
+   * @param maxSpeed         Maximum speed of the robot in meters per second for normal+angular acceleration in
+   *                         {@link swervelib.SwerveController} of the robot
+   * @return {@link SwerveDrive} instance.
+   */
+  public SwerveDrive createSwerveDrive(SimpleMotorFeedforward driveFeedforward, double maxSpeed)
+  {
     SwerveModuleConfiguration[] moduleConfigurations =
         new SwerveModuleConfiguration[moduleJsons.length];
     for (int i = 0; i < moduleConfigurations.length; i++)
@@ -141,19 +209,19 @@ public class SwerveParser
           module.createModuleConfiguration(
               pidfPropertiesJson.angle,
               pidfPropertiesJson.drive,
-              maxSpeedMPS,
-              physicalPropertiesJson.createPhysicalProperties(swerveDriveJson.optimalVoltage),
+              physicalPropertiesJson.createPhysicalProperties(),
               swerveDriveJson.modules[i]);
     }
     SwerveDriveConfiguration swerveDriveConfiguration =
         new SwerveDriveConfiguration(
             moduleConfigurations,
             swerveDriveJson.imu.createIMU(),
-            maxSpeedMPS,
-            swerveDriveJson.invertedIMU);
+            swerveDriveJson.invertedIMU,
+            driveFeedforward,
+            physicalPropertiesJson.createPhysicalProperties());
 
     return new SwerveDrive(
         swerveDriveConfiguration,
-        controllerPropertiesJson.createControllerConfiguration(swerveDriveConfiguration));
+        controllerPropertiesJson.createControllerConfiguration(swerveDriveConfiguration, maxSpeed), maxSpeed);
   }
 }

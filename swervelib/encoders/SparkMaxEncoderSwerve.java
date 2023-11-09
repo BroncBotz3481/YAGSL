@@ -20,7 +20,7 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
   public AbsoluteEncoder encoder;
 
   /**
-   * Create the {@link AbsoluteEncoder} object as a duty cycle. from the {@link CANSparkMax} motor.
+   * Create the {@link SparkMaxEncoderSwerve} object as a duty cycle from the {@link CANSparkMax} motor.
    *
    * @param motor            Motor to create the encoder from.
    * @param conversionFactor The conversion factor to set if the output is not from 0 to 360.

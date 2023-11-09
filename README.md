@@ -1,3 +1,4 @@
+<a href='https://ko-fi.com/yagsl' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Robot at ko-fi.com'></a>
 # Yet Another Generic Swerve Library
 * In early 2023 `swerve-lib` created by SwerveDriveSpecialties officially became unmaintained after not being updated in 2022.
 * This library aims to simplify Swerve Drive implementations while not sacrificing speed or processing power.
@@ -6,7 +7,9 @@
 * The swerve drive is configurable via JSON files, and you can initialize the entire swerve drive with a similar line as the following.
 * Simulation support.
 ```java
-SwerveDrive swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve")).createSwerveDrive();
+import edu.wpi.first.math.util.Units;
+
+SwerveDrive swerveDrive=new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(Units.feetToMeters(14.5));
 ```
 * The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [deploy](./deploy).
 
