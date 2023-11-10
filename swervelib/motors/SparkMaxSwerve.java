@@ -181,6 +181,10 @@ public class SparkMaxSwerve extends SwerveMotor
   {
     if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
     {
+      DriverStation.reportWarning(
+          "IF possible configure the duty cycle encoder offset in the REV Hardware Client instead of using the" +
+          " absoluteEncoderOffset in the Swerve Module JSON!",
+          false);
       absoluteEncoder = (AbsoluteEncoder) encoder.getAbsoluteEncoder();
       configureSparkMax(() -> pid.setFeedbackDevice(absoluteEncoder));
     }

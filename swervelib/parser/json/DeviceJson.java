@@ -53,6 +53,11 @@ public class DeviceJson
    */
   public SwerveAbsoluteEncoder createEncoder(SwerveMotor motor)
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "none":
@@ -87,6 +92,11 @@ public class DeviceJson
    */
   public SwerveIMU createIMU()
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "adis16448":
@@ -130,6 +140,11 @@ public class DeviceJson
    */
   public SwerveMotor createMotor(boolean isDriveMotor)
   {
+    if (id > 40)
+    {
+      DriverStation.reportWarning("CAN IDs greater than 40 can cause undefined behaviour, please use a CAN ID below 40!",
+                                  false);
+    }
     switch (type)
     {
       case "sparkmax_brushed":
