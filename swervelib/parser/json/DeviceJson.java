@@ -71,11 +71,11 @@ public class DeviceJson
       case "ma3":
       case "ctre_mag":
       case "rev_hex":
+      case "throughbore":
       case "am_mag":
       case "dutycycle":
         return new PWMDutyCycleEncoderSwerve(id);
       case "thrifty":
-      case "throughbore":
       case "analog":
         return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
