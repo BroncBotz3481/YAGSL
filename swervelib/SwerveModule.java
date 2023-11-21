@@ -66,6 +66,11 @@ public class SwerveModule
   private boolean                synchronizeEncoderQueued = false;
 
   /**
+   * Absolute Encoder Read Issue Dectected. 
+   */
+  public boolean                  absoluteEncoderReadIssue = false;
+
+  /**
    * Construct the swerve module and initialize the swerve module motors and absolute encoder.
    *
    * @param moduleNumber        Module number for kinematics.
@@ -298,13 +303,16 @@ public class SwerveModule
     double angle;
     if (absoluteEncoder != null)
     {
+      absoluteEncoderReadIssue = false;
       angle = absoluteEncoder.getAbsolutePosition() - angleOffset;
       if (absoluteEncoder.readingError)
       {
+        absoluteEncoderReadIssue = true;
         angle = getRelativePosition();
       }
     } else
     {
+      absoluteEncoderReadIssue = true;
       angle = getRelativePosition();
     }
     angle %= 360;
@@ -386,5 +394,15 @@ public class SwerveModule
   public SwerveModuleConfiguration getConfiguration()
   {
     return configuration;
+  }
+
+  /*
+   * Get if the last Absolute Encoder had a read issue.
+   * 
+   * @return If the last Absolute Encoder had a read issue.
+   */
+  public boolean getAbsoluteEncoderReadIssue()
+  {
+    return absoluteEncoderReadIssue;
   }
 }
