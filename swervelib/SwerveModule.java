@@ -256,7 +256,7 @@ public class SwerveModule
     if (!SwerveDriveTelemetry.isSimulation)
     {
       velocity = driveMotor.getVelocity();
-      azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
+      azimuth = Rotation2d.fromDegrees(getAbsolutePosition());
     } else
     {
       return simModule.getState();
