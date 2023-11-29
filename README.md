@@ -20,7 +20,7 @@ SwerveDrive swerveDrive=new SwerveParser(new File(Filesystem.getDeployDirectory(
 # Library Information
 ### Installation
 - [ ] Install NavX Library
-- [ ] Install Pheonix Library
+- [ ] Install Phoenix Library
 - [ ] Install REVLib.
 - [ ] Install YAGSL (`https://broncbotz3481.github.io/YAGSL-Lib/yagsl/yagsl.json`)  
 

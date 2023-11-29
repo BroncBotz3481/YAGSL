@@ -901,6 +901,8 @@ public class SwerveDrive
               "Module[" + module.configuration.name + "] Relative Encoder", module.getRelativePosition());
           SmartDashboard.putNumber(
               "Module[" + module.configuration.name + "] Absolute Encoder", module.getAbsolutePosition());
+          SmartDashboard.putNumber(
+                "Module[" + module.configuration.name + "] Absolute Encoder Read Issue", module.getAbsoluteEncoderReadIssue());
         }
         if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
         {
