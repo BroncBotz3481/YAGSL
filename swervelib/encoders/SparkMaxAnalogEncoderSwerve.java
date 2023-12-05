@@ -3,35 +3,33 @@ package swervelib.encoders;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxAnalogSensor;
+import com.revrobotics.SparkMaxAnalogSensor.Mode;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.function.Supplier;
 import swervelib.motors.SwerveMotor;
 
 /**
- * SparkMax absolute encoder, attached through the data port.
+ * SparkMax absolute encoder, attached through the data port analog pin.
  */
-public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
+public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
    * The {@link AbsoluteEncoder} representing the duty cycle encoder attached to the SparkMax.
    */
-  public AbsoluteEncoder encoder;
+  public SparkMaxAnalogSensor encoder;
 
   /**
-   * Create the {@link SparkMaxEncoderSwerve} object as a duty cycle from the {@link CANSparkMax} motor.
+   * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data port analog pin.
    *
    * @param motor            Motor to create the encoder from.
-   * @param conversionFactor The conversion factor to set if the output is not from 0 to 360.
    */
-  public SparkMaxEncoderSwerve(SwerveMotor motor, int conversionFactor)
+  public SparkMaxAnalogEncoderSwerve(SwerveMotor motor)
   {
     if (motor.getMotor() instanceof CANSparkMax)
     {
-      encoder = ((CANSparkMax) motor.getMotor()).getAbsoluteEncoder(Type.kDutyCycle);
-      configureSparkMax(() -> encoder.setVelocityConversionFactor(conversionFactor));
-      configureSparkMax(() -> encoder.setPositionConversionFactor(conversionFactor));
+      encoder = ((CANSparkMax) motor.getMotor()).getAnalog(Mode.kAbsolute);
     } else
     {
       throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");

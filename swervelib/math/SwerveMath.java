@@ -24,8 +24,8 @@ public class SwerveMath
 {
 
   /**
-   * Calculate the meters per rotation for the integrated encoder. Calculation: 4in diameter wheels * pi [circumfrence]
-   * / gear ratio.
+   * Calculate the meters per rotation for the integrated encoder. Calculation: (PI * WHEEL DIAMETER IN METERS) / (GEAR
+   * RATIO * ENCODER RESOLUTION)
    *
    * @param wheelDiameter    Wheel diameter in meters.
    * @param driveGearRatio   The gear ratio of the drive motor.

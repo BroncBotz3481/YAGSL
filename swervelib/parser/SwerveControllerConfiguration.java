@@ -23,8 +23,10 @@ public class SwerveControllerConfiguration
   public       double     maxAngularVelocity;
 
   /**
-   * Construct the swerve controller configuration.
+   * Construct the swerve controller configuration. Assumes robot is square to fetch maximum angular velocity.
    *
+   * @param driveCfg                    {@link SwerveDriveConfiguration} to fetch the first module X and Y used to
+   *                                    calculate the maximum angular velocity.
    * @param headingPIDF                 Heading PIDF configuration.
    * @param angleJoyStickRadiusDeadband Deadband on radius of angle joystick.
    * @param maxSpeedMPS                 Maximum speed in meters per second for angular velocity, remember if you have

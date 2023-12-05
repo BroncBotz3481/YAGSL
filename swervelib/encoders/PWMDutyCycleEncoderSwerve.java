@@ -1,5 +1,6 @@
 package swervelib.encoders;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 /**
@@ -63,6 +64,18 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
   public Object getAbsoluteEncoder()
   {
     return encoder;
+  }
+
+  /**
+   * Get the velocity in degrees/sec.
+   *
+   * @return velocity in degrees/sec.
+   */
+  @Override
+  public double getVelocity()
+  {
+    DriverStation.reportWarning("The PWM Duty Cycle encoder may not report accurate velocities!", true);
+    return encoder.get();
   }
 
   /**

@@ -1,4 +1,3 @@
-<a href='https://ko-fi.com/yagsl' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Robot at ko-fi.com'></a>
 # Yet Another Generic Swerve Library
 * In early 2023 `swerve-lib` created by SwerveDriveSpecialties officially became unmaintained after not being updated in 2022.
 * This library aims to simplify Swerve Drive implementations while not sacrificing speed or processing power.
@@ -41,3 +40,5 @@ https://user-images.githubusercontent.com/10247070/219801595-b9705a0a-74f1-41c8-
 
 https://user-images.githubusercontent.com/10247070/219801620-c2850078-9b58-4f32-95b4-0f8f6fba23d4.mp4
 
+# Support our developers!
+<a href='https://ko-fi.com/yagsl' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Robot at ko-fi.com'></a>

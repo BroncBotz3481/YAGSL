@@ -137,4 +137,15 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   {
     return encoder;
   }
+
+  /**
+   * Get the velocity in degrees/sec.
+   *
+   * @return velocity in degrees/sec.
+   */
+  @Override
+  public double getVelocity()
+  {
+    return encoder.getVelocity();
+  }
 }
