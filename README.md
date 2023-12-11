@@ -29,8 +29,8 @@ SwerveDrive swerveDrive=new SwerveParser(new File(Filesystem.getDeployDirectory(
 # Java docs is [here](https://broncbotz3481.github.io/YAGSL/).
 
 # Images
-![Field Shuffleboard](./imgaes/field.png)
-![Simulation](./imgaes/simulation.png)  
+![Field Shuffleboard](./images/field.png)
+![Simulation](./images/simulation.png)  
 
 # Falcon Video
 
