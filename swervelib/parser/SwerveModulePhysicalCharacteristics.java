@@ -11,7 +11,7 @@ public class SwerveModulePhysicalCharacteristics
   /**
    * Current limits for the Swerve Module.
    */
-  public final int    driveMotorCurrentLimit, angleMotorCurrentLimit;
+  public final int driveMotorCurrentLimit, angleMotorCurrentLimit;
   /**
    * The time it takes for the motor to go from 0 to full throttle in seconds.
    */

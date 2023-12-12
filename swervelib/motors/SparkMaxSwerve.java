@@ -214,19 +214,23 @@ public class SparkMaxSwerve extends SwerveMotor
       configureSparkMax(() -> {
         if (absoluteEncoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
         {
-          return ((AbsoluteEncoder) absoluteEncoder.getAbsoluteEncoder()).setPositionConversionFactor(positionConversionFactor);
+          return ((AbsoluteEncoder) absoluteEncoder.getAbsoluteEncoder()).setPositionConversionFactor(
+              positionConversionFactor);
         } else
         {
-          return ((SparkMaxAnalogSensor)absoluteEncoder.getAbsoluteEncoder()).setPositionConversionFactor(positionConversionFactor);
+          return ((SparkMaxAnalogSensor) absoluteEncoder.getAbsoluteEncoder()).setPositionConversionFactor(
+              positionConversionFactor);
         }
       });
       configureSparkMax(() -> {
         if (absoluteEncoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
         {
-          return ((AbsoluteEncoder) absoluteEncoder.getAbsoluteEncoder()).setVelocityConversionFactor(positionConversionFactor / 60);
+          return ((AbsoluteEncoder) absoluteEncoder.getAbsoluteEncoder()).setVelocityConversionFactor(
+              positionConversionFactor / 60);
         } else
         {
-          return ((SparkMaxAnalogSensor)absoluteEncoder.getAbsoluteEncoder()).setVelocityConversionFactor(positionConversionFactor / 60);
+          return ((SparkMaxAnalogSensor) absoluteEncoder.getAbsoluteEncoder()).setVelocityConversionFactor(
+              positionConversionFactor / 60);
         }
       });
     }

@@ -139,6 +139,25 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
+   * Sets the Absolute Encoder Offset inside of the CANcoder's Memory.
+   *
+   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @return if setting Absolute Encoder Offset was successful or not.
+   */
+  @Override
+  public boolean setAbsoluteEncoderOffset(double offset)
+  {
+    ErrorCode error = encoder.configMagnetOffset(offset);
+    if (error == ErrorCode.OK)
+    {
+      return true;
+    }
+    DriverStation.reportWarning(
+        "Failure to set CANCoder " + encoder.getDeviceID() + " Absolute Encoder Offset Error: " + error, false);
+    return false;
+  }
+
+  /**
    * Get the velocity in degrees/sec.
    *
    * @return velocity in degrees/sec.

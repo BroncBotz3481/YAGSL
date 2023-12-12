@@ -14,7 +14,7 @@ public class PhysicalPropertiesJson
    * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)} for angle motors or
    * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} for drive motors.
    */
-  public MotorConfigDouble conversionFactor = new MotorConfigDouble(0, 0);
+  public MotorConfigDouble conversionFactor               = new MotorConfigDouble(0, 0);
   /**
    * The current limit in AMPs to apply to the motors.
    */

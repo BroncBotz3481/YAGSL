@@ -107,6 +107,28 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
+   * Sets the Absolute Encoder Offset inside of the SparkMax's Memory.
+   *
+   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @return if setting Absolute Encoder Offset was successful or not.
+   */
+  @Override
+  public boolean setAbsoluteEncoderOffset(double offset)
+  {
+    REVLibError error = null;
+    for (int i = 0; i < maximumRetries; i++)
+    {
+      error = encoder.setZeroOffset(offset);
+      if (error == REVLibError.kOk)
+      {
+        return true;
+      }
+    }
+    DriverStation.reportWarning("Failure to set Absolute Encoder Offset Error: " + error, false);
+    return false;
+  }
+
+  /**
    * Get the velocity in degrees/sec.
    *
    * @return velocity in degrees/sec.

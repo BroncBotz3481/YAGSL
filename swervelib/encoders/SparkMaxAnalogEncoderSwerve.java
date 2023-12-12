@@ -1,6 +1,5 @@
 package swervelib.encoders;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxAnalogSensor;
@@ -16,14 +15,15 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link AbsoluteEncoder} representing the duty cycle encoder attached to the SparkMax.
+   * The {@link SparkMaxAnalogSensor} representing the duty cycle encoder attached to the SparkMax analog port.
    */
   public SparkMaxAnalogSensor encoder;
 
   /**
-   * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data port analog pin.
+   * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data
+   * port analog pin.
    *
-   * @param motor            Motor to create the encoder from.
+   * @param motor Motor to create the encoder from.
    */
   public SparkMaxAnalogEncoderSwerve(SwerveMotor motor)
   {
@@ -102,6 +102,19 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
   public Object getAbsoluteEncoder()
   {
     return encoder;
+  }
+
+  /**
+   * Sets the Absolute Encoder offset at the Encoder Level.
+   *
+   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @return if setting Absolute Encoder Offset was successful or not.
+   */
+  @Override
+  public boolean setAbsoluteEncoderOffset(double offset)
+  {
+    DriverStation.reportWarning("SparkMax Analog Sensor's do not support integrated offsets", true);
+    return false;
   }
 
   /**

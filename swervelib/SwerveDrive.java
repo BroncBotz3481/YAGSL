@@ -66,11 +66,11 @@ public class SwerveDrive
   /**
    * Odometry lock to ensure thread safety.
    */
-  private final Lock           odometryLock                                    = new ReentrantLock();
+  private final Lock                     odometryLock                                    = new ReentrantLock();
   /**
    * Field object.
    */
-  public        Field2d        field                                           = new Field2d();
+  public        Field2d                  field                                           = new Field2d();
   /**
    * Swerve controller for controlling heading of the robot.
    */
@@ -79,31 +79,31 @@ public class SwerveDrive
    * Standard deviation of encoders and gyroscopes, usually should not change. (meters of position and degrees of
    * rotation)
    */
-  public        Matrix<N3, N1> stateStdDevs                                    = VecBuilder.fill(0.1,
-                                                                                                 0.1,
-                                                                                                 0.1);
+  public        Matrix<N3, N1>           stateStdDevs                                    = VecBuilder.fill(0.1,
+                                                                                                           0.1,
+                                                                                                           0.1);
   /**
    * The standard deviation of the vision measurement, for best accuracy calculate the standard deviation at 2 or more
    * points and fit a line to it and modify this using {@link SwerveDrive#addVisionMeasurement(Pose2d, double, Matrix)}
    * with the calculated optimal standard deviation. (Units should be meters per pixel). By optimizing this you can get
    * vision accurate to inches instead of feet.
    */
-  public        Matrix<N3, N1> visionMeasurementStdDevs                        = VecBuilder.fill(0.9,
-                                                                                                 0.9,
-                                                                                                 0.9);
+  public        Matrix<N3, N1>           visionMeasurementStdDevs                        = VecBuilder.fill(0.9,
+                                                                                                           0.9,
+                                                                                                           0.9);
   /**
    * Invert odometry readings of drive motor positions, used as a patch for debugging currently.
    */
-  public        boolean        invertOdometry                                  = false;
+  public        boolean                  invertOdometry                                  = false;
   /**
    * Correct chassis velocity in {@link SwerveDrive#drive(Translation2d, double, boolean, boolean)} using 254's
    * correction.
    */
-  public        boolean        chassisVelocityCorrection                       = true;
+  public        boolean                  chassisVelocityCorrection                       = true;
   /**
    * Whether to correct heading when driving translationally. Set to true to enable.
    */
-  public        boolean        headingCorrection                               = false;
+  public        boolean                  headingCorrection                               = false;
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
@@ -115,23 +115,23 @@ public class SwerveDrive
   /**
    * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
-  private       int            moduleSynchronizationCounter                    = 0;
+  private       int                      moduleSynchronizationCounter                    = 0;
   /**
    * The last heading set in radians.
    */
-  private       double         lastHeadingRadians                              = 0;
+  private       double                   lastHeadingRadians                              = 0;
   /**
    * The absolute max speed that your robot can reach while translating in meters per second.
    */
-  private       double         attainableMaxTranslationalSpeedMetersPerSecond  = 0;
+  private       double                   attainableMaxTranslationalSpeedMetersPerSecond  = 0;
   /**
    * The absolute max speed the robot can reach while rotating radians per second.
    */
-  private       double         attainableMaxRotationalVelocityRadiansPerSecond = 0;
+  private       double                   attainableMaxRotationalVelocityRadiansPerSecond = 0;
   /**
    * Maximum speed of the robot in meters per second.
    */
-  private       double         maxSpeedMPS;
+  private       double                   maxSpeedMPS;
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
@@ -902,7 +902,8 @@ public class SwerveDrive
           SmartDashboard.putNumber(
               "Module[" + module.configuration.name + "] Absolute Encoder", module.getAbsolutePosition());
           SmartDashboard.putNumber(
-                "Module[" + module.configuration.name + "] Absolute Encoder Read Issue", module.getAbsoluteEncoderReadIssue() ? 1 : 0);
+              "Module[" + module.configuration.name + "] Absolute Encoder Read Issue",
+              module.getAbsoluteEncoderReadIssue() ? 1 : 0);
         }
         if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
         {
@@ -1068,6 +1069,29 @@ public class SwerveDrive
     for (SwerveModule module : swerveModules)
     {
       module.moduleStateOptimization = optimizationEnabled;
+    }
+  }
+
+  /**
+   * Pushes the Absolute Encoder offsets to the Encoder or Motor Controller, depending on type. Also removes the
+   * internal offsets to prevent double offsetting.
+   */
+  public void pushOffsetsToControllers()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.pushOffsetsToControllers();
+    }
+  }
+
+  /**
+   * Restores Internal YAGSL Encoder offsets and sets the Encoder stored offset back to 0
+   */
+  public void restoreInternalOffset()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.restoreInternalOffset();
     }
   }
 

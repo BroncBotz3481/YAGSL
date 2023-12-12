@@ -130,7 +130,7 @@ public class DeviceJson
       case "pigeon2":
         return new Pigeon2Swerve(id, canbus != null ? canbus : "");
       default:
-        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+        throw new RuntimeException(type + " is not a recognized imu/gyroscope type.");
     }
   }
 
@@ -181,7 +181,7 @@ public class DeviceJson
       case "talonsrx":
         return new TalonSRXSwerve(id, isDriveMotor);
       default:
-        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+        throw new RuntimeException(type + " is not a recognized motor type.");
     }
   }
 }
