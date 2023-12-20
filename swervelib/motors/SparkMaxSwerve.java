@@ -62,7 +62,7 @@ public class SparkMaxSwerve extends SwerveMotor
         encoder); // Configure feedback of the PID controller as the integrated encoder.
 
     // Spin off configurations in a different thread.
-    configureSparkMax(() -> motor.setCANTimeout(0));
+    // configureSparkMax(() -> motor.setCANTimeout(0)); // Commented out because it prevents feedback.
   }
 
   /**
