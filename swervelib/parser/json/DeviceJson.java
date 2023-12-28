@@ -80,6 +80,7 @@ public class DeviceJson
       case "dutycycle":
         return new PWMDutyCycleEncoderSwerve(id);
       case "thrifty":
+        return new AnalogAbsoluteEncoderSwerve(id);
       case "analog":
         return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
