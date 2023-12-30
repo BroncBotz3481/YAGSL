@@ -1,31 +1,31 @@
 package swervelib.encoders;
 
-import com.reduxrobotics.sensors.canandcoder.CANandcoder;
+import com.reduxrobotics.sensors.canandcoder.Canandcoder;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
- * HELIUM {@link CANandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
+ * HELIUM {@link Canandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
  */
 public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link CANandcoder} representing the CANandCoder on the CAN bus.
+   * The {@link Canandcoder} representing the CANandCoder on the CAN bus.
    */
-  public  CANandcoder encoder;
+  public  Canandcoder encoder;
   /**
    * Inversion state of the encoder.
    */
   private boolean     inverted = false;
 
   /**
-   * Create the {@link CANandcoder}
+   * Create the {@link Canandcoder}
    *
    * @param canid The CAN ID whenever the CANandCoder is operating on the CANBus.
    */
   public CanAndCoderSwerve(int canid)
   {
-    encoder = new CANandcoder(canid);
+    encoder = new Canandcoder(canid);
   }
 
   /**
@@ -47,7 +47,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
-   * Configure the CANandCoder to read from [0, 360) per second.
+   * Configure the CanAndCoder to read from [0, 360) per second.
    *
    * @param inverted Whether the encoder is inverted.
    */
