@@ -1,7 +1,3 @@
-frc.robot
-frc.robot.commands.swervedrive.auto
-frc.robot.commands.swervedrive.drivebase
-frc.robot.subsystems.swervedrive
 swervelib
 swervelib.encoders
 swervelib.imu
