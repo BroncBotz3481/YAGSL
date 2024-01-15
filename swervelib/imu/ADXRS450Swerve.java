@@ -37,7 +37,8 @@ public class ADXRS450Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    offset = new Rotation3d(0, 0, Math.toRadians(imu.getAngle()));
+    imu.calibrate();
+    offset = new Rotation3d(0, 0, 0);//Math.toRadians(-imu.getAngle()));
   }
 
   /**
@@ -66,7 +67,7 @@ public class ADXRS450Swerve extends SwerveIMU
    */
   public Rotation3d getRawRotation3d()
   {
-    return new Rotation3d(0, 0, Math.toRadians(imu.getAngle()));
+    return new Rotation3d(0, 0, Math.toRadians(-imu.getAngle()));
   }
 
   /**

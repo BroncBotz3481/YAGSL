@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.Timer;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
 import swervelib.parser.PIDFConfig;
-import swervelib.simulation.ctre.PhysicsSim;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
@@ -64,10 +63,6 @@ public class TalonSRXSwerve extends SwerveMotor
     factoryDefaults();
     clearStickyFaults();
 
-    if (SwerveDriveTelemetry.isSimulation)
-    {
-      PhysicsSim.getInstance().addTalonSRX(motor, .25, 6800);
-    }
   }
 
   /**
@@ -298,10 +293,6 @@ public class TalonSRXSwerve extends SwerveMotor
   @Override
   public void setReference(double setpoint, double feedforward, double position)
   {
-    if (SwerveDriveTelemetry.isSimulation)
-    {
-      PhysicsSim.getInstance().run();
-    }
 
     burnFlash();
 

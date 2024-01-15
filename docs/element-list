@@ -1,3 +1,7 @@
+frc.robot
+frc.robot.commands.swervedrive.auto
+frc.robot.commands.swervedrive.drivebase
+frc.robot.subsystems.swervedrive
 swervelib
 swervelib.encoders
 swervelib.imu
@@ -8,5 +12,4 @@ swervelib.parser.deserializer
 swervelib.parser.json
 swervelib.parser.json.modules
 swervelib.simulation
-swervelib.simulation.ctre
 swervelib.telemetry

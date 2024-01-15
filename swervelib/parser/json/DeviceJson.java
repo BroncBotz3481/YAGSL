@@ -1,6 +1,6 @@
 package swervelib.parser.json;
 
-import com.revrobotics.SparkMaxRelativeEncoder.Type;
+import com.revrobotics.SparkRelativeEncoder.Type;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
@@ -20,6 +20,7 @@ import swervelib.imu.NavXSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.PigeonSwerve;
 import swervelib.imu.SwerveIMU;
+import swervelib.motors.SparkFlexSwerve;
 import swervelib.motors.SparkMaxBrushedMotorSwerve;
 import swervelib.motors.SparkMaxSwerve;
 import swervelib.motors.SwerveMotor;
@@ -175,6 +176,8 @@ public class DeviceJson
       case "neo":
       case "sparkmax":
         return new SparkMaxSwerve(id, isDriveMotor);
+      case "sparkflex":
+        return new SparkFlexSwerve(id, isDriveMotor);
       case "falcon":
       case "talonfx":
         return new TalonFXSwerve(id, canbus != null ? canbus : "", isDriveMotor);

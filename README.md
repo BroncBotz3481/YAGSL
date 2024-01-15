@@ -21,6 +21,7 @@ SwerveDrive swerveDrive=new SwerveParser(new File(Filesystem.getDeployDirectory(
 - [ ] Install NavX Library
 - [ ] Install Phoenix Library
 - [ ] Install REVLib.
+- [ ] Install ReduxLib.
 - [ ] Install YAGSL (`https://broncbotz3481.github.io/YAGSL-Lib/yagsl/yagsl.json`)  
 
 ### [Easy Configuration File Generation](https://broncbotz3481.github.io/YAGSL-Example/)
@@ -42,6 +43,9 @@ https://user-images.githubusercontent.com/10247070/219801620-c2850078-9b58-4f32-
 
 # Special Thanks to Team 7900! Trial N' Error
 Without the debugging and aid of Team 7900 the project could never be as stable or active as it is.
+
+# Special Thanks to Team 6238! Popcorn Penguins!
+Without their hardwork debugging the issue with feedforwards the 2024 release would not have been possible. Thank you!
 
 
 # Support our developers!

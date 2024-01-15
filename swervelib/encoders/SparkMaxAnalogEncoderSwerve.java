@@ -2,8 +2,8 @@ package swervelib.encoders;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkMaxAnalogSensor;
-import com.revrobotics.SparkMaxAnalogSensor.Mode;
+import com.revrobotics.SparkAnalogSensor;
+import com.revrobotics.SparkAnalogSensor.Mode;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.function.Supplier;
 import swervelib.motors.SwerveMotor;
@@ -15,9 +15,9 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link SparkMaxAnalogSensor} representing the duty cycle encoder attached to the SparkMax analog port.
+   * The {@link SparkAnalogSensor} representing the duty cycle encoder attached to the SparkMax analog port.
    */
-  public SparkMaxAnalogSensor encoder;
+  public SparkAnalogSensor encoder;
 
   /**
    * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data

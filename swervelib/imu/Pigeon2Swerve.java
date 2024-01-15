@@ -1,7 +1,9 @@
 package swervelib.imu;
 
-import com.ctre.phoenix.sensors.Pigeon2Configuration;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.Pigeon2Configurator;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -17,7 +19,7 @@ public class Pigeon2Swerve extends SwerveIMU
   /**
    * Pigeon2 IMU device.
    */
-  WPI_Pigeon2 imu;
+  Pigeon2 imu;
   /**
    * Offset for the Pigeon 2.
    */
@@ -31,9 +33,7 @@ public class Pigeon2Swerve extends SwerveIMU
    */
   public Pigeon2Swerve(int canid, String canbus)
   {
-    imu = new WPI_Pigeon2(canid, canbus);
-    Pigeon2Configuration config = new Pigeon2Configuration();
-    imu.configAllSettings(config);
+    imu = new Pigeon2(canid, canbus);
     SmartDashboard.putData(imu);
   }
 
@@ -53,8 +53,11 @@ public class Pigeon2Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    imu.configFactoryDefault();
-    imu.configEnableCompass(false); // Compass utilization causes readings to jump dramatically in some cases.
+    Pigeon2Configurator  cfg    = imu.getConfigurator();
+    Pigeon2Configuration config = new Pigeon2Configuration();
+
+    // Compass utilization causes readings to jump dramatically in some cases.
+    cfg.apply(config.Pigeon2Features.withEnableCompass(false));
   }
 
   /**
@@ -84,9 +87,12 @@ public class Pigeon2Swerve extends SwerveIMU
   @Override
   public Rotation3d getRawRotation3d()
   {
-    double[] wxyz = new double[4];
-    imu.get6dQuaternion(wxyz);
-    return new Rotation3d(new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]));
+    // TODO: Switch to suppliers.
+    StatusSignal<Double> w    = imu.getQuatW();
+    StatusSignal<Double> x    = imu.getQuatX();
+    StatusSignal<Double> y    = imu.getQuatY();
+    StatusSignal<Double> z    = imu.getQuatZ();
+    return new Rotation3d(new Quaternion(w.refresh().getValue(), x.refresh().getValue(), y.refresh().getValue(), z.refresh().getValue()));
   }
 
   /**
@@ -109,9 +115,12 @@ public class Pigeon2Swerve extends SwerveIMU
   @Override
   public Optional<Translation3d> getAccel()
   {
-    short[] initial = new short[3];
-    imu.getBiasedAccelerometer(initial);
-    return Optional.of(new Translation3d(initial[0], initial[1], initial[2]).times(9.81 / 16384.0));
+    // TODO: Switch to suppliers.
+    StatusSignal<Double> xAcc = imu.getAccelerationX();
+    StatusSignal<Double> yAcc = imu.getAccelerationX();
+    StatusSignal<Double> zAcc = imu.getAccelerationX();
+
+    return Optional.of(new Translation3d(xAcc.refresh().getValue(), yAcc.refresh().getValue(), zAcc.refresh().getValue()).times(9.81 / 16384.0));
   }
 
   /**

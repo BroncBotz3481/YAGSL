@@ -44,7 +44,8 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    offset = new Rotation3d(0, 0, Math.toRadians(gyro.getAngle()));
+    gyro.calibrate();
+    offset = new Rotation3d(0, 0, 0);
   }
 
   /**
@@ -73,7 +74,7 @@ public class AnalogGyroSwerve extends SwerveIMU
    */
   public Rotation3d getRawRotation3d()
   {
-    return new Rotation3d(0, 0, Math.toRadians(gyro.getAngle()));
+    return new Rotation3d(0, 0, Math.toRadians(-gyro.getAngle()));
   }
 
   /**
