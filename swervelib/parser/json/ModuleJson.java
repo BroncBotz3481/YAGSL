@@ -116,7 +116,6 @@ public class ModuleJson
       throw new RuntimeException(
           "Conversion factors cannot be 0, please configure conversion factors in physicalproperties.json or the module JSON files.");
     }
-    System.out.println(conversionFactor.drive);
 
     return new SwerveModuleConfiguration(
         drive.createMotor(true),
