@@ -1,8 +1,8 @@
 package swervelib.encoders;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import swervelib.telemetry.Alert;
 
 /**
  * Swerve Absolute Encoder for Thrifty Encoders and other analog encoders.
@@ -19,6 +19,14 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
    * Inversion state of the encoder.
    */
   private boolean     inverted = false;
+  /**
+   * An {@link Alert} for if the absolute encoder offset cannot be set.
+   */
+  private Alert       cannotSetOffset;
+  /**
+   * An {@link Alert} detailing how the analog absolute encoder may not report accurate velocities.
+   */
+  private Alert       inaccurateVelocities;
 
   /**
    * Construct the Thrifty Encoder as a Swerve Absolute Encoder.
@@ -28,6 +36,14 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
   public AnalogAbsoluteEncoderSwerve(AnalogInput encoder)
   {
     this.encoder = encoder;
+    cannotSetOffset = new Alert(
+        "Encoders",
+        "Cannot Set Absolute Encoder Offset of Analog Encoders Channel #" + encoder.getChannel(),
+        Alert.AlertType.WARNING);
+    inaccurateVelocities = new Alert(
+        "Encoders",
+        "The Analog Absolute encoder may not report accurate velocities!",
+        Alert.AlertType.WARNING_TRACE);
   }
 
   /**
@@ -101,8 +117,7 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
   public boolean setAbsoluteEncoderOffset(double offset)
   {
     //Do Nothing
-    DriverStation.reportWarning(
-        "Cannot Set Absolute Encoder Offset of Analog Encoders Channel #" + encoder.getChannel(), false);
+    cannotSetOffset.set(true);
     return false;
   }
 
@@ -114,7 +129,7 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getVelocity()
   {
-    DriverStation.reportWarning("The Analog Absolute encoder may not report accurate velocities!", true);
+    inaccurateVelocities.set(true);
     return encoder.getValue();
   }
 }

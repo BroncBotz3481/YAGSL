@@ -56,6 +56,7 @@ public abstract class SwerveAbsoluteEncoder
 
   /**
    * Get the velocity in degrees/sec.
+   *
    * @return velocity in degrees/sec.
    */
   public abstract double getVelocity();

@@ -1,21 +1,21 @@
 package swervelib.motors;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
-import edu.wpi.first.wpilibj.DriverStation;
 import java.util.function.Supplier;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
+import swervelib.telemetry.Alert;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
@@ -27,11 +27,11 @@ public class SparkFlexSwerve extends SwerveMotor
   /**
    * SparkMAX Instance.
    */
-  public CANSparkFlex    motor;
+  public  CANSparkFlex          motor;
   /**
    * Integrated encoder.
    */
-  public RelativeEncoder encoder;
+  public  RelativeEncoder       encoder;
   /**
    * Absolute encoder attached to the SparkMax (if exists)
    */
@@ -39,11 +39,19 @@ public class SparkFlexSwerve extends SwerveMotor
   /**
    * Closed-loop PID controller.
    */
-  public  SparkPIDController pid;
+  public  SparkPIDController    pid;
   /**
    * Factory default already occurred.
    */
   private boolean               factoryDefaultOccurred = false;
+  /**
+   * An {@link Alert} for if there is an error configuring the motor.
+   */
+  private Alert                 failureConfiguring;
+  /**
+   * An {@link Alert} for if the absolute encoder's offset is set in the json instead of the hardware client.
+   */
+  private Alert                 absoluteEncoderOffsetWarning;
 
   /**
    * Initialize the swerve motor.
@@ -65,6 +73,15 @@ public class SparkFlexSwerve extends SwerveMotor
 
     // Spin off configurations in a different thread.
     // configureSparkMax(() -> motor.setCANTimeout(0)); // Commented out because it prevents feedback.
+    failureConfiguring = new Alert("Motors",
+                                   "Failure configuring motor " +
+                                   motor.getDeviceId(),
+                                   Alert.AlertType.WARNING_TRACE);
+    absoluteEncoderOffsetWarning = new Alert("Motors",
+                                             "IF possible configure the duty cycle encoder offset in the REV Hardware Client instead of using the " +
+                                             "absoluteEncoderOffset in the Swerve Module JSON!",
+                                             Alert.AlertType.WARNING);
+
   }
 
   /**
@@ -92,7 +109,7 @@ public class SparkFlexSwerve extends SwerveMotor
         return;
       }
     }
-    DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+    failureConfiguring.set(true);
   }
 
   /**
@@ -185,10 +202,7 @@ public class SparkFlexSwerve extends SwerveMotor
   {
     if (encoder.getAbsoluteEncoder() instanceof MotorFeedbackSensor)
     {
-      DriverStation.reportWarning(
-          "IF possible configure the duty cycle encoder offset in the REV Hardware Client instead of using the" +
-          " absoluteEncoderOffset in the Swerve Module JSON!",
-          false);
+      absoluteEncoderOffsetWarning.set(true);
       absoluteEncoder = encoder;
       configureSparkFlex(() -> pid.setFeedbackDevice((MotorFeedbackSensor) absoluteEncoder.getAbsoluteEncoder()));
     }
@@ -357,20 +371,20 @@ public class SparkFlexSwerve extends SwerveMotor
     if (isDriveMotor)
     {
       configureSparkFlex(() ->
-                            pid.setReference(
-                                setpoint,
-                                ControlType.kVelocity,
-                                pidSlot,
-                                feedforward));
+                             pid.setReference(
+                                 setpoint,
+                                 ControlType.kVelocity,
+                                 pidSlot,
+                                 feedforward));
     } else
     {
       configureSparkFlex(() ->
-                            pid.setReference(
-                                setpoint,
-                                ControlType.kPosition,
-                                pidSlot,
-                                feedforward));
-      if(SwerveDriveTelemetry.isSimulation)
+                             pid.setReference(
+                                 setpoint,
+                                 ControlType.kPosition,
+                                 pidSlot,
+                                 feedforward));
+      if (SwerveDriveTelemetry.isSimulation)
       {
         encoder.setPosition(setpoint);
       }

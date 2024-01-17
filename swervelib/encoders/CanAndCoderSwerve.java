@@ -25,7 +25,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
 
   /**
    * Reset the encoder to factory defaults.
-   * 
+   * <p>
    * This will not clear the stored zero offset.
    */
   @Override

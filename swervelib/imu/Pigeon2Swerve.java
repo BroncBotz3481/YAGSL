@@ -88,11 +88,14 @@ public class Pigeon2Swerve extends SwerveIMU
   public Rotation3d getRawRotation3d()
   {
     // TODO: Switch to suppliers.
-    StatusSignal<Double> w    = imu.getQuatW();
-    StatusSignal<Double> x    = imu.getQuatX();
-    StatusSignal<Double> y    = imu.getQuatY();
-    StatusSignal<Double> z    = imu.getQuatZ();
-    return new Rotation3d(new Quaternion(w.refresh().getValue(), x.refresh().getValue(), y.refresh().getValue(), z.refresh().getValue()));
+    StatusSignal<Double> w = imu.getQuatW();
+    StatusSignal<Double> x = imu.getQuatX();
+    StatusSignal<Double> y = imu.getQuatY();
+    StatusSignal<Double> z = imu.getQuatZ();
+    return new Rotation3d(new Quaternion(w.refresh().getValue(),
+                                         x.refresh().getValue(),
+                                         y.refresh().getValue(),
+                                         z.refresh().getValue()));
   }
 
   /**
@@ -120,7 +123,9 @@ public class Pigeon2Swerve extends SwerveIMU
     StatusSignal<Double> yAcc = imu.getAccelerationX();
     StatusSignal<Double> zAcc = imu.getAccelerationX();
 
-    return Optional.of(new Translation3d(xAcc.refresh().getValue(), yAcc.refresh().getValue(), zAcc.refresh().getValue()).times(9.81 / 16384.0));
+    return Optional.of(new Translation3d(xAcc.refresh().getValue(),
+                                         yAcc.refresh().getValue(),
+                                         zAcc.refresh().getValue()).times(9.81 / 16384.0));
   }
 
   /**

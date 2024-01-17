@@ -13,8 +13,6 @@ import swervelib.SwerveController;
 import swervelib.SwerveModule;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveModuleConfiguration;
-import swervelib.telemetry.SwerveDriveTelemetry;
-import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 /**
  * Mathematical functions which pertain to swerve drive.

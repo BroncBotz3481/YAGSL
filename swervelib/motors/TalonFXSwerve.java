@@ -20,31 +20,31 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Factory default already occurred.
    */
-  private final boolean              factoryDefaultOccurred  = false;
-  /**
-   * Current TalonFX configuration.
-   */
-  private       TalonFXConfiguration configuration           = new TalonFXConfiguration();
+  private final boolean            factoryDefaultOccurred  = false;
   /**
    * Whether the absolute encoder is integrated.
    */
-  private final boolean              absoluteEncoder         = false;
+  private final boolean            absoluteEncoder         = false;
   /**
    * Motion magic angle voltage setter.
    */
-  private final MotionMagicVoltage   m_angleVoltageSetter    = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage m_angleVoltageSetter    = new MotionMagicVoltage(0);
+  /**
+   * Velocity voltage setter for controlling drive motor.
+   */
+  private final VelocityVoltage    m_velocityVoltageSetter = new VelocityVoltage(0);
 //  /**
 //   * Motion Magic exponential voltage setters.
 //   */
 //  private final MotionMagicExpoVoltage m_angleVoltageExpoSetter = new MotionMagicExpoVoltage(0);
   /**
-   * Velocity voltage setter for controlling drive motor.
-   */
-  private final VelocityVoltage      m_velocityVoltageSetter = new VelocityVoltage(0);
-  /**
    * TalonFX motor controller.
    */
   TalonFX motor;
+  /**
+   * Current TalonFX configuration.
+   */
+  private TalonFXConfiguration configuration = new TalonFXConfiguration();
 
   /**
    * Constructor for TalonFX swerve motor.

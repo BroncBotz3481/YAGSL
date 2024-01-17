@@ -89,7 +89,22 @@ public class SwerveDriveConfiguration
    */
   public double getDriveBaseRadiusMeters()
   {
-    Translation2d furthestModule = moduleLocationsMeters[0];
-    return Math.abs(Math.sqrt(Math.pow(furthestModule.getX(), 2) + Math.pow(furthestModule.getY(), 2)));
+    //Find Center of Robot by adding all module offsets together. Should be zero, but incase it isn't
+    Translation2d centerOfModules = moduleLocationsMeters[0].plus(moduleLocationsMeters[1])
+                                                            .plus(moduleLocationsMeters[2])
+                                                            .plus(moduleLocationsMeters[3]);
+
+    //Find Largest Radius by checking the distance to the center point 
+    double largestRadius = centerOfModules.getDistance(moduleLocationsMeters[0]);
+    for (int i = 1; i < moduleLocationsMeters.length; i++)
+    {
+      if (largestRadius < centerOfModules.getDistance(moduleLocationsMeters[i]))
+      {
+        largestRadius = centerOfModules.getDistance(moduleLocationsMeters[i]);
+      }
+    }
+
+    //Return Largest Radius
+    return largestRadius;
   }
 }

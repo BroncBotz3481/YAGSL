@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -68,6 +67,10 @@ public class SwerveDrive
    */
   private final Lock                     odometryLock                                    = new ReentrantLock();
   /**
+   * Deadband for speeds in heading correction.
+   */
+  private final double                   HEADING_CORRECTION_DEADBAND                     = 0.01;
+  /**
    * Field object.
    */
   public        Field2d                  field                                           = new Field2d();
@@ -101,13 +104,13 @@ public class SwerveDrive
    */
   public        boolean                  chassisVelocityCorrection                       = true;
   /**
-   * Whether heading correction PID is currently active.
-   */
-  private       boolean                  correctionEnabled                               = false;
-  /**
    * Whether to correct heading when driving translationally. Set to true to enable.
    */
   public        boolean                  headingCorrection                               = false;
+  /**
+   * Whether heading correction PID is currently active.
+   */
+  private       boolean                  correctionEnabled                               = false;
   /**
    * Swerve IMU device for sensing the heading of the robot.
    */
@@ -120,10 +123,6 @@ public class SwerveDrive
    * Counter to synchronize the modules relative encoder with absolute encoder when not moving.
    */
   private       int                      moduleSynchronizationCounter                    = 0;
-  /**
-   * Deadband for speeds in heading correction.
-   */
-  private final double                   HEADING_CORRECTION_DEADBAND                     = 0.01;
   /**
    * The last heading set in radians.
    */
@@ -413,10 +412,10 @@ public class SwerveDrive
     if (headingCorrection)
     {
       if (Math.abs(velocity.omegaRadiansPerSecond) < HEADING_CORRECTION_DEADBAND
-          && (Math.abs(velocity.vxMetersPerSecond) > HEADING_CORRECTION_DEADBAND 
-          || Math.abs(velocity.vyMetersPerSecond) > HEADING_CORRECTION_DEADBAND)) 
+          && (Math.abs(velocity.vxMetersPerSecond) > HEADING_CORRECTION_DEADBAND
+              || Math.abs(velocity.vyMetersPerSecond) > HEADING_CORRECTION_DEADBAND))
       {
-        if (!correctionEnabled) 
+        if (!correctionEnabled)
         {
           lastHeadingRadians = getYaw().getRadians();
           correctionEnabled = true;
