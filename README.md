@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 SwerveDrive swerveDrive=new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(Units.feetToMeters(14.5));
 ```
 * The library is located in [swervelib/](./swervelib) with documentation in [docs/](./docs) and example JSON in [deploy](./deploy).
+* Support for [NetworkAlerts](https://github.com/Mechanical-Advantage/NetworkAlerts/) for use in Shuffleboard.
 
 # Discussions
 * Latest resources and features will be posted on the discusions page [here](https://github.com/BroncBotz3481/YAGSL-Example/discussions).
