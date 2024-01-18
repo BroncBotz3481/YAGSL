@@ -74,7 +74,7 @@ public class SwerveDrive
   /**
    * Deadband for speeds in heading correction.
    */
-  private final double                   HEADING_CORRECTION_DEADBAND                     = 0.01;
+  private       double                   HEADING_CORRECTION_DEADBAND                     = 0.01;
   /**
    * Field object.
    */
@@ -315,7 +315,19 @@ public class SwerveDrive
    */
   public void setHeadingCorrection(boolean state)
   {
+    setHeadingCorrection(state, HEADING_CORRECTION_DEADBAND);
+  }
+
+  /**
+   * Set the heading correction capabilities of YAGSL.
+   *
+   * @param state    {@link SwerveDrive#headingCorrection} state.
+   * @param deadband {@link SwerveDrive#HEADING_CORRECTION_DEADBAND} deadband.
+   */
+  public void setHeadingCorrection(boolean state, double deadband)
+  {
     headingCorrection = state;
+    HEADING_CORRECTION_DEADBAND = deadband;
   }
 
   /**
