@@ -234,6 +234,8 @@ public class SwerveDrive
     }
 
     odometryThread.startPeriodic(SwerveDriveTelemetry.isSimulation ? 0.01 : 0.02);
+
+    checkIfTunerXCompatible();
   }
 
   /**
