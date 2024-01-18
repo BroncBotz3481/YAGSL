@@ -28,11 +28,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import swervelib.encoders.CANCoderSwerve;
+import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveMath;
+import swervelib.motors.TalonFXSwerve;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
+import swervelib.telemetry.Alert;
+import swervelib.telemetry.Alert.AlertType;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
@@ -139,6 +144,13 @@ public class SwerveDrive
    * Maximum speed of the robot in meters per second.
    */
   private       double                   maxSpeedMPS;
+  /**
+   * Alert to recommend Tuner X if the configuration is compatible.
+   */
+  private final Alert                    tunerXRecommendation                            = new Alert("Swerve Drive",
+                                                                                                     "Your Swerve Drive is compatible with Tuner X swerve generator, please consider using that instead of YAGSL. More information here!\n" +
+                                                                                                     "https://pro.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html",
+                                                                                                     AlertType.WARNING);
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive} method, or via the
@@ -222,6 +234,29 @@ public class SwerveDrive
     }
 
     odometryThread.startPeriodic(SwerveDriveTelemetry.isSimulation ? 0.01 : 0.02);
+  }
+
+  /**
+   * Check all components to ensure that Tuner X Swerve Generator is recommended instead.
+   */
+  private void checkIfTunerXCompatible()
+  {
+    boolean compatible = imu instanceof Pigeon2Swerve;
+    for (SwerveModule module : swerveModules)
+    {
+      compatible = compatible && module.getDriveMotor() instanceof TalonFXSwerve &&
+                   module.getAngleMotor() instanceof TalonFXSwerve &&
+                   module.getAbsoluteEncoder() instanceof CANCoderSwerve;
+      if (!compatible)
+      {
+        break;
+      }
+    }
+    if (compatible)
+    {
+      tunerXRecommendation.set(true);
+    }
+
   }
 
   /**
@@ -465,6 +500,29 @@ public class SwerveDrive
     setMaximumSpeed(attainableMaxModuleSpeedMetersPerSecond);
     this.attainableMaxTranslationalSpeedMetersPerSecond = attainableMaxTranslationalSpeedMetersPerSecond;
     this.attainableMaxRotationalVelocityRadiansPerSecond = attainableMaxRotationalVelocityRadiansPerSecond;
+    this.swerveController.config.maxAngularVelocity = attainableMaxRotationalVelocityRadiansPerSecond;
+  }
+
+  /**
+   * Get the maximum velocity from {@link SwerveDrive#attainableMaxTranslationalSpeedMetersPerSecond} or
+   * {@link SwerveDrive#maxSpeedMPS} whichever is higher.
+   *
+   * @return Maximum speed in meters/second.
+   */
+  public double getMaximumVelocity()
+  {
+    return Math.max(this.attainableMaxTranslationalSpeedMetersPerSecond, maxSpeedMPS);
+  }
+
+  /**
+   * Get the maximum angular velocity, either {@link SwerveDrive#attainableMaxRotationalVelocityRadiansPerSecond} or
+   * {@link SwerveControllerConfiguration#maxAngularVelocity}.
+   *
+   * @return Maximum angular velocity in radians per second.
+   */
+  public double getMaximumAngularVelocity()
+  {
+    return Math.max(this.attainableMaxRotationalVelocityRadiansPerSecond, swerveController.config.maxAngularVelocity);
   }
 
   /**

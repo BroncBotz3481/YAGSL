@@ -46,11 +46,25 @@ import java.util.function.Predicate;
 public class Alert
 {
 
+  /**
+   * Group of the alert.
+   */
   private static Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
-
+  /**
+   * Type of the Alert to raise.
+   */
   private final AlertType type;
+  /**
+   * Activation state of alert.
+   */
   private       boolean   active          = false;
+  /**
+   * When the alert was raised.
+   */
   private       double    activeStartTime = 0.0;
+  /**
+   * Text of the alert.
+   */
   private       String    text;
 
   /**
@@ -89,6 +103,8 @@ public class Alert
   /**
    * Sets whether the alert should currently be displayed. When activated, the alert text will also be sent to the
    * console.
+   *
+   * @param active Set the alert as active and report it to the driver station.
    */
   public void set(boolean active)
   {
@@ -119,6 +135,8 @@ public class Alert
 
   /**
    * Updates current alert text.
+   *
+   * @param text The text for the alert.
    */
   public void setText(String text)
   {
@@ -182,11 +200,22 @@ public class Alert
     INFO
   }
 
+  /**
+   * Sendable alert for advantage scope.
+   */
   private static class SendableAlerts implements Sendable
   {
 
+    /**
+     * Alert list for sendable.
+     */
     public final List<Alert> alerts = new ArrayList<>();
 
+    /**
+     * Get alerts based off of type.
+     * @param type Type of alert to fetch.
+     * @return Active alert strings.
+     */
     public String[] getStrings(AlertType type)
     {
       Predicate<Alert> activeFilter = (Alert x) -> x.type == type && x.active;

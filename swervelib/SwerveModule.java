@@ -395,6 +395,16 @@ public class SwerveModule
   }
 
   /**
+   * Get the {@link SwerveAbsoluteEncoder} for the {@link SwerveModule}.
+   *
+   * @return {@link SwerveAbsoluteEncoder} for the swerve module.
+   */
+  public SwerveAbsoluteEncoder getAbsoluteEncoder()
+  {
+    return absoluteEncoder;
+  }
+
+  /**
    * Fetch the {@link SwerveModuleConfiguration} for the {@link SwerveModule} with the parsed configurations.
    *
    * @return {@link SwerveModuleConfiguration} for the {@link SwerveModule}.
