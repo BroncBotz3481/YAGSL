@@ -49,23 +49,23 @@ public class Alert
   /**
    * Group of the alert.
    */
-  private static Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
+  private static Map<String, SendableAlerts> groups          = new HashMap<String, SendableAlerts>();
   /**
    * Type of the Alert to raise.
    */
-  private final AlertType type;
+  private final  AlertType                   type;
   /**
    * Activation state of alert.
    */
-  private       boolean   active          = false;
+  private        boolean                     active          = false;
   /**
    * When the alert was raised.
    */
-  private       double    activeStartTime = 0.0;
+  private        double                      activeStartTime = 0.0;
   /**
    * Text of the alert.
    */
-  private       String    text;
+  private        String                      text;
 
   /**
    * Creates a new Alert in the default group - "Alerts". If this is the first to be instantiated, the appropriate
@@ -213,6 +213,7 @@ public class Alert
 
     /**
      * Get alerts based off of type.
+     *
      * @param type Type of alert to fetch.
      * @return Active alert strings.
      */

@@ -19,7 +19,11 @@ public class ADXRS450Swerve extends SwerveIMU
   /**
    * Offset for the ADXRS450.
    */
-  private       Rotation3d    offset = new Rotation3d();
+  private       Rotation3d    offset      = new Rotation3d();
+  /**
+   * Inversion for the gyro
+   */
+  private       boolean       invertedIMU = false;
 
   /**
    * Construct the ADXRS450 imu and reset default configurations. Publish the gyro to the SmartDashboard.
@@ -61,13 +65,24 @@ public class ADXRS450Swerve extends SwerveIMU
   }
 
   /**
+   * Set the gyro to invert its default direction
+   *
+   * @param invertIMU invert gyro direction
+   */
+  public void setInverted(boolean invertIMU)
+  {
+    invertedIMU = invertIMU;
+  }
+
+  /**
    * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
    *
    * @return {@link Rotation3d} from the IMU.
    */
   public Rotation3d getRawRotation3d()
   {
-    return new Rotation3d(0, 0, Math.toRadians(-imu.getAngle()));
+    Rotation3d reading = new Rotation3d(0, 0, Math.toRadians(-imu.getAngle()));
+    return invertedIMU ? reading.unaryMinus() : reading;
   }
 
   /**
