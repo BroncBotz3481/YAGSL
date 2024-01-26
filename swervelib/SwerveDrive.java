@@ -543,14 +543,6 @@ public class SwerveDrive
     for (SwerveModule module : swerveModules)
     {
       module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop, false);
-
-      if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
-      {
-        SwerveDriveTelemetry.desiredStates[module.moduleNumber *
-                                           2] = module.lastState.angle.getDegrees();
-        SwerveDriveTelemetry.desiredStates[(module.moduleNumber * 2) +
-                                           1] = module.lastState.speedMetersPerSecond;
-      }
     }
   }
 
