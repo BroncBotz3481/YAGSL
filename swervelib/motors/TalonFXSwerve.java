@@ -40,7 +40,7 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Conversion factor for the motor.
    */
-  private       double             conversionFactor;
+  private double               conversionFactor;
   /**
    * Current TalonFX configuration.
    */
@@ -341,6 +341,39 @@ public class TalonFXSwerve extends SwerveMotor
     {
       motor.setControl(m_angleVoltageSetter.withPosition(setpoint / 360.0));
     }
+  }
+
+  /**
+   * Get the voltage output of the motor controller.
+   *
+   * @return Voltage output.
+   */
+  @Override
+  public double getVoltage()
+  {
+    return motor.getMotorVoltage().refresh().getValue();
+  }
+
+  /**
+   * Set the voltage of the motor.
+   *
+   * @param voltage Voltage to set.
+   */
+  @Override
+  public void setVoltage(double voltage)
+  {
+    motor.setVoltage(voltage);
+  }
+
+  /**
+   * Get the applied dutycycle output.
+   *
+   * @return Applied dutycycle output to the motor.
+   */
+  @Override
+  public double getAppliedOutput()
+  {
+    return motor.getDutyCycle().refresh().getValue();
   }
 
   /**

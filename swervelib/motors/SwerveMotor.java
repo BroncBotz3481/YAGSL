@@ -102,6 +102,27 @@ public abstract class SwerveMotor
   public abstract void setReference(double setpoint, double feedforward, double position);
 
   /**
+   * Get the voltage output of the motor controller.
+   *
+   * @return Voltage output.
+   */
+  public abstract double getVoltage();
+
+  /**
+   * Set the voltage of the motor.
+   *
+   * @param voltage Voltage to set.
+   */
+  public abstract void setVoltage(double voltage);
+
+  /**
+   * Get the applied dutycycle output.
+   *
+   * @return Applied dutycycle output to the motor.
+   */
+  public abstract double getAppliedOutput();
+
+  /**
    * Get the velocity of the integrated encoder.
    *
    * @return velocity in meters per second or degrees per second.

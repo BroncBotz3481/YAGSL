@@ -112,7 +112,6 @@ public class SwerveModule
     {
       absoluteEncoder.factoryDefault();
       absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
-      angleMotor.setPosition(getAbsolutePosition());
     }
 
     // Config angle motor/controller
@@ -121,6 +120,12 @@ public class SwerveModule
     angleMotor.configurePIDWrapping(0, 180);
     angleMotor.setInverted(moduleConfiguration.angleMotorInverted);
     angleMotor.setMotorBrake(false);
+
+    // Set the position AFTER settings the conversion factor.
+    if (absoluteEncoder != null)
+    {
+      angleMotor.setPosition(getAbsolutePosition());
+    }
 
     // Config drive motor/controller
     driveMotor.configureIntegratedEncoder(moduleConfiguration.conversionFactors.drive);
@@ -199,18 +204,22 @@ public class SwerveModule
       driveMotor.set(percentOutput);
     } else
     {
-      // Taken from the CTRE SwerveModule class.
-      // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveModule.html#line.46
-      /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
-      /* To reduce the "skew" that occurs when changing direction */
-      double steerMotorError = desiredState.angle.getDegrees() - getAbsolutePosition();
-      /* If error is close to 0 rotations, we're already there, so apply full power */
-      /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
-      double cosineScalar = Math.cos(Units.degreesToRadians(steerMotorError));
-      /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
-      if (cosineScalar < 0.0 || desiredState.speedMetersPerSecond == 0)
+      double cosineScalar = 1.0;
+      if (configuration.useCosineCompensator)
       {
-        cosineScalar = 0.0;
+        // Taken from the CTRE SwerveModule class.
+        // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveModule.html#line.46
+        /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
+        /* To reduce the "skew" that occurs when changing direction */
+        double steerMotorError = desiredState.angle.getDegrees() - getAbsolutePosition();
+        /* If error is close to 0 rotations, we're already there, so apply full power */
+        /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
+        cosineScalar = Math.cos(Units.degreesToRadians(steerMotorError));
+        /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
+        if (cosineScalar < 0.0)
+        {
+          cosineScalar = 0.0;
+        }
       }
 
       double velocity = desiredState.speedMetersPerSecond * (cosineScalar);
