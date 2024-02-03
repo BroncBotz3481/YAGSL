@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,6 +34,7 @@ import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveMath;
 import swervelib.motors.TalonFXSwerve;
+import swervelib.parser.Cache;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
@@ -58,6 +61,10 @@ public class SwerveDrive
    * Swerve odometry.
    */
   public final  SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+  /**
+   * IMU reading cache for robot readings.
+   */
+  public final  Cache<Rotation3d>        imuReadingCache;
   /**
    * Swerve modules.
    */
@@ -155,10 +162,12 @@ public class SwerveDrive
     if (SwerveDriveTelemetry.isSimulation)
     {
       simIMU = new SwerveIMUSimulation();
+      imuReadingCache = new Cache<>(simIMU::getGyroRotation3d, 5L);
     } else
     {
       imu = config.imu;
       imu.factoryDefault();
+      imuReadingCache = new Cache<>(imu::getRotation3d, 5L);
     }
 
     this.swerveModules = config.modules;
@@ -211,6 +220,24 @@ public class SwerveDrive
     odometryThread.startPeriodic(SwerveDriveTelemetry.isSimulation ? 0.01 : 0.02);
 
     checkIfTunerXCompatible();
+  }
+
+  /**
+   * Update the cache validity period for the robot.
+   *
+   * @param imu             IMU reading cache validity period in milliseconds.
+   * @param driveMotor      Drive motor reading cache in milliseconds.
+   * @param absoluteEncoder Absolute encoder reading cache in milliseconds.
+   */
+  public void updateCacheValidityPeriods(long imu, long driveMotor, long absoluteEncoder)
+  {
+    imuReadingCache.updateValidityPeriod(imu);
+    for (SwerveModule module : swerveModules)
+    {
+      module.drivePositionCache.updateValidityPeriod(driveMotor);
+      module.driveVelocityCache.updateValidityPeriod(driveMotor);
+      module.absolutePositionCache.updateValidityPeriod(absoluteEncoder);
+    }
   }
 
   /**
@@ -623,7 +650,7 @@ public class SwerveDrive
     odometryLock.lock();
     swerveDrivePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
     odometryLock.unlock();
-    kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, pose.getRotation()));
+    kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, getYaw()));
   }
 
   /**
@@ -695,6 +722,7 @@ public class SwerveDrive
     {
       setGyroOffset(imu.getRawRotation3d().minus(gyro));
     }
+    imuReadingCache.update();
   }
 
   /**
@@ -704,13 +732,14 @@ public class SwerveDrive
   {
     // Resets the real gyro or the angle accumulator, depending on whether the robot is being
     // simulated
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      imu.setOffset(imu.getRawRotation3d());
-    } else
+    if (SwerveDriveTelemetry.isSimulation)
     {
       simIMU.setAngle(0);
+    } else
+    {
+      setGyroOffset(imu.getRawRotation3d());
     }
+    imuReadingCache.update();
     swerveController.lastAngleScalar = 0;
     lastHeadingRadians = 0;
     resetOdometry(new Pose2d(getPose().getTranslation(), new Rotation2d()));
@@ -724,13 +753,7 @@ public class SwerveDrive
   public Rotation2d getYaw()
   {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      return Rotation2d.fromRadians(imu.getRotation3d().getZ());
-    } else
-    {
-      return simIMU.getYaw();
-    }
+    return Rotation2d.fromRadians(imuReadingCache.getValue().getZ());
   }
 
   /**
@@ -741,13 +764,7 @@ public class SwerveDrive
   public Rotation2d getPitch()
   {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      return Rotation2d.fromRadians(imu.getRotation3d().getY());
-    } else
-    {
-      return simIMU.getPitch();
-    }
+    return Rotation2d.fromRadians(imuReadingCache.getValue().getY());
   }
 
   /**
@@ -758,13 +775,7 @@ public class SwerveDrive
   public Rotation2d getRoll()
   {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      return Rotation2d.fromRadians(imu.getRotation3d().getX());
-    } else
-    {
-      return simIMU.getRoll();
-    }
+    return Rotation2d.fromRadians(imuReadingCache.getValue().getX());
   }
 
   /**
@@ -775,13 +786,7 @@ public class SwerveDrive
   public Rotation3d getGyroRotation3d()
   {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
-      return imu.getRotation3d();
-    } else
-    {
-      return simIMU.getGyroRotation3d();
-    }
+    return imuReadingCache.getValue();
   }
 
   /**
@@ -1016,6 +1021,7 @@ public class SwerveDrive
     {
       imu.setOffset(offset);
     }
+    imuReadingCache.update();
   }
 
   /**
@@ -1083,6 +1089,21 @@ public class SwerveDrive
   public SwerveModule[] getModules()
   {
     return swerveDriveConfiguration.modules;
+  }
+
+  /**
+   * Get the {@link SwerveModule}'s as a {@link HashMap} where the key is the swerve module configuration name.
+   *
+   * @return {@link HashMap}(Module Name, SwerveModule)
+   */
+  public Map<String, SwerveModule> getModuleMap()
+  {
+    Map<String, SwerveModule> map = new HashMap<String, SwerveModule>();
+    for (SwerveModule module : swerveModules)
+    {
+      map.put(module.configuration.name, module);
+    }
+    return map;
   }
 
   /**

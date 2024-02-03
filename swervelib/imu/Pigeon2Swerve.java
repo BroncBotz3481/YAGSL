@@ -17,17 +17,21 @@ public class Pigeon2Swerve extends SwerveIMU
 {
 
   /**
+   * Wait time for status frames to show up.
+   */
+  private final double     STATUS_TIMEOUT_SECONDS = 0.02;
+  /**
    * Pigeon2 IMU device.
    */
   Pigeon2 imu;
   /**
    * Offset for the Pigeon 2.
    */
-  private Rotation3d offset      = new Rotation3d();
+  private       Rotation3d offset                 = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private boolean    invertedIMU = false;
+  private       boolean    invertedIMU            = false;
 
   /**
    * Generate the SwerveIMU for pigeon.
@@ -106,10 +110,10 @@ public class Pigeon2Swerve extends SwerveIMU
     StatusSignal<Double> x = imu.getQuatX();
     StatusSignal<Double> y = imu.getQuatY();
     StatusSignal<Double> z = imu.getQuatZ();
-    Rotation3d reading = new Rotation3d(new Quaternion(w.refresh().getValue(),
-                                                       x.refresh().getValue(),
-                                                       y.refresh().getValue(),
-                                                       z.refresh().getValue()));
+    Rotation3d reading = new Rotation3d(new Quaternion(w.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
+                                                       x.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
+                                                       y.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
+                                                       z.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue()));
     return invertedIMU ? reading.unaryMinus() : reading;
   }
 
@@ -138,9 +142,9 @@ public class Pigeon2Swerve extends SwerveIMU
     StatusSignal<Double> yAcc = imu.getAccelerationY();
     StatusSignal<Double> zAcc = imu.getAccelerationZ();
 
-    return Optional.of(new Translation3d(xAcc.refresh().getValue(),
-                                         yAcc.refresh().getValue(),
-                                         zAcc.refresh().getValue()).times(9.81 / 16384.0));
+    return Optional.of(new Translation3d(xAcc.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
+                                         yAcc.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
+                                         zAcc.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue()).times(9.81 / 16384.0));
   }
 
   /**
