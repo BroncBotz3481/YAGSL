@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -33,6 +34,10 @@ public class TalonFXSwerve extends SwerveMotor
    * Velocity voltage setter for controlling drive motor.
    */
   private final VelocityVoltage    m_velocityVoltageSetter = new VelocityVoltage(0);
+  /**
+   * Voltage setter for controlling the motor.
+   */
+  private final VoltageOut m_voltageOutSetter = new VoltageOut(0);
   /**
    * Wait time for status frames to show up.
    */
@@ -367,7 +372,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void setVoltage(double voltage)
   {
-    motor.setVoltage(voltage);
+    motor.setControl(m_voltageOutSetter.withOutput(voltage));
   }
 
   /**
