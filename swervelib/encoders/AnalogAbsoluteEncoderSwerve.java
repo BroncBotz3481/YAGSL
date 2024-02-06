@@ -130,6 +130,6 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
   public double getVelocity()
   {
     inaccurateVelocities.set(true);
-    return encoder.getValue();
+    return encoder.getValue() * 360;
   }
 }

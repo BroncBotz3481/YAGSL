@@ -1141,4 +1141,19 @@ public class SwerveDrive
     }
   }
 
+  /**
+   * Enable or disable the {@link swervelib.parser.SwerveModuleConfiguration#useCosineCompensator} for all
+   * {@link SwerveModule}'s in the swerve drive. The cosine compensator will slow down or speed up modules that are
+   * close to their desired state in theory.
+   *
+   * @param enabled Usage of the cosine compensator.
+   */
+  public void setCosineCompensator(boolean enabled)
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.configuration.useCosineCompensator = enabled;
+    }
+  }
+
 }

@@ -4,7 +4,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
@@ -29,15 +28,15 @@ public class SwerveModule
   /**
    * Absolute encoder position cache.
    */
-  public final  Cache<Double>          absolutePositionCache;
+  public final  Cache<Double>             absolutePositionCache;
   /**
    * Drive motor position cache.
    */
-  public final  Cache<Double>          drivePositionCache;
+  public final  Cache<Double>             drivePositionCache;
   /**
    * Drive motor velocity cache.
    */
-  public final  Cache<Double>          driveVelocityCache;
+  public final  Cache<Double>             driveVelocityCache;
   /**
    * Swerve Motors.
    */
@@ -235,6 +234,7 @@ public class SwerveModule
     } else
     {
       driveMotor.setReference(velocity, feedforward.calculate(velocity));
+      desiredState.speedMetersPerSecond = velocity;
     }
 
     // If we are forcing the angle
@@ -290,14 +290,14 @@ public class SwerveModule
     // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveModule.html#line.46
     /* From FRC 900's whitepaper, we add a cosine compensator to the applied drive velocity */
     /* To reduce the "skew" that occurs when changing direction */
-    double steerMotorError = desiredState.angle.getDegrees() - getAbsolutePosition();
     /* If error is close to 0 rotations, we're already there, so apply full power */
     /* If the error is close to 0.25 rotations, then we're 90 degrees, so movement doesn't help us at all */
-    cosineScalar = Math.cos(Units.degreesToRadians(steerMotorError));
+    cosineScalar = Rotation2d.fromDegrees(desiredState.angle.getDegrees())
+                             .minus(Rotation2d.fromDegrees(getAbsolutePosition())).getCos(); // TODO: Investigate angle modulus by 180.
     /* Make sure we don't invert our drive, even though we shouldn't ever target over 90 degrees anyway */
     if (cosineScalar < 0.0)
     {
-      cosineScalar = 0.0;
+      cosineScalar = 1;
     }
 
     return desiredState.speedMetersPerSecond * (cosineScalar);

@@ -100,7 +100,7 @@ public class SwerveController
    * @param angle                      The desired angle of the robot in radians.
    * @param currentHeadingAngleRadians The current robot heading in radians.
    * @param maxSpeed                   Maximum speed in meters per second.
-   * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
+   * @return {@link ChassisSpeeds} which can be sent to the Swerve Drive.
    */
   public ChassisSpeeds getTargetSpeeds(
       double xInput, double yInput, double angle, double currentHeadingAngleRadians, double maxSpeed)
@@ -138,7 +138,7 @@ public class SwerveController
    * @param currentHeadingAngleRadians The current robot heading in radians.
    * @param maxSpeed                   Maximum speed of the drive motors in meters per second, multiplier of the xInput
    *                                   and yInput.
-   * @return {@link ChassisSpeeds} which can be sent to th Swerve Drive.
+   * @return {@link ChassisSpeeds} which can be sent to the Swerve Drive.
    */
   public ChassisSpeeds getTargetSpeeds(
       double xInput,
