@@ -36,7 +36,7 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Wait time for status frames to show up.
    */
-  private final double               STATUS_TIMEOUT_SECONDS = 0.02;
+  public static double               STATUS_TIMEOUT_SECONDS = 0.02;
   /**
    * TalonFX motor controller.
    */

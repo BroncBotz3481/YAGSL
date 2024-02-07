@@ -1,5 +1,6 @@
 package swervelib.imu;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Pigeon2Configurator;
@@ -19,7 +20,7 @@ public class Pigeon2Swerve extends SwerveIMU
   /**
    * Wait time for status frames to show up.
    */
-  private final double     STATUS_TIMEOUT_SECONDS = 0.02;
+  public static double     STATUS_TIMEOUT_SECONDS = 0.04;
   /**
    * Pigeon2 IMU device.
    */
@@ -110,10 +111,26 @@ public class Pigeon2Swerve extends SwerveIMU
     StatusSignal<Double> x = imu.getQuatX();
     StatusSignal<Double> y = imu.getQuatY();
     StatusSignal<Double> z = imu.getQuatZ();
-    Rotation3d reading = new Rotation3d(new Quaternion(w.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
-                                                       x.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
-                                                       y.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue(),
-                                                       z.waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue()));
+    if(w.getStatus() != StatusCode.OK)
+    {
+      w = w.waitForUpdate(STATUS_TIMEOUT_SECONDS);
+    }
+    if(x.getStatus() != StatusCode.OK)
+    {
+      x = x.waitForUpdate(STATUS_TIMEOUT_SECONDS);
+    }
+    if(y.getStatus() != StatusCode.OK)
+    {
+      y = y.waitForUpdate(STATUS_TIMEOUT_SECONDS);
+    }
+    if(z.getStatus() != StatusCode.OK)
+    {
+      z = z.waitForUpdate(STATUS_TIMEOUT_SECONDS);
+    }
+    Rotation3d reading = new Rotation3d(new Quaternion(w.getValue(),
+                                                       x.getValue(),
+                                                       y.getValue(),
+                                                       z.getValue()));
     return invertedIMU ? reading.unaryMinus() : reading;
   }
 
