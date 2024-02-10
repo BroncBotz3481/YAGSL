@@ -217,16 +217,15 @@ public class Alert
      * @param type Type of alert to fetch.
      * @return Active alert strings.
      */
-    public String[] getStrings(AlertType type)
-    {
-      Predicate<Alert> activeFilter = (Alert x) -> x.type == type && x.active;
-      Comparator<Alert> timeSorter =
-          (Alert a1, Alert a2) -> (int) (a2.activeStartTime - a1.activeStartTime);
-      return alerts.stream()
-                   .filter(activeFilter)
-                   .sorted(timeSorter)
-                   .map((Alert a) -> a.text)
-                   .toArray(String[]::new);
+    public String[] getStrings(AlertType type) {
+      List<String> alertStrings = new ArrayList<>();
+      for (Alert alert : alerts) {
+        if (alert.type == type && alert.active) {
+          alertStrings.add(alert.text);
+        }
+      }
+      // alertStrings.sort((a1, a2) -> (int) (a2.activeStartTime - a1.activeStartTime));
+      return alertStrings.toArray(new String[0]);
     }
 
     @Override
