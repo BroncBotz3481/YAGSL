@@ -34,11 +34,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * Class for managing persistent alerts to be sent over NetworkTables.
@@ -111,24 +109,7 @@ public class Alert
     if (active && !this.active)
     {
       activeStartTime = Timer.getFPGATimestamp();
-      switch (type)
-      {
-        case ERROR:
-          DriverStation.reportError(text, false);
-          break;
-        case ERROR_TRACE:
-          DriverStation.reportError(text, true);
-          break;
-        case WARNING:
-          DriverStation.reportWarning(text, false);
-          break;
-        case WARNING_TRACE:
-          DriverStation.reportWarning(text, true);
-          break;
-        case INFO:
-          System.out.println(text);
-          break;
-      }
+      printAlert(text);
     }
     this.active = active;
   }
@@ -142,26 +123,37 @@ public class Alert
   {
     if (active && !text.equals(this.text))
     {
-      switch (type)
-      {
-        case ERROR:
-          DriverStation.reportError(text, false);
-          break;
-        case ERROR_TRACE:
-          DriverStation.reportError(text, true);
-          break;
-        case WARNING:
-          DriverStation.reportWarning(text, false);
-          break;
-        case WARNING_TRACE:
-          DriverStation.reportWarning(text, true);
-          break;
-        case INFO:
-          System.out.println(text);
-          break;
-      }
+      printAlert(text);
     }
     this.text = text;
+  }
+
+
+  /**
+   * Print the alert message.
+   *
+   * @param text Text to print.
+   */
+  private void printAlert(String text)
+  {
+    switch (type)
+    {
+      case ERROR:
+        DriverStation.reportError(text, false);
+        break;
+      case ERROR_TRACE:
+        DriverStation.reportError(text, true);
+        break;
+      case WARNING:
+        DriverStation.reportWarning(text, false);
+        break;
+      case WARNING_TRACE:
+        DriverStation.reportWarning(text, true);
+        break;
+      case INFO:
+        System.out.println(text);
+        break;
+    }
   }
 
   /**
@@ -219,14 +211,16 @@ public class Alert
      */
     public String[] getStrings(AlertType type)
     {
-      Predicate<Alert> activeFilter = (Alert x) -> x.type == type && x.active;
-      Comparator<Alert> timeSorter =
-          (Alert a1, Alert a2) -> (int) (a2.activeStartTime - a1.activeStartTime);
-      return alerts.stream()
-                   .filter(activeFilter)
-                   .sorted(timeSorter)
-                   .map((Alert a) -> a.text)
-                   .toArray(String[]::new);
+      List<String> alertStrings = new ArrayList<>();
+      for (Alert alert : alerts)
+      {
+        if (alert.type == type && alert.active)
+        {
+          alertStrings.add(alert.text);
+        }
+      }
+      // alertStrings.sort((a1, a2) -> (int) (a2.activeStartTime - a1.activeStartTime));
+      return alertStrings.toArray(new String[alertStrings.size()]);
     }
 
     @Override

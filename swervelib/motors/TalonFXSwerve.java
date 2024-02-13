@@ -18,6 +18,10 @@ public class TalonFXSwerve extends SwerveMotor
 {
 
   /**
+   * Wait time for status frames to show up.
+   */
+  public static double             STATUS_TIMEOUT_SECONDS  = 0.02;
+  /**
    * Factory default already occurred.
    */
   private final boolean            factoryDefaultOccurred  = false;
@@ -34,21 +38,17 @@ public class TalonFXSwerve extends SwerveMotor
    */
   private final VelocityVoltage    m_velocityVoltageSetter = new VelocityVoltage(0);
   /**
-   * Wait time for status frames to show up.
-   */
-  public static double               STATUS_TIMEOUT_SECONDS = 0.02;
-  /**
    * TalonFX motor controller.
    */
   TalonFX motor;
   /**
    * Conversion factor for the motor.
    */
-  private       double               conversionFactor;
+  private double               conversionFactor;
   /**
    * Current TalonFX configuration.
    */
-  private       TalonFXConfiguration configuration          = new TalonFXConfiguration();
+  private TalonFXConfiguration configuration = new TalonFXConfiguration();
 
 
   /**
