@@ -32,11 +32,11 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Motion magic angle voltage setter.
    */
-  private final MotionMagicVoltage m_angleVoltageSetter    = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage angleVoltageSetter = new MotionMagicVoltage(0);
   /**
    * Velocity voltage setter for controlling drive motor.
    */
-  private final VelocityVoltage    m_velocityVoltageSetter = new VelocityVoltage(0);
+  private final VelocityVoltage velocityVoltageSetter = new VelocityVoltage(0);
   /**
    * TalonFX motor controller.
    */
@@ -107,9 +107,9 @@ public class TalonFXSwerve extends SwerveMotor
       configuration.ClosedLoopGeneral.ContinuousWrap = true;
       cfg.apply(configuration);
 
-      m_angleVoltageSetter.UpdateFreqHz = 0;
+      angleVoltageSetter.UpdateFreqHz = 0;
       //      m_angleVoltageExpoSetter.UpdateFreqHz = 0;
-      m_velocityVoltageSetter.UpdateFreqHz = 0;
+      velocityVoltageSetter.UpdateFreqHz = 0;
       //      motor.configFactoryDefault();
       //      motor.setSensorPhase(true);
       //      motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
@@ -341,10 +341,10 @@ public class TalonFXSwerve extends SwerveMotor
 
     if (isDriveMotor)
     {
-      motor.setControl(m_velocityVoltageSetter.withVelocity(setpoint).withFeedForward(feedforward));
+      motor.setControl(velocityVoltageSetter.withVelocity(setpoint).withFeedForward(feedforward));
     } else
     {
-      motor.setControl(m_angleVoltageSetter.withPosition(setpoint / 360.0));
+      motor.setControl(angleVoltageSetter.withPosition(setpoint / 360.0));
     }
   }
 

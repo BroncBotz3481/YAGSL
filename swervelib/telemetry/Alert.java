@@ -220,7 +220,7 @@ public class Alert
         }
       }
       // alertStrings.sort((a1, a2) -> (int) (a2.activeStartTime - a1.activeStartTime));
-      return alertStrings.toArray(new String[alertStrings.size()]);
+      return alertStrings.toArray(new String[0]);
     }
 
     @Override

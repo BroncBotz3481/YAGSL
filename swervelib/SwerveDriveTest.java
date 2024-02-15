@@ -37,23 +37,23 @@ public class SwerveDriveTest
   /**
    * Tracks the voltage being applied to a motor
    */
-  private static final MutableMeasure<Voltage>            m_appliedVoltage = mutable(Volts.of(0));
+  private static final MutableMeasure<Voltage> appliedVoltage = mutable(Volts.of(0));
   /**
    * Tracks the distance travelled of a position motor
    */
-  private static final MutableMeasure<Distance>           m_distance       = mutable(Meters.of(0));
+  private static final MutableMeasure<Distance> distance = mutable(Meters.of(0));
   /**
    * Tracks the velocity of a positional motor
    */
-  private static final MutableMeasure<Velocity<Distance>> m_velocity       = mutable(MetersPerSecond.of(0));
+  private static final MutableMeasure<Velocity<Distance>> velocity = mutable(MetersPerSecond.of(0));
   /**
    * Tracks the rotations of an angular motor
    */
-  private static final MutableMeasure<Angle>              m_anglePosition  = mutable(Degrees.of(0));
+  private static final MutableMeasure<Angle> anglePosition = mutable(Degrees.of(0));
   /**
    * Tracks the velocity of an angular motor
    */
-  private static final MutableMeasure<Velocity<Angle>>    m_angVelocity    = mutable(DegreesPerSecond.of(0));
+  private static final MutableMeasure<Velocity<Angle>> angVelocity = mutable(DegreesPerSecond.of(0));
 
   /**
    * Set the angle of the modules to a given {@link Rotation2d}
@@ -290,9 +290,9 @@ public class SwerveDriveTest
     SmartDashboard.putNumber("Module[" + module.configuration.name + "] SysId Drive Position", distance);
     SmartDashboard.putNumber("Module[" + module.configuration.name + "] SysId Drive Velocity", velocity);
     log.motor("drive-" + module.configuration.name)
-       .voltage(m_appliedVoltage.mut_replace(power, Volts))
-       .linearPosition(m_distance.mut_replace(distance, Meters))
-       .linearVelocity(m_velocity.mut_replace(velocity, MetersPerSecond));
+       .voltage(appliedVoltage.mut_replace(power, Volts))
+       .linearPosition(SwerveDriveTest.distance.mut_replace(distance, Meters))
+       .linearVelocity(SwerveDriveTest.velocity.mut_replace(velocity, MetersPerSecond));
   }
 
   /**
@@ -362,9 +362,9 @@ public class SwerveDriveTest
     SmartDashboard.putNumber("Module[" + module.configuration.name + "] SysId Angle Position", angle);
     SmartDashboard.putNumber("Module[" + module.configuration.name + "] SysId Absolute Encoder Velocity", velocity);
     log.motor("angle-" + module.configuration.name)
-       .voltage(m_appliedVoltage.mut_replace(power, Volts))
-       .angularPosition(m_anglePosition.mut_replace(angle, Degrees))
-       .angularVelocity(m_angVelocity.mut_replace(velocity, DegreesPerSecond));
+       .voltage(appliedVoltage.mut_replace(power, Volts))
+       .angularPosition(anglePosition.mut_replace(angle, Degrees))
+       .angularVelocity(angVelocity.mut_replace(velocity, DegreesPerSecond));
   }
 
   /**

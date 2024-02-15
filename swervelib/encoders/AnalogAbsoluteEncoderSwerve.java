@@ -22,11 +22,11 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
   /**
    * An {@link Alert} for if the absolute encoder offset cannot be set.
    */
-  private Alert       cannotSetOffset;
+  private final Alert       cannotSetOffset;
   /**
    * An {@link Alert} detailing how the analog absolute encoder may not report accurate velocities.
    */
-  private Alert       inaccurateVelocities;
+  private final Alert       inaccurateVelocities;
 
   /**
    * Construct the Thrifty Encoder as a Swerve Absolute Encoder.

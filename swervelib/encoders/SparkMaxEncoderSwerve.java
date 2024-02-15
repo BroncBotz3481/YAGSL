@@ -21,11 +21,11 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
   /**
    * An {@link Alert} for if there is a failure configuring the encoder.
    */
-  private Alert           failureConfiguring;
+  private final Alert           failureConfiguring;
   /**
    * An {@link Alert} for if there is a failure configuring the encoder offset.
    */
-  private Alert           offsetFailure;
+  private final Alert           offsetFailure;
 
   /**
    * Create the {@link SparkMaxEncoderSwerve} object as a duty cycle from the {@link CANSparkMax} motor.

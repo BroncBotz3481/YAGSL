@@ -21,11 +21,11 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
   /**
    * An {@link Alert} for if there is a failure configuring the encoder.
    */
-  private Alert             failureConfiguring;
+  private final Alert             failureConfiguring;
   /**
    * An {@link Alert} for if the absolute encoder does not support integrated offsets.
    */
-  private Alert             doesNotSupportIntegratedOffsets;
+  private final Alert             doesNotSupportIntegratedOffsets;
 
 
   /**
