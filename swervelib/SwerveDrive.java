@@ -446,8 +446,8 @@ public class SwerveDrive {
 
   /**
    * The primary method for controlling the drivebase. Takes a {@link ChassisSpeeds}, and calculates and commands module
-   * states accordingly. Can use either open-loop or closed-loop velocity control for the wheel velocities. Also has
-   * field- and robot-relative modes, which affect how the translation vector is used.
+   * states accordingly. Can use either open-loop or closed-loop velocity control for the wheel velocities. Applies
+   * heading correction if enabled and necessary.
    *
    * @param velocity               The chassis speeds to set the robot to achieve.
    * @param isOpenLoop             Whether to use closed-loop velocity control. Set to true to disable closed-loop.
@@ -533,7 +533,7 @@ public class SwerveDrive {
   }
 
   /**
-   * Set the module states (azimuth and velocity) directly. Used primarily for auto pathing.
+   * Set the module states (azimuth and velocity) directly.
    *
    * @param desiredStates A list of SwerveModuleStates to send to the modules.
    * @param isOpenLoop    Whether to use closed-loop velocity control. Set to true to disable closed-loop.
