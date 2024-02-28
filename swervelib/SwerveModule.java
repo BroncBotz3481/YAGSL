@@ -9,6 +9,7 @@ import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
 import swervelib.motors.SwerveMotor;
 import swervelib.parser.Cache;
+import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.simulation.SwerveModuleSimulation;
 import swervelib.telemetry.Alert;
@@ -78,13 +79,17 @@ public class SwerveModule
    */
   public        int                    moduleNumber;
   /**
-   * Feedforward for drive motor during closed loop control.
+   * Feedforward for the drive motor during closed loop control.
    */
-  public        SimpleMotorFeedforward feedforward;
+  private       SimpleMotorFeedforward driveMotorFeedforward;
   /**
    * Maximum speed of the drive motors in meters per second.
    */
   public        double                 maxSpeed;
+  /**
+   * Anti-Jitter AKA auto-centering disabled.
+   */
+  private       boolean                antiJitterEnabled        = true;
   /**
    * Last swerve module state applied.
    */
@@ -122,8 +127,8 @@ public class SwerveModule
     configuration = moduleConfiguration;
     angleOffset = moduleConfiguration.angleOffset;
 
-    // Initialize Feedforward for drive motor.
-    feedforward = driveFeedforward;
+    // Initialize Feedforwards.
+    driveMotorFeedforward = driveFeedforward;
 
     // Create motors from configuration and reset them to defaults.
     angleMotor = moduleConfiguration.angleMotor;
@@ -237,6 +242,76 @@ public class SwerveModule
   }
 
   /**
+   * Set the antiJitter functionality, if true the modules will NOT auto center. Pushes the offsets to the angle motor
+   * controllers as well.
+   *
+   * @param antiJitter Anti-Jitter state desired.
+   */
+  public void setAntiJitter(boolean antiJitter)
+  {
+    this.antiJitterEnabled = antiJitter;
+    if (antiJitter)
+    {
+      pushOffsetsToControllers();
+    } else
+    {
+      restoreInternalOffset();
+    }
+  }
+
+  /**
+   * Set the feedforward attributes to the given parameters.
+   *
+   * @param drive Drive motor feedforward for the module.
+   */
+  public void setFeedforward(SimpleMotorFeedforward drive)
+  {
+    this.driveMotorFeedforward = drive;
+  }
+
+  /**
+   * Set the drive PIDF values.
+   *
+   * @param config {@link PIDFConfig} of that should be set.
+   */
+  public void setDrivePIDF(PIDFConfig config)
+  {
+    configuration.velocityPIDF = config;
+    driveMotor.configurePIDF(config);
+  }
+
+  /**
+   * Get the current drive motor PIDF values.
+   *
+   * @return {@link PIDFConfig} of the drive motor.
+   */
+  public PIDFConfig getDrivePIDF()
+  {
+    return configuration.velocityPIDF;
+  }
+
+  /**
+   * Set the angle/azimuth/steering motor PID
+   *
+   * @param config {@link PIDFConfig} of that should be set.
+   */
+  public void setAnglePIDF(PIDFConfig config)
+  {
+    configuration.anglePIDF = config;
+    angleMotor.configurePIDF(config);
+  }
+
+  /**
+   * Get the current angle/azimuth/steering motor PIDF values.
+   *
+   * @return {@link PIDFConfig} of the angle motor.
+   */
+  public PIDFConfig getAnglePIDF()
+  {
+    return configuration.anglePIDF;
+  }
+
+  /**
    * Set the desired state of the swerve module. <br /><b>WARNING: If you are not using one of the functions from
    * {@link SwerveDrive} you may screw up {@link SwerveDrive#kinematics}</b>
    *
@@ -250,7 +325,7 @@ public class SwerveModule
     desiredState = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(getAbsolutePosition()));
 
     // If we are forcing the angle
-    if (!force)
+    if (!force && antiJitterEnabled)
     {
       // Prevents module rotation if speed is less than 1%
       SwerveMath.antiJitter(desiredState, lastState, Math.min(maxSpeed, 4));
@@ -267,7 +342,7 @@ public class SwerveModule
       driveMotor.set(percentOutput);
     } else
     {
-      driveMotor.setReference(velocity, feedforward.calculate(velocity));
+      driveMotor.setReference(velocity, driveMotorFeedforward.calculate(velocity));
       desiredState.speedMetersPerSecond = velocity;
     }
 
@@ -507,7 +582,7 @@ public class SwerveModule
    */
   public void pushOffsetsToControllers()
   {
-    if (absoluteEncoder != null)
+    if (absoluteEncoder != null && angleOffset == configuration.angleOffset)
     {
       if (absoluteEncoder.setAbsoluteEncoderOffset(angleOffset))
       {
