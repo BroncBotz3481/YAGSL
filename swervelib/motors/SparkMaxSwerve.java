@@ -53,6 +53,11 @@ public class SparkMaxSwerve extends SwerveMotor
   private Supplier<Double>      position;
 
   /**
+   * An {@link Alert} for if there is an error configuring the motor.
+   */
+  private Alert              failureConfiguringAlert;
+
+  /**
    * Initialize the swerve motor.
    *
    * @param motor        The SwerveMotor as a SparkMax object.
@@ -74,6 +79,9 @@ public class SparkMaxSwerve extends SwerveMotor
     position = encoder::getPosition;
     // Spin off configurations in a different thread.
     // configureSparkMax(() -> motor.setCANTimeout(0)); // Commented out because it prevents feedback.
+    failureConfiguringAlert = new Alert("Motors",
+                                        "Failure configuring motor " + motor.getDeviceId(),
+                                        Alert.AlertType.WARNING_TRACE);
   }
 
   /**
@@ -101,7 +109,7 @@ public class SparkMaxSwerve extends SwerveMotor
         return;
       }
     }
-    DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
+    failureConfiguringAlert.set(true);
   }
 
   /**
