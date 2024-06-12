@@ -104,7 +104,7 @@ public class SwerveDrive
   /**
    * Amount of seconds the duration of the timestep the speeds should be applied for.
    */
-  private        double                   discretizationdtSeconds                         = 0.02;
+  private       double                   discretizationdtSeconds                         = 0.02;
   /**
    * Deadband for speeds in heading correction.
    */
@@ -347,15 +347,17 @@ public class SwerveDrive
   }
 
   /**
-   * Tertiary method of controlling the drive base given velocity in both field oriented and robot oriented at the same time. 
-   * The inputs are added together so this is not intneded to be used to give the driver both methods of control.
-   * 
+   * Tertiary method of controlling the drive base given velocity in both field oriented and robot oriented at the same
+   * time. The inputs are added together so this is not intneded to be used to give the driver both methods of control.
+   *
    * @param fieldOrientedVelocity The field oriented velocties to use
    * @param robotOrientedVelocity The robot oriented velocties to use
    */
-  public void driveFieldOrientedandRobotOriented(ChassisSpeeds fieldOrientedVelocity, ChassisSpeeds robotOrientedVelocity)
+  public void driveFieldOrientedandRobotOriented(ChassisSpeeds fieldOrientedVelocity,
+                                                 ChassisSpeeds robotOrientedVelocity)
   {
-    ChassisSpeeds TotalVelocties = ChassisSpeeds.fromFieldRelativeSpeeds(fieldOrientedVelocity, getOdometryHeading()).plus(robotOrientedVelocity);
+    ChassisSpeeds TotalVelocties = ChassisSpeeds.fromFieldRelativeSpeeds(fieldOrientedVelocity, getOdometryHeading())
+                                                .plus(robotOrientedVelocity);
     drive(TotalVelocties);
   }
 
@@ -1174,11 +1176,13 @@ public class SwerveDrive
 
   /**
    * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction
-   * 
-   * @param enable
-   * @param dtSeconds
+   *
+   * @param enable    Enable chassis velocity correction, which will use
+   *                  {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following.
+   * @param dtSeconds The duration of the timestep the speeds should be applied for.
    */
-  public void setChassisDiscretization(boolean enable, double dtSeconds){
+  public void setChassisDiscretization(boolean enable, double dtSeconds)
+  {
     chassisVelocityCorrection = enable;
     discretizationdtSeconds = dtSeconds;
   }
