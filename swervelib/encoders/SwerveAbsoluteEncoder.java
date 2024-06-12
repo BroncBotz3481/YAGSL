@@ -49,7 +49,7 @@ public abstract class SwerveAbsoluteEncoder
   /**
    * Sets the Absolute Encoder offset at the Encoder Level.
    *
-   * @param offset the offset the Absolute Encoder uses as the zero point.
+   * @param offset the offset the Absolute Encoder uses as the zero point in degrees.
    * @return if setting Absolute Encoder Offset was successful or not.
    */
   public abstract boolean setAbsoluteEncoderOffset(double offset);

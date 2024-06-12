@@ -228,7 +228,6 @@ public class TalonSRXSwerve extends SwerveMotor
   @Override
   public void setInverted(boolean inverted)
   {
-    Timer.delay(1);
     motor.setInverted(inverted);
   }
 

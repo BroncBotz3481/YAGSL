@@ -75,6 +75,10 @@ public class SwerveModule
    */
   private final String                 rawDriveName;
   /**
+   * NT3 Raw drive motor.
+   */
+  private final String                 rawDriveVelName;
+  /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back right.
    */
   public        int                    moduleNumber;
@@ -207,6 +211,7 @@ public class SwerveModule
     absoluteEncoderIssueName = "Module[" + configuration.name + "] Absolute Encoder Read Issue";
     rawAngleName = "Module[" + configuration.name + "] Raw Angle Encoder";
     rawDriveName = "Module[" + configuration.name + "] Raw Drive Encoder";
+    rawDriveVelName = "Module[" + configuration.name + "] Raw Drive Velocity";
   }
 
   /**
@@ -252,7 +257,7 @@ public class SwerveModule
     this.antiJitterEnabled = antiJitter;
     if (antiJitter)
     {
-      pushOffsetsToControllers();
+      pushOffsetsToEncoders();
     } else
     {
       restoreInternalOffset();
@@ -366,7 +371,7 @@ public class SwerveModule
       simModule.updateStateAndPosition(desiredState);
     }
 
-    if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal())
+    if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.INFO.ordinal())
     {
       SwerveDriveTelemetry.desiredStates[moduleNumber * 2] = desiredState.angle.getDegrees();
       SwerveDriveTelemetry.desiredStates[(moduleNumber * 2) + 1] = velocity;
@@ -580,7 +585,7 @@ public class SwerveModule
   /**
    * Push absolute encoder offset in the memory of the encoder or controller. Also removes the internal angle offset.
    */
-  public void pushOffsetsToControllers()
+  public void pushOffsetsToEncoders()
   {
     if (absoluteEncoder != null && angleOffset == configuration.angleOffset)
     {
@@ -633,7 +638,7 @@ public class SwerveModule
     }
     SmartDashboard.putNumber(rawAngleName, angleMotor.getPosition());
     SmartDashboard.putNumber(rawDriveName, driveMotor.getPosition());
-    SmartDashboard.putNumber(adjAbsoluteAngleName, getAbsolutePosition());
+    SmartDashboard.putNumber(rawDriveVelName, driveMotor.getVelocity()); SmartDashboard.putNumber(adjAbsoluteAngleName, getAbsolutePosition());
     SmartDashboard.putNumber(absoluteEncoderIssueName, getAbsoluteEncoderReadIssue() ? 1 : 0);
   }
 }

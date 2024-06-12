@@ -26,10 +26,6 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
    * An {@link Alert}  for if the encoder cannot report accurate velocities.
    */
   private       Alert            inaccurateVelocities;
-    /**
-   * An {@link Alert}  for if the encoder is disconnected.
-   */
-  private       Alert            disconnected;
 
   /**
    * Constructor for the PWM duty cycle encoder.
@@ -43,10 +39,6 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
         "Encoders",
         "The PWM Duty Cycle encoder may not report accurate velocities!",
         Alert.AlertType.WARNING_TRACE);
-    inaccurateVelocities = new Alert(
-        "Encoders",
-        "The swerve encoder on port " + pin + "is disconnected!",
-        Alert.AlertType.ERROR_TRACE);
 
   }
 
@@ -69,7 +61,6 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getAbsolutePosition()
   {
-    disconnected.set(!encoder.isConnected());
     return (isInverted ? -1.0 : 1.0) * encoder.getAbsolutePosition() * 360;
   }
 
@@ -92,7 +83,6 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getVelocity()
   {
-    disconnected.set(!encoder.isConnected());
     inaccurateVelocities.set(true);
     return encoder.get();
   }
