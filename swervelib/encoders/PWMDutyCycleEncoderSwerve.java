@@ -26,6 +26,10 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
    * An {@link Alert}  for if the encoder cannot report accurate velocities.
    */
   private       Alert            inaccurateVelocities;
+  /**
+   * The Offset in degrees of the PWM absolute encoder.
+   */
+  private       double           offset;
 
   /**
    * Constructor for the PWM duty cycle encoder.
@@ -61,7 +65,7 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getAbsolutePosition()
   {
-    return (isInverted ? -1.0 : 1.0) * encoder.getAbsolutePosition() * 360;
+    return (isInverted ? -1.0 : 1.0) * ((encoder.get() * 360) - offset);
   }
 
   /**
@@ -105,16 +109,11 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
     // Do nothing
   }
 
-  /**
-   * Sets the offset of the Encoder in the WPILib Encoder Library.
-   *
-   * @param offset the offset the Absolute Encoder uses as the zero point.
-   * @return Always true due to no external device commands.
-   */
+
   @Override
   public boolean setAbsoluteEncoderOffset(double offset)
   {
-    encoder.setPositionOffset(offset);
+    this.offset = offset;
 
     return true;
   }
