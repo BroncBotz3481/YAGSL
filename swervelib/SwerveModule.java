@@ -379,8 +379,10 @@ public class SwerveModule
 
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
     {
-      SmartDashboard.putNumber("swerve/modules/" + configuration.name + "/Speed Setpoint", desiredState.speedMetersPerSecond);
-      SmartDashboard.putNumber("swerve/modules/" + configuration.name + "/Angle Setpoint", desiredState.angle.getDegrees());
+      SmartDashboard.putNumber("swerve/modules/" + configuration.name + "/Speed Setpoint",
+                               desiredState.speedMetersPerSecond);
+      SmartDashboard.putNumber("swerve/modules/" + configuration.name + "/Angle Setpoint",
+                               desiredState.angle.getDegrees());
     }
   }
 

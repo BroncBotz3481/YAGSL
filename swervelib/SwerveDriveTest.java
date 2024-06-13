@@ -360,7 +360,8 @@ public class SwerveDriveTest
     double velocity = module.getAbsoluteEncoder().getVelocity();
     SmartDashboard.putNumber("swerve/modules/" + module.configuration.name + "/SysId Angle Power", power);
     SmartDashboard.putNumber("swerve/modules/" + module.configuration.name + "/SysId Angle Position", angle);
-    SmartDashboard.putNumber("swerve/modules/" + module.configuration.name + "/SysId Absolute Encoder Velocity", velocity);
+    SmartDashboard.putNumber("swerve/modules/" + module.configuration.name + "/SysId Absolute Encoder Velocity",
+                             velocity);
     log.motor("angle-" + module.configuration.name)
        .voltage(m_appliedVoltage.mut_replace(power, Volts))
        .angularPosition(m_anglePosition.mut_replace(angle, Degrees))
