@@ -81,7 +81,7 @@ public class SwerveModule
   /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back right.
    */
-  public        int                    moduleNumber;
+  public final  int                    moduleNumber;
   /**
    * Maximum speed of the drive motors in meters per second.
    */
