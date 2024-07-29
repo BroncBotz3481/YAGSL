@@ -9,6 +9,7 @@ import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.parser.SwerveModulePhysicalCharacteristics;
 import swervelib.parser.json.modules.BoolMotorJson;
+import swervelib.parser.json.modules.ConversionFactorsJson;
 import swervelib.parser.json.modules.LocationJson;
 
 /**
@@ -20,11 +21,11 @@ public class ModuleJson
   /**
    * Drive motor device configuration.
    */
-  public DeviceJson        drive;
+  public DeviceJson            drive;
   /**
    * Angle motor device configuration.
    */
-  public DeviceJson        angle;
+  public DeviceJson            angle;
   /**
    * Conversion factor for the module, if different from the one in swervedrive.json
    * <p>
@@ -32,31 +33,35 @@ public class ModuleJson
    * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)} for angle motors or
    * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} for drive motors.
    */
-  public MotorConfigDouble conversionFactor        = new MotorConfigDouble(0, 0);
+  public MotorConfigDouble     conversionFactor        = new MotorConfigDouble(0, 0);
+  /**
+   * Conversion Factors composition. Auto-calculates the conversion factors.
+   */
+  public ConversionFactorsJson conversionFactors       = new ConversionFactorsJson();
   /**
    * Absolute encoder device configuration.
    */
-  public DeviceJson        encoder;
+  public DeviceJson            encoder;
   /**
    * Defines which motors are inverted.
    */
-  public BoolMotorJson     inverted;
+  public BoolMotorJson         inverted;
   /**
    * Absolute encoder offset from 0 in degrees.
    */
-  public double            absoluteEncoderOffset;
+  public double                absoluteEncoderOffset;
   /**
    * Absolute encoder inversion state.
    */
-  public boolean           absoluteEncoderInverted = false;
+  public boolean               absoluteEncoderInverted = false;
   /**
    * The location of the swerve module from the center of the robot in inches.
    */
-  public LocationJson      location;
+  public LocationJson          location;
   /**
    * Should do cosine compensation when not pointing correct direction;.
    */
-  public boolean           useCosineCompensator    = true;
+  public boolean               useCosineCompensator    = true;
 
   /**
    * Create the swerve module configuration based off of parsed data.
@@ -83,6 +88,27 @@ public class ModuleJson
       {
         angleMotor.setAbsoluteEncoder(absEncoder);
       }
+    }
+
+    // Setup deprecation notice.
+//    if (this.conversionFactor.drive != 0 && this.conversionFactor.angle != 0)
+//    {
+//      new Alert("Configuration",
+//                "\n'conversionFactor': {'drive': " + conversionFactor.drive + ", 'angle': " + conversionFactor.angle +
+//                "} \nis deprecated, please use\n" +
+//                "'conversionFactors': {'drive': {'factor': " + conversionFactor.drive + "}, 'angle': {'factor': " +
+//                conversionFactor.angle + "} }",
+//                AlertType.WARNING).set(true);
+//    }
+
+    // Override with composite conversion factor.
+    if (!conversionFactors.isAngleEmpty())
+    {
+      conversionFactor.angle = conversionFactors.angle.calculate();
+    }
+    if (!conversionFactors.isDriveEmpty())
+    {
+      conversionFactor.drive = conversionFactors.drive.calculate();
     }
 
     // Set the conversion factors to null if they are both 0.

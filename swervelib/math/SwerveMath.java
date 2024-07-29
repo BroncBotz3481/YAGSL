@@ -359,6 +359,9 @@ public class SwerveMath
   /**
    * Put an angle within the 360 deg scope of a reference. For example, given a scope reference of 756 degrees, assumes
    * the full scope is (720-1080), and places an angle of 22 degrees into it, returning 742 deg.
+   * 
+   * A more formal definition: returns the closest angle {@code n} to {@code scopeReference} such that {@code n} is
+   * congruent to {@code newAngle}.
    *
    * @param scopeReference Current Angle (deg)
    * @param newAngle       Target Angle (deg)
@@ -366,34 +369,11 @@ public class SwerveMath
    */
   public static double placeInAppropriate0To360Scope(double scopeReference, double newAngle)
   {
-    double lowerBound;
-    double upperBound;
-    double lowerOffset = scopeReference % 360;
-    if (lowerOffset >= 0)
-    {
-      lowerBound = scopeReference - lowerOffset;
-      upperBound = scopeReference + (360 - lowerOffset);
-    } else
-    {
-      upperBound = scopeReference - lowerOffset;
-      lowerBound = scopeReference - (360 + lowerOffset);
-    }
-    while (newAngle < lowerBound)
-    {
-      newAngle += 360;
-    }
-    while (newAngle > upperBound)
-    {
-      newAngle -= 360;
-    }
-    if (newAngle - scopeReference > 180)
-    {
-      newAngle -= 360;
-    } else if (newAngle - scopeReference < -180)
-    {
-      newAngle += 360;
-    }
-    return newAngle;
+    // Figure out how many revolutions from the angle to the reference
+    double diffRevs = Math.round((scopeReference - newAngle) / 360) * 360;
+
+    // Add that many revolutions
+    return diffRevs + newAngle;
   }
 
   /**

@@ -1160,6 +1160,21 @@ public class SwerveDrive
   }
 
   /**
+   * Enable auto-centering module wheels. This has a side effect of causing some jitter to the robot when a PID is not
+   * tuned perfectly. This function is a wrapper for {@link SwerveModule#setAntiJitter(boolean)} to perform
+   * auto-centering.
+   *
+   * @param enabled Enable auto-centering (disable antiJitter)
+   */
+  public void setAutoCenteringModules(boolean enabled)
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.setAntiJitter(!enabled);
+    }
+  }
+
+  /**
    * Enable or disable the {@link swervelib.parser.SwerveModuleConfiguration#useCosineCompensator} for all
    * {@link SwerveModule}'s in the swerve drive. The cosine compensator will slow down or speed up modules that are
    * close to their desired state in theory.
