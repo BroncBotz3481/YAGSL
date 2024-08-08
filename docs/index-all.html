@@ -304,13 +304,13 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Calculate the meters per rotation for the integrated encoder.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html" class="type-name-link" title="class in swervelib.encoders">CanAndCoderSwerve</a> - Class in <a href="swervelib/encoders/package-summary.html">swervelib.encoders</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html" class="type-name-link" title="class in swervelib.encoders">CanAndMagSwerve</a> - Class in <a href="swervelib/encoders/package-summary.html">swervelib.encoders</a></dt>
 <dd>
-<div class="block">HELIUM <code>Canandcoder</code> from ReduxRobotics absolute encoder, attached through the CAN bus.</div>
+<div class="block">HELIUM <code>Canandmag</code> from ReduxRobotics absolute encoder, attached through the CAN bus.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#%3Cinit%3E(int)" class="member-name-link">CanAndCoderSwerve(int)</a> - Constructor for class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#%3Cinit%3E(int)" class="member-name-link">CanAndMagSwerve(int)</a> - Constructor for class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
-<div class="block">Create the <code>Canandcoder</code></div>
+<div class="block">Create the <code>Canandmag</code></div>
 </dd>
 <dt><a href="swervelib/parser/json/DeviceJson.html#canbus" class="member-name-link">canbus</a> - Variable in class swervelib.parser.json.<a href="swervelib/parser/json/DeviceJson.html" title="class in swervelib.parser.json">DeviceJson</a></dt>
 <dd>
@@ -339,7 +339,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Clear sticky faults on the encoder.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#clearStickyFaults()" class="member-name-link">clearStickyFaults()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#clearStickyFaults()" class="member-name-link">clearStickyFaults()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
 <div class="block">Clear sticky faults on the encoder.</div>
 </dd>
@@ -432,9 +432,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configure the absolute encoder to read from [0, 360) per second.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#configure(boolean)" class="member-name-link">configure(boolean)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#configure(boolean)" class="member-name-link">configure(boolean)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
-<div class="block">Configure the CANandCoder to read from [0, 360) per second.</div>
+<div class="block">Configure the CANandMag to read from [0, 360) per second.</div>
 </dd>
 <dt><a href="swervelib/encoders/CANCoderSwerve.html#configure(boolean)" class="member-name-link">configure(boolean)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CANCoderSwerve.html" title="class in swervelib.encoders">CANCoderSwerve</a></dt>
 <dd>
@@ -768,9 +768,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Encoder as Analog Input.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#encoder" class="member-name-link">encoder</a> - Variable in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#encoder" class="member-name-link">encoder</a> - Variable in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagerve</a></dt>
 <dd>
-<div class="block">The <code>Canandcoder</code> representing the CANandCoder on the CAN bus.</div>
+<div class="block">The <code>Canandmag</code> representing the CANandMag on the CAN bus.</div>
 </dd>
 <dt><a href="swervelib/encoders/CANCoderSwerve.html#encoder" class="member-name-link">encoder</a> - Variable in class swervelib.encoders.<a href="swervelib/encoders/CANCoderSwerve.html" title="class in swervelib.encoders">CANCoderSwerve</a></dt>
 <dd>
@@ -835,7 +835,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Reset the encoder to factory defaults.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#factoryDefault()" class="member-name-link">factoryDefault()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#factoryDefault()" class="member-name-link">factoryDefault()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
 <div class="block">Reset the encoder to factory defaults.</div>
 </dd>
@@ -946,7 +946,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the instantiated absolute encoder Object.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#getAbsoluteEncoder()" class="member-name-link">getAbsoluteEncoder()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#getAbsoluteEncoder()" class="member-name-link">getAbsoluteEncoder()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
 <div class="block">Get the instantiated absolute encoder Object.</div>
 </dd>
@@ -978,7 +978,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the absolute position of the encoder.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#getAbsolutePosition()" class="member-name-link">getAbsolutePosition()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#getAbsolutePosition()" class="member-name-link">getAbsolutePosition()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
 <div class="block">Get the absolute position of the encoder.</div>
 </dd>
@@ -1370,7 +1370,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the velocity in degrees/sec.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#getVelocity()" class="member-name-link">getVelocity()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#getVelocity()" class="member-name-link">getVelocity()</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
 <div class="block">Get the velocity in degrees/sec.</div>
 </dd>
@@ -2067,9 +2067,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Cannot Set the offset of an Analog Absolute Encoder.</div>
 </dd>
-<dt><a href="swervelib/encoders/CanAndCoderSwerve.html#setAbsoluteEncoderOffset(double)" class="member-name-link">setAbsoluteEncoderOffset(double)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndCoderSwerve.html" title="class in swervelib.encoders">CanAndCoderSwerve</a></dt>
+<dt><a href="swervelib/encoders/CanAndMagSwerve.html#setAbsoluteEncoderOffset(double)" class="member-name-link">setAbsoluteEncoderOffset(double)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CanAndMagSwerve.html" title="class in swervelib.encoders">CanAndMagSwerve</a></dt>
 <dd>
-<div class="block">Cannot set the offset of the CanAndCoder.</div>
+<div class="block">Cannot set the offset of the CanAndMag.</div>
 </dd>
 <dt><a href="swervelib/encoders/CANCoderSwerve.html#setAbsoluteEncoderOffset(double)" class="member-name-link">setAbsoluteEncoderOffset(double)</a> - Method in class swervelib.encoders.<a href="swervelib/encoders/CANCoderSwerve.html" title="class in swervelib.encoders">CANCoderSwerve</a></dt>
 <dd>

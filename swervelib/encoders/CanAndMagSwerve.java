@@ -1,26 +1,26 @@
 package swervelib.encoders;
 
-import com.reduxrobotics.sensors.canandcoder.Canandcoder;
+import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 /**
- * HELIUM {@link Canandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
+ * HELIUM {@link Canandmag} from ReduxRobotics absolute encoder, attached through the CAN bus.
  */
-public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
+public class CanAndMagSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link Canandcoder} representing the CANandCoder on the CAN bus.
+   * The {@link Canandmag} representing the CANandMag on the CAN bus.
    */
-  public Canandcoder encoder;
+  public Canandmag encoder;
 
   /**
-   * Create the {@link Canandcoder}
+   * Create the {@link Canandmag}
    *
-   * @param canid The CAN ID whenever the CANandCoder is operating on the CANBus.
+   * @param canid The CAN ID whenever the CANandMag is operating on the CANBus.
    */
-  public CanAndCoderSwerve(int canid)
+  public CanAndMagSwerve(int canid)
   {
-    encoder = new Canandcoder(canid);
+    encoder = new Canandmag(canid);
   }
 
   /**
@@ -44,14 +44,14 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
-   * Configure the Canandcoder to read from [0, 360) per second.
+   * Configure the Canandmag to read from [0, 360) per second.
    *
    * @param inverted Whether the encoder is inverted.
    */
   @Override
   public void configure(boolean inverted)
   {
-    encoder.setSettings(new Canandcoder.Settings().setInvertDirection(inverted));
+    encoder.setSettings(new Canandmag.Settings().setInvertDirection(inverted));
   }
 
   /**
@@ -77,7 +77,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
-   * Cannot set the offset of the Canandcoder.
+   * Cannot set the offset of the Canandmag.
    *
    * @param offset the offset the Absolute Encoder uses as the zero point.
    * @return true if setting the zero point succeeded, false otherwise
@@ -85,7 +85,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public boolean setAbsoluteEncoderOffset(double offset)
   {
-    return encoder.setSettings(new Canandcoder.Settings().setZeroOffset(offset));
+    return encoder.setSettings(new Canandmag.Settings().setZeroOffset(offset));
   }
 
   /**
