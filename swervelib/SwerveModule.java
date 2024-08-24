@@ -43,7 +43,7 @@ public class SwerveModule
   /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back right.
    */
-  public final  int                    moduleNumber;
+  public final int moduleNumber;
   /**
    * Swerve Motors.
    */

@@ -32,13 +32,15 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
    * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data
    * port analog pin.
    *
-   * @param motor Motor to create the encoder from.
+   * @param motor      Motor to create the encoder from.
+   * @param maxVoltage Maximum voltage for analog input reading.
    */
-  public SparkMaxAnalogEncoderSwerve(SwerveMotor motor)
+  public SparkMaxAnalogEncoderSwerve(SwerveMotor motor, double maxVoltage)
   {
     if (motor.getMotor() instanceof CANSparkMax)
     {
       encoder = ((CANSparkMax) motor.getMotor()).getAnalog(Mode.kAbsolute);
+      encoder.setPositionConversionFactor(360 / maxVoltage);
     } else
     {
       throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");
@@ -108,7 +110,7 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getAbsolutePosition()
   {
-    return encoder.getPosition() * (360 / 3.3);
+    return encoder.getPosition();
   }
 
   /**
