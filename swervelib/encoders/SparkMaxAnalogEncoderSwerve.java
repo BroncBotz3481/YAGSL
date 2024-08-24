@@ -108,7 +108,7 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getAbsolutePosition()
   {
-    return encoder.getPosition();
+    return encoder.getPosition() * (360 / 3.3);
   }
 
   /**

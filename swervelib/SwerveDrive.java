@@ -1065,6 +1065,21 @@ public class SwerveDrive
   }
 
   /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust in vision measurements
+   * after the autonomous period, or to change trust as distance to a vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these numbers to trust
+   *                                 global measurements from vision less. This matrix is in the form [x, y, theta],
+   *                                 with units in meters and radians.
+   */
+  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs)
+  {
+    odometryLock.lock();
+    swerveDrivePoseEstimator.setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    odometryLock.unlock();
+  }
+
+  /**
    * Add a vision measurement to the {@link SwerveDrivePoseEstimator} and update the {@link SwerveIMU} gyro reading with
    * the given timestamp of the vision measurement.
    *

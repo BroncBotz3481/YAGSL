@@ -359,7 +359,7 @@ public class SwerveMath
   /**
    * Put an angle within the 360 deg scope of a reference. For example, given a scope reference of 756 degrees, assumes
    * the full scope is (720-1080), and places an angle of 22 degrees into it, returning 742 deg.
-   * 
+   * <p>
    * A more formal definition: returns the closest angle {@code n} to {@code scopeReference} such that {@code n} is
    * congruent to {@code newAngle}.
    *

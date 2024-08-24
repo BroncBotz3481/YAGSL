@@ -1,26 +1,26 @@
 package swervelib.encoders;
 
-import com.reduxrobotics.sensors.canandcoder.Canandcoder;
+import com.reduxrobotics.sensors.canandmag.Canandmag;
 
 /**
- * HELIUM {@link Canandcoder} from ReduxRobotics absolute encoder, attached through the CAN bus.
+ * HELIUM {@link Canandmag} from ReduxRobotics absolute encoder, attached through the CAN bus.
  */
 public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link Canandcoder} representing the CANandCoder on the CAN bus.
+   * The {@link Canandmag} representing the CANandCoder on the CAN bus.
    */
-  public Canandcoder encoder;
+  public Canandmag encoder;
 
   /**
-   * Create the {@link Canandcoder}
+   * Create the {@link Canandmag}
    *
    * @param canid The CAN ID whenever the CANandCoder is operating on the CANBus.
    */
   public CanAndCoderSwerve(int canid)
   {
-    encoder = new Canandcoder(canid);
+    encoder = new Canandmag(canid);
   }
 
   /**
@@ -51,7 +51,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public void configure(boolean inverted)
   {
-    encoder.setSettings(new Canandcoder.Settings().setInvertDirection(inverted));
+    encoder.setSettings(new Canandmag.Settings().setInvertDirection(inverted));
   }
 
   /**
@@ -85,7 +85,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public boolean setAbsoluteEncoderOffset(double offset)
   {
-    return encoder.setSettings(new Canandcoder.Settings().setZeroOffset(offset));
+    return encoder.setSettings(new Canandmag.Settings().setZeroOffset(offset));
   }
 
   /**

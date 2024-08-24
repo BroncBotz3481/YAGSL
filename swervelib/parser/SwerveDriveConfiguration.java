@@ -12,6 +12,10 @@ public class SwerveDriveConfiguration
 {
 
   /**
+   * Number of modules on the robot.
+   */
+  public final int                                 moduleCount;
+  /**
    * Swerve Module locations.
    */
   public       Translation2d[]                     moduleLocationsMeters;
@@ -19,10 +23,6 @@ public class SwerveDriveConfiguration
    * Swerve IMU
    */
   public       SwerveIMU                           imu;
-  /**
-   * Number of modules on the robot.
-   */
-  public final int                                 moduleCount;
   /**
    * Swerve Modules.
    */

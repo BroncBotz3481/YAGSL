@@ -237,7 +237,11 @@ public class SparkMaxBrushedMotorSwerve extends SwerveMotor
   @Override
   public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder)
   {
-    if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
+    if (encoder == null)
+    {
+      absoluteEncoder = null;
+      configureSparkMax(() -> pid.setFeedbackDevice(this.encoder));
+    } else if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
     {
       absoluteEncoder = (AbsoluteEncoder) encoder.getAbsoluteEncoder();
       configureSparkMax(() -> pid.setFeedbackDevice(absoluteEncoder));

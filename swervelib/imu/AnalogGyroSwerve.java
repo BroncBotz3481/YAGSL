@@ -15,7 +15,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   /**
    * Gyroscope object.
    */
-  private final AnalogGyro gyro;
+  private final AnalogGyro imu;
   /**
    * Offset for the analog gyro.
    */
@@ -37,9 +37,9 @@ public class AnalogGyroSwerve extends SwerveIMU
       throw new RuntimeException(
           "Analog Gyroscope must be attached to port 0 or 1 on the roboRIO.\n");
     }
-    gyro = new AnalogGyro(channel);
+    imu = new AnalogGyro(channel);
     factoryDefault();
-    SmartDashboard.putData(gyro);
+    SmartDashboard.putData(imu);
   }
 
   /**
@@ -48,7 +48,7 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    gyro.calibrate();
+    imu.calibrate();
     offset = new Rotation3d(0, 0, 0);
   }
 
@@ -88,7 +88,7 @@ public class AnalogGyroSwerve extends SwerveIMU
    */
   public Rotation3d getRawRotation3d()
   {
-    Rotation3d reading = new Rotation3d(0, 0, Math.toRadians(-gyro.getAngle()));
+    Rotation3d reading = new Rotation3d(0, 0, Math.toRadians(-imu.getAngle()));
     return invertedIMU ? reading.unaryMinus() : reading;
   }
 
@@ -116,6 +116,14 @@ public class AnalogGyroSwerve extends SwerveIMU
   }
 
   /**
+   * Fetch the rotation rate from the IMU in degrees per second. If rotation rate isn't supported returns empty.
+   * @return {@link Double} of the rotation rate as an {@link Optional}.
+   */
+  public double getRate() {
+    return imu.getRate();
+  }
+
+  /**
    * Get the instantiated IMU object.
    *
    * @return IMU object.
@@ -123,6 +131,6 @@ public class AnalogGyroSwerve extends SwerveIMU
   @Override
   public Object getIMU()
   {
-    return gyro;
+    return imu;
   }
 }

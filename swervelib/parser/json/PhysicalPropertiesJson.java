@@ -2,8 +2,6 @@ package swervelib.parser.json;
 
 import swervelib.parser.SwerveModulePhysicalCharacteristics;
 import swervelib.parser.json.modules.ConversionFactorsJson;
-import swervelib.telemetry.Alert;
-import swervelib.telemetry.Alert.AlertType;
 
 /**
  * {@link swervelib.parser.SwerveModulePhysicalCharacteristics} parsed data. Used to configure the SwerveModule.

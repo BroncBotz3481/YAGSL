@@ -200,7 +200,11 @@ public class SparkFlexSwerve extends SwerveMotor
   @Override
   public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder)
   {
-    if (encoder.getAbsoluteEncoder() instanceof MotorFeedbackSensor)
+    if (encoder == null)
+    {
+      absoluteEncoder = null;
+      configureSparkFlex(() -> pid.setFeedbackDevice(this.encoder));
+    } else if (encoder.getAbsoluteEncoder() instanceof MotorFeedbackSensor)
     {
       absoluteEncoderOffsetWarning.set(true);
       absoluteEncoder = encoder;
