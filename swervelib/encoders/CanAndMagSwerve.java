@@ -5,20 +5,20 @@ import com.reduxrobotics.sensors.canandmag.Canandmag;
 /**
  * HELIUM {@link Canandmag} from ReduxRobotics absolute encoder, attached through the CAN bus.
  */
-public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
+public class CanAndMagSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
-   * The {@link Canandmag} representing the CANandCoder on the CAN bus.
+   * The {@link Canandmag} representing the CANandMag on the CAN bus.
    */
   public Canandmag encoder;
 
   /**
    * Create the {@link Canandmag}
    *
-   * @param canid The CAN ID whenever the CANandCoder is operating on the CANBus.
+   * @param canid The CAN ID whenever the CANandMag is operating on the CANBus.
    */
-  public CanAndCoderSwerve(int canid)
+  public CanAndMagSwerve(int canid)
   {
     encoder = new Canandmag(canid);
   }
@@ -44,7 +44,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
-   * Configure the Canandcoder to read from [0, 360) per second.
+   * Configure the CANandMag to read from [0, 360) per second.
    *
    * @param inverted Whether the encoder is inverted.
    */
@@ -77,7 +77,7 @@ public class CanAndCoderSwerve extends SwerveAbsoluteEncoder
   }
 
   /**
-   * Cannot set the offset of the Canandcoder.
+   * Cannot set the offset of the CANandMag.
    *
    * @param offset the offset the Absolute Encoder uses as the zero point.
    * @return true if setting the zero point succeeded, false otherwise

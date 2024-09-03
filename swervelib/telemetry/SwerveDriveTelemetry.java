@@ -41,7 +41,7 @@ public class SwerveDriveTelemetry
    */
   public static       int                moduleCount;
   /**
-   * The number of swerve modules
+   * The Locations of the swerve drive wheels.
    */
   public static       double[]           wheelLocations;
   /**
