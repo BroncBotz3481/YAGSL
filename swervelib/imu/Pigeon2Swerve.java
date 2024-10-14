@@ -26,11 +26,15 @@ public class Pigeon2Swerve extends SwerveIMU
   /**
    * Offset for the Pigeon 2.
    */
-  private Rotation3d offset      = new Rotation3d();
+  private Rotation3d          offset      = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private boolean    invertedIMU = false;
+  private boolean             invertedIMU = false;
+  /**
+   * Pigeon2 configurator.
+   */
+  private Pigeon2Configurator cfg;
 
   /**
    * Generate the SwerveIMU for pigeon.
@@ -41,6 +45,7 @@ public class Pigeon2Swerve extends SwerveIMU
   public Pigeon2Swerve(int canid, String canbus)
   {
     imu = new Pigeon2(canid, canbus);
+    this.cfg = imu.getConfigurator();
     SmartDashboard.putData(imu);
   }
 
@@ -60,7 +65,6 @@ public class Pigeon2Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    Pigeon2Configurator  cfg    = imu.getConfigurator();
     Pigeon2Configuration config = new Pigeon2Configuration();
 
     // Compass utilization causes readings to jump dramatically in some cases.

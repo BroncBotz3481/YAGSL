@@ -49,6 +49,10 @@ public class TalonFXSwerve extends SwerveMotor
    * Current TalonFX configuration.
    */
   private TalonFXConfiguration configuration = new TalonFXConfiguration();
+  /**
+   * Current TalonFX Configurator.
+   */
+  private TalonFXConfigurator cfg;
 
 
   /**
@@ -61,6 +65,7 @@ public class TalonFXSwerve extends SwerveMotor
   {
     this.isDriveMotor = isDriveMotor;
     this.motor = motor;
+    this.cfg = motor.getConfigurator();
 
     factoryDefaults();
     clearStickyFaults();
@@ -102,7 +107,6 @@ public class TalonFXSwerve extends SwerveMotor
   {
     if (!factoryDefaultOccurred)
     {
-      TalonFXConfigurator cfg = motor.getConfigurator();
       configuration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       configuration.ClosedLoopGeneral.ContinuousWrap = true;
       cfg.apply(configuration);
@@ -156,7 +160,6 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor)
   {
-    TalonFXConfigurator cfg = motor.getConfigurator();
     cfg.refresh(configuration);
 
     positionConversionFactor = 1 / positionConversionFactor;
@@ -246,7 +249,6 @@ public class TalonFXSwerve extends SwerveMotor
   public void configurePIDF(PIDFConfig config)
   {
 
-    TalonFXConfigurator cfg = motor.getConfigurator();
     cfg.refresh(configuration.Slot0);
     cfg.apply(
         configuration.Slot0.withKP(config.p).withKI(config.i).withKD(config.d).withKS(config.f));
@@ -263,7 +265,6 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void configurePIDWrapping(double minInput, double maxInput)
   {
-    TalonFXConfigurator cfg = motor.getConfigurator();
     cfg.refresh(configuration.ClosedLoopGeneral);
     configuration.ClosedLoopGeneral.ContinuousWrap = true;
     cfg.apply(configuration.ClosedLoopGeneral);
@@ -414,7 +415,6 @@ public class TalonFXSwerve extends SwerveMotor
     if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation)
     {
       position = position < 0 ? (position % 360) + 360 : position;
-      TalonFXConfigurator cfg = motor.getConfigurator();
       cfg.setPosition(position / 360);
     }
   }
@@ -439,7 +439,6 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void setCurrentLimit(int currentLimit)
   {
-    TalonFXConfigurator cfg = motor.getConfigurator();
     cfg.refresh(configuration.CurrentLimits);
     cfg.apply(
         configuration.CurrentLimits.withStatorCurrentLimit(currentLimit)
@@ -454,7 +453,6 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public void setLoopRampRate(double rampRate)
   {
-    TalonFXConfigurator cfg = motor.getConfigurator();
     cfg.refresh(configuration.ClosedLoopRamps);
     cfg.apply(configuration.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(rampRate));
   }

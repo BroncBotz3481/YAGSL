@@ -112,6 +112,14 @@ public class SwerveModule
    * Encoder synchronization queued.
    */
   private       boolean                synchronizeEncoderQueued = false;
+  /**
+   * Encoder, Absolute encoder synchronization enabled.
+   */
+  private boolean synchronizeEncoderEnabled = false;
+  /**
+   * Encoder synchronization deadband in degrees.
+   */
+  private double synchronizeEncoderDeadband = 3;
 
 
   /**
@@ -242,10 +250,30 @@ public class SwerveModule
    */
   public void queueSynchronizeEncoders()
   {
-    if (absoluteEncoder != null)
+    if (absoluteEncoder != null && synchronizeEncoderEnabled)
     {
       synchronizeEncoderQueued = true;
     }
+  }
+
+  /**
+   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a few seconds.
+   * @param enabled Enable state
+   * @param deadband Deadband in degrees, default is 3 degrees.
+   */
+  public void setEncoderAutoSynchronize(boolean enabled, double deadband)
+  {
+    synchronizeEncoderEnabled = enabled;
+    synchronizeEncoderDeadband = deadband;
+  }
+
+  /**
+   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a few seconds.
+   * @param enabled Enable state
+   */
+  public void setEncoderAutoSynchronize(boolean enabled)
+  {
+    synchronizeEncoderEnabled = enabled;
   }
 
   /**
@@ -355,10 +383,12 @@ public class SwerveModule
 
     // Prevent module rotation if angle is the same as the previous angle.
     // Synchronize encoders if queued and send in the current position as the value from the absolute encoder.
-    if (absoluteEncoder != null && synchronizeEncoderQueued)
+    if (absoluteEncoder != null && synchronizeEncoderQueued && synchronizeEncoderEnabled)
     {
       double absoluteEncoderPosition = getAbsolutePosition();
-      angleMotor.setPosition(absoluteEncoderPosition);
+      if(Math.abs(angleMotor.getPosition() - absoluteEncoderPosition) >= synchronizeEncoderDeadband) {
+        angleMotor.setPosition(absoluteEncoderPosition);
+      }
       angleMotor.setReference(desiredState.angle.getDegrees(), 0, absoluteEncoderPosition);
       synchronizeEncoderQueued = false;
     } else

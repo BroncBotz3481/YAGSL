@@ -142,7 +142,7 @@ public class ModuleJson
 
     // Backwards compatibility, auto-optimization.
     if (conversionFactor.angle == 360 && absEncoder != null &&
-        absEncoder.getAbsoluteEncoder() instanceof AbsoluteEncoder && angleMotor.getMotor() instanceof CANSparkMax)
+        absEncoder.getAbsoluteEncoder() instanceof MotorFeedbackSensor && angleMotor.getMotor() instanceof CANSparkMax)
     {
       angleMotor.setAbsoluteEncoder(absEncoder);
     }

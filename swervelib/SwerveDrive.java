@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import swervelib.encoders.CANCoderSwerve;
+import swervelib.imu.IMUVelocity;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveMath;
@@ -98,6 +99,24 @@ public class SwerveDrive
    */
   public        boolean                  chassisVelocityCorrection                       = true;
   /**
+   * Correct chassis velocity in {@link SwerveDrive#setChassisSpeeds(ChassisSpeeds chassisSpeeds)} (auto) using 254's
+   * correction during auto.
+   */
+  public        boolean                  autonomousChassisVelocityCorrection             = false;
+  /**
+   * Correct for skew that scales with angular velocity in {@link SwerveDrive#drive(Translation2d, double, boolean, boolean)}
+   */
+  public        boolean                  angularVelocityCorrection                      = false;
+    /**
+   * Correct for skew that scales with angular velocity in {@link SwerveDrive#setChassisSpeeds(ChassisSpeeds chassisSpeeds)}
+   * during auto.
+   */
+  public        boolean                  autonomousAngularVelocityCorrection            = false;
+  /**
+   * Angular Velocity Correction Coefficent (expected values between -0.15 and 0.15).
+   */
+  public        double                   angularVelocityCoefficient                     = 0;
+  /**
    * Whether to correct heading when driving translationally. Set to true to enable.
    */
   public        boolean                  headingCorrection                               = false;
@@ -113,6 +132,11 @@ public class SwerveDrive
    * Swerve IMU device for sensing the heading of the robot.
    */
   private       SwerveIMU                imu;
+  /**
+   * Class that calculates robot's yaw velocity using IMU measurements. Used for angularVelocityCorrection in 
+   * {@link SwerveDrive#drive(Translation2d, double, boolean, boolean)}.
+   */
+  private       IMUVelocity             imuVelocity;
   /**
    * Simulation of the swerve drive.
    */
@@ -479,12 +503,7 @@ public class SwerveDrive
   public void drive(ChassisSpeeds velocity, boolean isOpenLoop, Translation2d centerOfRotationMeters)
   {
 
-    // Thank you to Jared Russell FRC254 for Open Loop Compensation Code
-    // https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5
-    if (chassisVelocityCorrection)
-    {
-      velocity = ChassisSpeeds.discretize(velocity, discretizationdtSeconds);
-    }
+    velocity = movementOptimizations(velocity, chassisVelocityCorrection, angularVelocityCorrection);
 
     // Heading Angular Velocity Deadband, might make a configuration option later.
     // Originally made by Team 1466 Webb Robotics.
@@ -518,7 +537,7 @@ public class SwerveDrive
     // Calculate required module states via kinematics
     SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(velocity, centerOfRotationMeters);
 
-    setRawModuleStates(swerveModuleStates, isOpenLoop);
+    setRawModuleStates(swerveModuleStates, velocity, isOpenLoop);
   }
 
   /**
@@ -568,14 +587,15 @@ public class SwerveDrive
    * Set the module states (azimuth and velocity) directly.
    *
    * @param desiredStates A list of SwerveModuleStates to send to the modules.
+   * @param desiredChassisSpeed The desired chassis speeds to set the robot to achieve.
    * @param isOpenLoop    Whether to use closed-loop velocity control. Set to true to disable closed-loop.
    */
-  private void setRawModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop)
+  private void setRawModuleStates(SwerveModuleState[] desiredStates, ChassisSpeeds desiredChassisSpeed, boolean isOpenLoop)
   {
     // Desaturates wheel speeds
     if (attainableMaxTranslationalSpeedMetersPerSecond != 0 || attainableMaxRotationalVelocityRadiansPerSecond != 0)
     {
-      SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, getRobotVelocity(),
+      SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, desiredChassisSpeed,
                                                   maxSpeedMPS,
                                                   attainableMaxTranslationalSpeedMetersPerSecond,
                                                   attainableMaxRotationalVelocityRadiansPerSecond);
@@ -593,14 +613,23 @@ public class SwerveDrive
 
   /**
    * Set the module states (azimuth and velocity) directly. Used primarily for auto paths.
+   * Does not allow for usage of desaturateWheelSpeeds(SwerveModuleState[] moduleStates,
+   * ChassisSpeeds desiredChassisSpeed, double attainableMaxModuleSpeedMetersPerSecond,
+   * double attainableMaxTranslationalSpeedMetersPerSecond, double attainableMaxRotationalVelocityRadiansPerSecond)
    *
    * @param desiredStates A list of SwerveModuleStates to send to the modules.
    * @param isOpenLoop    Whether to use closed-loop velocity control. Set to true to disable closed-loop.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop)
   {
-    setRawModuleStates(kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)),
-                       isOpenLoop);
+    desiredStates = kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates));
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeedMPS);
+
+    // Sets states
+    for (SwerveModule module : swerveModules)
+    {
+      module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop, false);
+    }
   }
 
   /**
@@ -610,11 +639,14 @@ public class SwerveDrive
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds)
   {
+
+    chassisSpeeds = movementOptimizations(chassisSpeeds, autonomousChassisVelocityCorrection, autonomousAngularVelocityCorrection);
+
     SwerveDriveTelemetry.desiredChassisSpeeds[1] = chassisSpeeds.vyMetersPerSecond;
     SwerveDriveTelemetry.desiredChassisSpeeds[0] = chassisSpeeds.vxMetersPerSecond;
     SwerveDriveTelemetry.desiredChassisSpeeds[2] = Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond);
 
-    setRawModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
+    setRawModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), chassisSpeeds, false);
   }
 
   /**
@@ -837,8 +869,22 @@ public class SwerveDrive
   }
 
   /**
+   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a few seconds.
+   * @param enabled Enable state
+   * @param deadband Deadband in degrees, default is 3 degrees.
+   */
+  public void setModuleEncoderAutoSynchronize(boolean enabled, double deadband)
+  {
+    for(SwerveModule swerveModule : swerveModules)
+    {
+      swerveModule.setEncoderAutoSynchronize(enabled, deadband);
+    }
+  }
+
+
+  /**
    * Set the maximum speed of the drive motors, modified {@link SwerveDrive#maxSpeedMPS} which is used for the
-   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState[], boolean)} function and
+   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState[], ChassisSpeeds, boolean)} function and
    * {@link SwerveController#getTargetSpeeds(double, double, double, double, double)} functions. This function overrides
    * what was placed in the JSON and could damage your motor/robot if set too high or unachievable rates.
    *
@@ -866,7 +912,7 @@ public class SwerveDrive
 
   /**
    * Set the maximum speed of the drive motors, modified {@link SwerveDrive#maxSpeedMPS} which is used for the
-   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState[], boolean)} function and
+   * {@link SwerveDrive#setRawModuleStates(SwerveModuleState[], ChassisSpeeds, boolean)} function and
    * {@link SwerveController#getTargetSpeeds(double, double, double, double, double)} functions. This function overrides
    * what was placed in the JSON and could damage your motor/robot if set too high or unachievable rates. Overwrites the
    * {@link SwerveModule#setFeedforward(SimpleMotorFeedforward)}.
@@ -1205,7 +1251,7 @@ public class SwerveDrive
   }
 
   /**
-   * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction
+   * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction in teleop
    *
    * @param enable    Enable chassis velocity correction, which will use
    *                  {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following.
@@ -1213,8 +1259,101 @@ public class SwerveDrive
    */
   public void setChassisDiscretization(boolean enable, double dtSeconds)
   {
-    chassisVelocityCorrection = enable;
-    discretizationdtSeconds = dtSeconds;
+    if(!SwerveDriveTelemetry.isSimulation)
+    {
+      chassisVelocityCorrection = enable;
+      discretizationdtSeconds = dtSeconds;
+    }
+  }
+
+  /**
+   * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction in teleop and/or auto
+   *
+   * @param useInTeleop    Enable chassis velocity correction, which will use
+   *                       {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following in teleop.
+   * @param useInAuto      Enable chassis velocity correction, which will use
+   *                       {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following in auto.
+   * @param dtSeconds      The duration of the timestep the speeds should be applied for.
+   */
+  public void setChassisDiscretization(boolean useInTeleop, boolean useInAuto, double dtSeconds)
+  {
+    if(!SwerveDriveTelemetry.isSimulation)
+    {
+      chassisVelocityCorrection = useInTeleop;
+      autonomousChassisVelocityCorrection = useInAuto;
+      discretizationdtSeconds = dtSeconds;
+    }
+  }
+
+  /**
+   * Enables angular velocity skew correction in teleop and/or autonomous
+   * and sets the angular velocity coefficient for both modes
+   *
+   * @param useInTeleop          Enables angular velocity correction in teleop.
+   * @param useInAuto            Enables angular velocity correction in autonomous.
+   * @param angularVelocityCoeff The angular velocity coefficient. Expected values between -0.15 to 0.15.
+   *                             Start with a value of 0.1, test in teleop.
+   *                             When enabling for the first time if the skew is significantly worse try inverting the value.
+   *                             Tune by moving in a straight line while rotating. Testing is best done with angular velocity controls on the right stick.
+   *                             Change the value until you are visually happy with the skew.
+   *                             Ensure your tune works with different translational and rotational magnitudes.
+   *                             If this reduces skew in teleop, it may improve auto.
+   */
+  public void setAngularVelocityCompensation(boolean useInTeleop, boolean useInAuto, double angularVelocityCoeff)
+  {
+    if(!SwerveDriveTelemetry.isSimulation)
+    {
+      imuVelocity = IMUVelocity.createIMUVelocity(imu);
+      angularVelocityCorrection = useInTeleop;
+      autonomousAngularVelocityCorrection = useInAuto;
+      angularVelocityCoefficient = angularVelocityCoeff;
+    }
+  }
+
+  /**
+   * Correct for skew that worsens as angular velocity increases
+   *
+   * @param velocity  The chassis speeds to set the robot to achieve.
+   * @return {@link ChassisSpeeds} of the robot after angular velocity skew correction.
+   */
+  public ChassisSpeeds angularVelocitySkewCorrection(ChassisSpeeds velocity)
+  {
+    var angularVelocity = new Rotation2d(imuVelocity.getVelocity() * angularVelocityCoefficient);
+      if(angularVelocity.getRadians() != 0.0){
+        velocity = ChassisSpeeds.fromRobotRelativeSpeeds(
+                      velocity.vxMetersPerSecond,
+                      velocity.vyMetersPerSecond,
+                      velocity.omegaRadiansPerSecond,
+                      getOdometryHeading());
+        velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading().plus(angularVelocity));
+      }
+    return velocity;
+  }
+
+  /**
+   * Enable desired drive corrections
+   *
+   * @param velocity                         The chassis speeds to set the robot to achieve.
+   * @param uesChassisDiscretize             Correct chassis velocity using 254's correction.
+   * @param useAngularVelocitySkewCorrection Use the robot's angular velocity to correct for skew.
+   * @return                                 The chassis speeds after optimizations.
+   */
+  private ChassisSpeeds movementOptimizations(ChassisSpeeds velocity, boolean uesChassisDiscretize, boolean useAngularVelocitySkewCorrection)
+  {
+
+    if(useAngularVelocitySkewCorrection)
+    {
+      velocity = angularVelocitySkewCorrection(velocity);
+    }
+
+    // Thank you to Jared Russell FRC254 for Open Loop Compensation Code
+    // https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5
+    if (uesChassisDiscretize)
+    {
+      velocity = ChassisSpeeds.discretize(velocity, discretizationdtSeconds);
+    }
+
+    return velocity;
   }
 
 }
