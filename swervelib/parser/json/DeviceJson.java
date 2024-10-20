@@ -20,6 +20,7 @@ import swervelib.imu.ADIS16448Swerve;
 import swervelib.imu.ADIS16470Swerve;
 import swervelib.imu.ADXRS450Swerve;
 import swervelib.imu.AnalogGyroSwerve;
+import swervelib.imu.CanandgyroSwerve;
 import swervelib.imu.NavXSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.PigeonSwerve;
@@ -117,6 +118,8 @@ public class DeviceJson
         return new ADXRS450Swerve();
       case "analog":
         return new AnalogGyroSwerve(id);
+      case "canandgyro":
+        return new CanandgyroSwerve(id);
       case "navx":
       case "navx_spi":
         return new NavXSwerve(SPI.Port.kMXP);
