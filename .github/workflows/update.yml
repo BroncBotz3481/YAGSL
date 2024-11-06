@@ -1,0 +1,33 @@
+name: Build and Publish YAGSL vendordep
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release version number"
+        type: string
+        required: true
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      releaseVersion: ${{ inputs.releaseVersion }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone dev branch
+        run: |
+          gh repo clone BroncBotz3481/YAGSL-Example -- -b dev
+      - name: Copy source over
+        run: |
+          rm -rf src/main/java/swervelib
+          cp -r YAGSL-Example/src/main/java/swervelib ./
+          rm -rf YAGSL-Example
+      - name: Update repository
+        run: |
+          git config --global user.name "thenetworkgrinch"
+          git config --global user.email "thenetworkgrinch@users.noreply.github.com"
+          git add .
+          git commit -m "Upgrading to ${{ inputs.releaseVersion }}"
+          git push
