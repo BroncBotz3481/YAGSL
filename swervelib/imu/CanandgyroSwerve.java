@@ -1,17 +1,12 @@
 package swervelib.imu;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.configs.Pigeon2Configurator;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 /**
- * SwerveIMU interface for the Boron Candandgyro by Redux Robotics
+ * SwerveIMU interface for the Boron {@link Canandgyro} by Redux Robotics
  */
 public class CanandgyroSwerve extends SwerveIMU
 {
@@ -19,24 +14,24 @@ public class CanandgyroSwerve extends SwerveIMU
   /**
    * Wait time for status frames to show up.
    */
-  public static double STATUS_TIMEOUT_SECONDS = 0.04;
+  public static double     STATUS_TIMEOUT_SECONDS = 0.04;
   /**
-   * Boron Canandgyro by Redux Robotics.
+   * Boron {@link Canandgyro} by Redux Robotics.
    */
-  Canandgyro imu;
+  private final Canandgyro imu;
   /**
-   * Offset for the Boron Canandgyro.
+   * Offset for the Boron {@link Canandgyro}.
    */
-  private Rotation3d offset      = new Rotation3d();
+  private       Rotation3d offset                 = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private boolean    invertedIMU = false;
+  private       boolean    invertedIMU            = false;
 
   /**
    * Generate the SwerveIMU for {@link Canandgyro}.
    *
-   * @param canid CAN ID for the Boron Canandgyro
+   * @param canid CAN ID for the Boron {@link Canandgyro}
    */
   public CanandgyroSwerve(int canid)
   {
@@ -44,7 +39,7 @@ public class CanandgyroSwerve extends SwerveIMU
   }
 
   /**
-   * Reset IMU to factory default.
+   * Reset {@link Canandgyro} to factory default.
    */
   @Override
   public void factoryDefault()
@@ -53,7 +48,7 @@ public class CanandgyroSwerve extends SwerveIMU
   }
 
   /**
-   * Clear sticky faults on IMU.
+   * Clear sticky faults on {@link Canandgyro}.
    */
   @Override
   public void clearStickyFaults()
@@ -128,7 +123,7 @@ public class CanandgyroSwerve extends SwerveIMU
   }
 
   /**
-   * Get the instantiated IMU object.
+   * Get the instantiated {@link Canandgyro} IMU object.
    *
    * @return IMU object.
    */

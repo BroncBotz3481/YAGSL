@@ -95,7 +95,7 @@ public class SwerveModule
   /**
    * Anti-Jitter AKA auto-centering disabled.
    */
-  private       boolean                antiJitterEnabled        = true;
+  private boolean antiJitterEnabled          = true;
   /**
    * Last swerve module state applied.
    */
@@ -111,15 +111,15 @@ public class SwerveModule
   /**
    * Encoder synchronization queued.
    */
-  private       boolean                synchronizeEncoderQueued = false;
+  private boolean synchronizeEncoderQueued   = false;
   /**
    * Encoder, Absolute encoder synchronization enabled.
    */
-  private boolean synchronizeEncoderEnabled = false;
+  private boolean synchronizeEncoderEnabled  = false;
   /**
    * Encoder synchronization deadband in degrees.
    */
-  private double synchronizeEncoderDeadband = 3;
+  private double  synchronizeEncoderDeadband = 3;
 
 
   /**
@@ -257,8 +257,10 @@ public class SwerveModule
   }
 
   /**
-   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a few seconds.
-   * @param enabled Enable state
+   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a
+   * few seconds.
+   *
+   * @param enabled  Enable state
    * @param deadband Deadband in degrees, default is 3 degrees.
    */
   public void setEncoderAutoSynchronize(boolean enabled, double deadband)
@@ -268,7 +270,9 @@ public class SwerveModule
   }
 
   /**
-   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a few seconds.
+   * Enable auto synchronization for encoders during a match. This will only occur when the modules are not moving for a
+   * few seconds.
+   *
    * @param enabled Enable state
    */
   public void setEncoderAutoSynchronize(boolean enabled)
@@ -386,7 +390,8 @@ public class SwerveModule
     if (absoluteEncoder != null && synchronizeEncoderQueued && synchronizeEncoderEnabled)
     {
       double absoluteEncoderPosition = getAbsolutePosition();
-      if(Math.abs(angleMotor.getPosition() - absoluteEncoderPosition) >= synchronizeEncoderDeadband) {
+      if (Math.abs(angleMotor.getPosition() - absoluteEncoderPosition) >= synchronizeEncoderDeadband)
+      {
         angleMotor.setPosition(absoluteEncoderPosition);
       }
       angleMotor.setReference(desiredState.angle.getDegrees(), 0, absoluteEncoderPosition);

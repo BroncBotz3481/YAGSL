@@ -33,7 +33,7 @@ public class TalonSRXSwerve extends SwerveMotor
   /**
    * TalonSRX motor controller.
    */
-  WPI_TalonSRX motor;
+  private final WPI_TalonSRX motor;
   /**
    * The position conversion factor to convert raw sensor units to Meters Per 100ms, or Ticks to Degrees.
    */

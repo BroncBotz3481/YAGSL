@@ -40,7 +40,7 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * TalonFX motor controller.
    */
-  TalonFX motor;
+  private final TalonFX motor;
   /**
    * Conversion factor for the motor.
    */

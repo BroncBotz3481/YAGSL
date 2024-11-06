@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 /**
- * SwerveIMU interface for the Pigeon2
+ * SwerveIMU interface for the {@link Pigeon2}
  */
 public class Pigeon2Swerve extends SwerveIMU
 {
@@ -18,29 +18,29 @@ public class Pigeon2Swerve extends SwerveIMU
   /**
    * Wait time for status frames to show up.
    */
-  public static double STATUS_TIMEOUT_SECONDS = 0.04;
+  public static double              STATUS_TIMEOUT_SECONDS = 0.04;
   /**
-   * Pigeon2 IMU device.
+   * {@link Pigeon2} IMU device.
    */
-  Pigeon2 imu;
+  private final Pigeon2             imu;
   /**
-   * Offset for the Pigeon 2.
+   * Offset for the {@link Pigeon2}.
    */
-  private Rotation3d          offset      = new Rotation3d();
+  private       Rotation3d          offset                 = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private boolean             invertedIMU = false;
+  private       boolean             invertedIMU            = false;
   /**
-   * Pigeon2 configurator.
+   * {@link Pigeon2} configurator.
    */
-  private Pigeon2Configurator cfg;
+  private       Pigeon2Configurator cfg;
 
   /**
-   * Generate the SwerveIMU for pigeon.
+   * Generate the SwerveIMU for {@link Pigeon2}.
    *
-   * @param canid  CAN ID for the pigeon
-   * @param canbus CAN Bus name the pigeon resides on.
+   * @param canid  CAN ID for the {@link Pigeon2}
+   * @param canbus CAN Bus name the {@link Pigeon2} resides on.
    */
   public Pigeon2Swerve(int canid, String canbus)
   {
@@ -50,9 +50,9 @@ public class Pigeon2Swerve extends SwerveIMU
   }
 
   /**
-   * Generate the SwerveIMU for pigeon.
+   * Generate the SwerveIMU for {@link Pigeon2}.
    *
-   * @param canid CAN ID for the pigeon
+   * @param canid CAN ID for the {@link Pigeon2}
    */
   public Pigeon2Swerve(int canid)
   {
@@ -60,7 +60,7 @@ public class Pigeon2Swerve extends SwerveIMU
   }
 
   /**
-   * Reset IMU to factory default.
+   * Reset {@link Pigeon2} to factory default.
    */
   @Override
   public void factoryDefault()
@@ -72,7 +72,7 @@ public class Pigeon2Swerve extends SwerveIMU
   }
 
   /**
-   * Clear sticky faults on IMU.
+   * Clear sticky faults on {@link Pigeon2}.
    */
   @Override
   public void clearStickyFaults()
@@ -153,7 +153,7 @@ public class Pigeon2Swerve extends SwerveIMU
   }
 
   /**
-   * Get the instantiated IMU object.
+   * Get the instantiated {@link Pigeon2} object.
    *
    * @return IMU object.
    */

@@ -12,6 +12,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
@@ -24,33 +25,33 @@ public class SparkMaxSwerve extends SwerveMotor
 {
 
   /**
-   * SparkMAX Instance.
+   * {@link CANSparkMax} Instance.
    */
-  public  CANSparkMax           motor;
+  private final CANSparkMax           motor;
   /**
    * Integrated encoder.
    */
-  public  RelativeEncoder       encoder;
+  public        RelativeEncoder       encoder;
   /**
    * Absolute encoder attached to the SparkMax (if exists)
    */
-  public  SwerveAbsoluteEncoder absoluteEncoder;
+  public        SwerveAbsoluteEncoder absoluteEncoder;
   /**
    * Closed-loop PID controller.
    */
-  public  SparkPIDController    pid;
+  public        SparkPIDController    pid;
   /**
    * Factory default already occurred.
    */
-  private boolean               factoryDefaultOccurred = false;
+  private       boolean               factoryDefaultOccurred = false;
   /**
    * Supplier for the velocity of the motor controller.
    */
-  private Supplier<Double>      velocity;
+  private       Supplier<Double>      velocity;
   /**
    * Supplier for the position of the motor controller.
    */
-  private Supplier<Double>      position;
+  private       Supplier<Double>      position;
 
   /**
    * Initialize the swerve motor.
@@ -100,6 +101,7 @@ public class SparkMaxSwerve extends SwerveMotor
       {
         return;
       }
+      Timer.delay(0.01);
     }
     DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
   }
@@ -252,7 +254,7 @@ public class SparkMaxSwerve extends SwerveMotor
         configureCANStatusFrames(100, 20, 20, 200, 20, 8, 50);
       }
       // Need to test on analog encoders but the same concept should apply for them, worst thing that could happen is slightly more can use
-      else if(absoluteEncoder.getAbsoluteEncoder() instanceof SparkAnalogSensor)
+      else if (absoluteEncoder.getAbsoluteEncoder() instanceof SparkAnalogSensor)
       {
         configureCANStatusFrames(100, 20, 20, 19, 200, 200, 200);
       }
@@ -357,7 +359,10 @@ public class SparkMaxSwerve extends SwerveMotor
   @Override
   public void setInverted(boolean inverted)
   {
-    motor.setInverted(inverted);
+    configureSparkMax(() -> {
+      motor.setInverted(inverted);
+      return motor.getLastError();
+    });
   }
 
   /**
