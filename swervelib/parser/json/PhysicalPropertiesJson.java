@@ -1,5 +1,8 @@
 package swervelib.parser.json;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import swervelib.parser.SwerveModulePhysicalCharacteristics;
 import swervelib.parser.json.modules.ConversionFactorsJson;
 
@@ -9,13 +12,23 @@ import swervelib.parser.json.modules.ConversionFactorsJson;
 public class PhysicalPropertiesJson
 {
 
-
   /**
-   * Conversion factor applied to the motor controllers PID loops. Can be calculated with
-   * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)} for angle motors or
-   * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} for drive motors.
+   * DEPRECATED! Use {@link PhysicalPropertiesJson#conversionFactors} instead.
    */
-  public MotorConfigDouble     conversionFactor               = new MotorConfigDouble(0, 0);
+  @Deprecated(since = "2025", forRemoval = true)
+  public MotorConfigDouble     conversionFactor               = new MotorConfigDouble();
+  /**
+   * Minimum voltage to spin the module or wheel.
+   */
+  public MotorConfigDouble     friction                       = new MotorConfigDouble(0.3, 0.2);
+  /**
+   * Steer rotational inertia in KilogramMetersSquare.
+   */
+  public double                steerRotationalInertia         = 0.03;
+  /**
+   * Robot mass in lb (pounds)
+   */
+  public double                robotMass                      = 110.2311;
   /**
    * Conversion Factors composition. Auto-calculates the conversion factors.
    */
@@ -45,35 +58,29 @@ public class PhysicalPropertiesJson
   public SwerveModulePhysicalCharacteristics createPhysicalProperties()
   {
     // Setup deprecation notice.
-//    if (conversionFactor.drive != 0 && conversionFactor.angle != 0 && conversionFactors.isDriveEmpty() &&
-//        conversionFactors.isAngleEmpty())
-//    {
-//      new Alert("Configuration",
-//                "\n'conversionFactor': {'drive': " + conversionFactor.drive + ", 'angle': " + conversionFactor.angle +
-//                "} \nis deprecated, please use\n" +
-//                "'conversionFactors': {'drive': {'factor': " + conversionFactor.drive + "}, 'angle': {'factor': " +
-//                conversionFactor.angle + "} }",
-//                AlertType.ERROR_TRACE).set(true);
-//    }
-
-    if (!conversionFactors.isAngleEmpty())
+    if (conversionFactor.drive != 0 && conversionFactor.angle != 0 && conversionFactors.isDriveEmpty() &&
+        conversionFactors.isAngleEmpty())
     {
-      conversionFactor.angle = conversionFactors.angle.calculate();
-    }
-
-    if (!conversionFactors.isDriveEmpty())
-    {
-      conversionFactor.drive = conversionFactors.drive.calculate();
+      new Alert("Configuration",
+                "\n'conversionFactor': {'drive': " + conversionFactor.drive + ", 'angle': " + conversionFactor.angle +
+                "} \nis deprecated, please use\n" +
+                "'conversionFactors': {'drive': {'factor': " + conversionFactor.drive + "}, 'angle': {'factor': " +
+                conversionFactor.angle + "} }",
+                AlertType.kError).set(true);
     }
 
     return new SwerveModulePhysicalCharacteristics(
-        conversionFactor,
+        conversionFactors,
         wheelGripCoefficientOfFriction,
         optimalVoltage,
         currentLimit.drive,
         currentLimit.angle,
         rampRate.drive,
-        rampRate.angle);
+        rampRate.angle,
+        friction.drive,
+        friction.angle,
+        steerRotationalInertia,
+        Units.Pounds.of(robotMass).in(Units.Kilogram));
   }
 }
 

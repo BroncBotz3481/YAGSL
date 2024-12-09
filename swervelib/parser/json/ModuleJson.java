@@ -1,8 +1,8 @@
 package swervelib.parser.json;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.MotorFeedbackSensor;
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.util.Units;
+import swervelib.encoders.SparkMaxEncoderSwerve;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.motors.SwerveMotor;
 import swervelib.parser.PIDFConfig;
@@ -26,14 +26,6 @@ public class ModuleJson
    * Angle motor device configuration.
    */
   public DeviceJson            angle;
-  /**
-   * Conversion factor for the module, if different from the one in swervedrive.json
-   * <p>
-   * Conversion factor applied to the motor controllers PID loops. Can be calculated with
-   * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)} for angle motors or
-   * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} for drive motors.
-   */
-  public MotorConfigDouble     conversionFactor        = new MotorConfigDouble(0, 0);
   /**
    * Conversion Factors composition. Auto-calculates the conversion factors.
    */
@@ -81,37 +73,8 @@ public class ModuleJson
     SwerveMotor           angleMotor = angle.createMotor(false);
     SwerveAbsoluteEncoder absEncoder = encoder.createEncoder(angleMotor);
 
-    // Setup deprecation notice.
-//    if (this.conversionFactor.drive != 0 && this.conversionFactor.angle != 0)
-//    {
-//      new Alert("Configuration",
-//                "\n'conversionFactor': {'drive': " + conversionFactor.drive + ", 'angle': " + conversionFactor.angle +
-//                "} \nis deprecated, please use\n" +
-//                "'conversionFactors': {'drive': {'factor': " + conversionFactor.drive + "}, 'angle': {'factor': " +
-//                conversionFactor.angle + "} }",
-//                AlertType.WARNING).set(true);
-//    }
-
-    // Override with composite conversion factor.
-    if (!conversionFactors.isAngleEmpty())
-    {
-      conversionFactor.angle = conversionFactors.angle.calculate();
-    }
-    if (!conversionFactors.isDriveEmpty())
-    {
-      conversionFactor.drive = conversionFactors.drive.calculate();
-    }
-
     // Set the conversion factors to null if they are both 0.
-    if (this.conversionFactor != null)
-    {
-      if (this.conversionFactor.angle == 0 && this.conversionFactor.drive == 0)
-      {
-        this.conversionFactor = null;
-      }
-    }
-
-    if (this.conversionFactor == null && physicalCharacteristics.conversionFactor == null)
+    if (!conversionFactors.works() && physicalCharacteristics.conversionFactor == null)
     {
       throw new RuntimeException("No Conversion Factor configured! Please create SwerveDrive using \n" +
                                  "SwerveParser.createSwerveDrive(driveFeedforward, maxSpeed, angleMotorConversionFactor, driveMotorConversion)\n" +
@@ -120,27 +83,27 @@ public class ModuleJson
                                  "OR\n" +
                                  "Set the conversion factor in physicalproperties.json OR the module JSON file." +
                                  "REMEMBER: You can calculate the conversion factors using SwerveMath.calculateMetersPerRotation AND SwerveMath.calculateDegreesPerSteeringRotation\n");
-    } else if (physicalCharacteristics.conversionFactor != null && this.conversionFactor == null)
+    } else if (physicalCharacteristics.conversionFactor.works() && !conversionFactors.works())
     {
-      this.conversionFactor = physicalCharacteristics.conversionFactor;
-    } else if (physicalCharacteristics.conversionFactor !=
-               null) // If both are defined, override 0 with the physical characterstics input.
+      conversionFactors = physicalCharacteristics.conversionFactor;
+    } else if (physicalCharacteristics.conversionFactor.works())
+    // If both are defined, override 0 with the physical characterstics input.
     {
-      this.conversionFactor.angle = this.conversionFactor.angle == 0 ? physicalCharacteristics.conversionFactor.angle
-                                                                     : this.conversionFactor.angle;
-      this.conversionFactor.drive = this.conversionFactor.drive == 0 ? physicalCharacteristics.conversionFactor.drive
-                                                                     : this.conversionFactor.drive;
+      conversionFactors.angle = conversionFactors.isAngleEmpty() ? physicalCharacteristics.conversionFactor.angle
+                                                                 : conversionFactors.angle;
+      conversionFactors.drive = conversionFactors.isDriveEmpty() ? physicalCharacteristics.conversionFactor.drive
+                                                                 : conversionFactors.drive;
     }
 
-    if (this.conversionFactor.drive == 0 || this.conversionFactor.angle == 0)
+    if (conversionFactors.isDriveEmpty() || conversionFactors.isAngleEmpty())
     {
       throw new RuntimeException(
           "Conversion factors cannot be 0, please configure conversion factors in physicalproperties.json or the module JSON files.");
     }
 
     // Backwards compatibility, auto-optimization.
-    if (conversionFactor.angle == 360 && absEncoder != null &&
-        absEncoder.getAbsoluteEncoder() instanceof MotorFeedbackSensor && angleMotor.getMotor() instanceof CANSparkMax)
+    if (conversionFactors.angle.factor == 360 && absEncoder != null &&
+        absEncoder instanceof SparkMaxEncoderSwerve && angleMotor.getMotor() instanceof SparkMax)
     {
       angleMotor.setAbsoluteEncoder(absEncoder);
     }
@@ -148,7 +111,7 @@ public class ModuleJson
     return new SwerveModuleConfiguration(
         drive.createMotor(true),
         angleMotor,
-        conversionFactor,
+        conversionFactors,
         absEncoder,
         absoluteEncoderOffset,
         Units.inchesToMeters(Math.round(location.x) == 0 ? location.front : location.x),

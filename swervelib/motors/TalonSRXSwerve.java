@@ -7,6 +7,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.system.plant.DCMotor;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveMath;
 import swervelib.parser.PIDFConfig;
@@ -21,42 +23,44 @@ public class TalonSRXSwerve extends SwerveMotor
   /**
    * Factory default already occurred.
    */
-  private final boolean               factoryDefaultOccurred = false;
+  private final boolean               factoryDefaultOccurred   = false;
   /**
    * Current TalonFX configuration.
    */
-  private final TalonSRXConfiguration configuration          = new TalonSRXConfiguration();
+  private final TalonSRXConfiguration configuration            = new TalonSRXConfiguration();
   /**
    * Whether the absolute encoder is integrated.
    */
-  private final boolean               absoluteEncoder        = false;
+  private final boolean               absoluteEncoder          = false;
   /**
    * TalonSRX motor controller.
    */
-  private final WPI_TalonSRX motor;
+  private final WPI_TalonSRX          motor;
   /**
    * The position conversion factor to convert raw sensor units to Meters Per 100ms, or Ticks to Degrees.
    */
-  private double  positionConversionFactor = 1;
+  private       double                positionConversionFactor = 1;
   /**
    * If the TalonFX configuration has changed.
    */
-  private boolean configChanged            = true;
+  private       boolean               configChanged            = true;
   /**
    * Nominal voltage default to use with feedforward.
    */
-  private double  nominalVoltage           = 12.0;
+  private       double                nominalVoltage           = 12.0;
 
   /**
    * Constructor for TalonSRX swerve motor.
    *
    * @param motor        Motor to use.
    * @param isDriveMotor Whether this motor is a drive motor.
+   * @param motorType    {@link DCMotor} which the {@link WPI_TalonSRX} is attached to.
    */
-  public TalonSRXSwerve(WPI_TalonSRX motor, boolean isDriveMotor)
+  public TalonSRXSwerve(WPI_TalonSRX motor, boolean isDriveMotor, DCMotor motorType)
   {
     this.isDriveMotor = isDriveMotor;
     this.motor = motor;
+    this.simMotor = motorType;
     motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
 
     factoryDefaults();
@@ -69,10 +73,11 @@ public class TalonSRXSwerve extends SwerveMotor
    *
    * @param id           ID of the TalonSRX on the canbus.
    * @param isDriveMotor Whether the motor is a drive or steering motor.
+   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
    */
-  public TalonSRXSwerve(int id, boolean isDriveMotor)
+  public TalonSRXSwerve(int id, boolean isDriveMotor, DCMotor motorType)
   {
-    this(new WPI_TalonSRX(id), isDriveMotor);
+    this(new WPI_TalonSRX(id), isDriveMotor, motorType);
   }
 
   /**
@@ -358,11 +363,6 @@ public class TalonSRXSwerve extends SwerveMotor
     } else
     {
       var pos = motor.getSelectedSensorPosition() * positionConversionFactor;
-      pos %= 360;
-      if (pos < 360)
-      {
-        pos += 360;
-      }
       return pos;
     }
   }
@@ -422,6 +422,17 @@ public class TalonSRXSwerve extends SwerveMotor
   }
 
   /**
+   * Set the selected feedback device for the TalonSRX.
+   *
+   * @param feedbackDevice Feedback device to select.
+   */
+  public void setSelectedFeedbackDevice(FeedbackDevice feedbackDevice)
+  {
+    configuration.primaryPID.selectedFeedbackSensor = feedbackDevice;
+    configChanged = true;
+  }
+
+  /**
    * Get the motor object from the module.
    *
    * @return Motor object.
@@ -430,6 +441,21 @@ public class TalonSRXSwerve extends SwerveMotor
   public Object getMotor()
   {
     return motor;
+  }
+
+  /**
+   * Get the {@link DCMotor} of the motor class.
+   *
+   * @return {@link DCMotor} of this type.
+   */
+  @Override
+  public DCMotor getSimMotor()
+  {
+    if (simMotor == null)
+    {
+      simMotor = DCMotor.getCIM(1);
+    }
+    return simMotor;
   }
 
   /**

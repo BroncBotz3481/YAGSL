@@ -1,6 +1,6 @@
 package swervelib.parser;
 
-import swervelib.parser.json.MotorConfigDouble;
+import swervelib.parser.json.modules.ConversionFactorsJson;
 
 /**
  * Configuration class which stores physical characteristics shared between every swerve module.
@@ -17,19 +17,31 @@ public class SwerveModulePhysicalCharacteristics
    */
   public final double driveMotorRampRate, angleMotorRampRate;
   /**
+   * The minimum voltage to spin the module or wheel.
+   */
+  public final double driveFrictionVoltage, angleFrictionVoltage;
+  /**
    * Wheel grip tape coefficient of friction on carpet, as described by the vendor.
    */
-  public final double            wheelGripCoefficientOfFriction;
+  public final double                wheelGripCoefficientOfFriction;
+  /**
+   * Steer rotational inertia in (KilogramSquareMeters) kg/m_sq.
+   */
+  public final double                steerRotationalInertia;
+  /**
+   * Robot mass in Kilograms.
+   */
+  public final double                robotMassKg;
   /**
    * The voltage to use for the smart motor voltage compensation.
    */
-  public       double            optimalVoltage;
+  public       double                optimalVoltage;
   /**
    * The conversion factors for the drive and angle motors, created by
    * {@link swervelib.math.SwerveMath#calculateMetersPerRotation(double, double, double)} and
    * {@link swervelib.math.SwerveMath#calculateDegreesPerSteeringRotation(double, double)}.
    */
-  public       MotorConfigDouble conversionFactor;
+  public       ConversionFactorsJson conversionFactor;
 
   /**
    * Construct the swerve module physical characteristics.
@@ -47,15 +59,23 @@ public class SwerveModulePhysicalCharacteristics
    *                                       over drawing power from battery)
    * @param angleMotorRampRate             The time in seconds to go from 0 to full throttle on the motor. (Prevents
    *                                       overdrawing power and power loss).
+   * @param angleFrictionVoltage           Angle motor minimum voltage.
+   * @param driveFrictionVoltage           Drive motor minimum voltage.
+   * @param steerRotationalInertia         Steering rotational inertia in KilogramSquareMeters.
+   * @param robotMassKg                    Robot mass in kG.
    */
   public SwerveModulePhysicalCharacteristics(
-      MotorConfigDouble conversionFactors,
+      ConversionFactorsJson conversionFactors,
       double wheelGripCoefficientOfFriction,
       double optimalVoltage,
       int driveMotorCurrentLimit,
       int angleMotorCurrentLimit,
       double driveMotorRampRate,
-      double angleMotorRampRate)
+      double angleMotorRampRate,
+      double driveFrictionVoltage,
+      double angleFrictionVoltage,
+      double steerRotationalInertia,
+      double robotMassKg)
   {
     this.wheelGripCoefficientOfFriction = wheelGripCoefficientOfFriction;
     this.optimalVoltage = optimalVoltage;
@@ -64,7 +84,7 @@ public class SwerveModulePhysicalCharacteristics
     // Set the conversion factors to null if they are both 0.
     if (conversionFactors != null)
     {
-      if (conversionFactors.angle == 0 && conversionFactors.drive == 0)
+      if (conversionFactors.isAngleEmpty() && conversionFactors.isDriveEmpty())
       {
         this.conversionFactor = null;
       }
@@ -74,6 +94,10 @@ public class SwerveModulePhysicalCharacteristics
     this.angleMotorCurrentLimit = angleMotorCurrentLimit;
     this.driveMotorRampRate = driveMotorRampRate;
     this.angleMotorRampRate = angleMotorRampRate;
+    this.driveFrictionVoltage = driveFrictionVoltage;
+    this.angleFrictionVoltage = angleFrictionVoltage;
+    this.steerRotationalInertia = steerRotationalInertia;
+    this.robotMassKg = robotMassKg;
   }
 
   /**
@@ -90,7 +114,7 @@ public class SwerveModulePhysicalCharacteristics
    *                           power and power loss).
    */
   public SwerveModulePhysicalCharacteristics(
-      MotorConfigDouble conversionFactors,
+      ConversionFactorsJson conversionFactors,
       double driveMotorRampRate,
       double angleMotorRampRate)
   {
@@ -101,6 +125,10 @@ public class SwerveModulePhysicalCharacteristics
         40,
         20,
         driveMotorRampRate,
-        angleMotorRampRate);
+        angleMotorRampRate,
+        0.2,
+        0.3,
+        0.03,
+        50);
   }
 }

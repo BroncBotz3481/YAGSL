@@ -15,7 +15,7 @@ public class IMULinearMovingAverageFilter
   /**
    * Gain on each reading.
    */
-  private final double m_inputGain;
+  private final double               m_inputGain;
 
   /**
    * Construct a linear moving average fitler

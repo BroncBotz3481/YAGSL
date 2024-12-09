@@ -1,5 +1,6 @@
 package swervelib.motors;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 
@@ -13,6 +14,12 @@ public abstract class SwerveMotor
    * The maximum amount of times the swerve motor will attempt to configure a motor if failures occur.
    */
   public final int     maximumRetries = 5;
+  /**
+   * Sim motor to use, defaulted in {@link SwerveMotor#getSimMotor()}, but can be overridden here. <br/> NOTE: This will
+   * not change the simulation motor type! It is intended for use only if you are utilizing Feedforwards from
+   * PathPlanner.
+   */
+  public       DCMotor simMotor;
   /**
    * Whether the swerve motor is a drive motor.
    */
@@ -171,6 +178,13 @@ public abstract class SwerveMotor
    * @return Motor object.
    */
   public abstract Object getMotor();
+
+  /**
+   * Get the {@link DCMotor} of the motor class.
+   *
+   * @return {@link DCMotor} of this type.
+   */
+  public abstract DCMotor getSimMotor();
 
   /**
    * Queries whether the absolute encoder is directly attached to the motor controller.

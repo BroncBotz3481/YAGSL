@@ -22,7 +22,8 @@ public class ConversionFactorsJson
    */
   public boolean isDriveEmpty()
   {
-    return drive.factor == 0 && drive.diameter == 0 && drive.gearRatio == 0;
+    drive.calculate();
+    return drive.factor == 0;
   }
 
   /**
@@ -32,6 +33,18 @@ public class ConversionFactorsJson
    */
   public boolean isAngleEmpty()
   {
-    return angle.factor == 0 && angle.gearRatio == 0;
+    angle.calculate();
+    return angle.factor == 0;
+  }
+
+  /**
+   * Check if the conversion factor can be found.
+   *
+   * @return If the conversion factors can be found.
+   */
+  public boolean works()
+  {
+    return (angle.factor != 0 && drive.factor != 0) ||
+           ((drive.gearRatio != 0 && drive.diameter != 0)) && (angle.gearRatio != 0);
   }
 }

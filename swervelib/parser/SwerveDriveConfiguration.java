@@ -1,9 +1,14 @@
 package swervelib.parser;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import java.util.function.Supplier;
+import org.ironmaple.simulation.drivesims.GyroSimulation;
 import swervelib.SwerveModule;
+import swervelib.imu.NavXSwerve;
+import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
+import swervelib.math.SwerveMath;
 
 /**
  * Swerve drive configurations used during SwerveDrive construction.
@@ -38,20 +43,18 @@ public class SwerveDriveConfiguration
    * @param moduleConfigs           Module configuration.
    * @param swerveIMU               Swerve IMU.
    * @param invertedIMU             Invert the IMU.
-   * @param driveFeedforward        The drive motor feedforward to use for the {@link SwerveModule}.
    * @param physicalCharacteristics {@link SwerveModulePhysicalCharacteristics} to store in association with self.
    */
   public SwerveDriveConfiguration(
       SwerveModuleConfiguration[] moduleConfigs,
       SwerveIMU swerveIMU,
       boolean invertedIMU,
-      SimpleMotorFeedforward driveFeedforward,
       SwerveModulePhysicalCharacteristics physicalCharacteristics)
   {
     this.moduleCount = moduleConfigs.length;
     this.imu = swerveIMU;
     swerveIMU.setInverted(invertedIMU);
-    this.modules = createModules(moduleConfigs, driveFeedforward);
+    this.modules = createModules(moduleConfigs);
     this.moduleLocationsMeters = new Translation2d[moduleConfigs.length];
     for (SwerveModule module : modules)
     {
@@ -63,17 +66,15 @@ public class SwerveDriveConfiguration
   /**
    * Create modules based off of the SwerveModuleConfiguration.
    *
-   * @param swerves          Swerve constants.
-   * @param driveFeedforward Drive feedforward created using
-   *                         {@link swervelib.math.SwerveMath#createDriveFeedforward(double, double, double)}.
+   * @param swerves Swerve constants.
    * @return Swerve Modules.
    */
-  public SwerveModule[] createModules(SwerveModuleConfiguration[] swerves, SimpleMotorFeedforward driveFeedforward)
+  public SwerveModule[] createModules(SwerveModuleConfiguration[] swerves)
   {
     SwerveModule[] modArr = new SwerveModule[swerves.length];
     for (int i = 0; i < swerves.length; i++)
     {
-      modArr[i] = new SwerveModule(i, swerves[i], driveFeedforward);
+      modArr[i] = new SwerveModule(i, swerves[i]);
     }
     return modArr;
   }
@@ -96,4 +97,68 @@ public class SwerveDriveConfiguration
     //Return Largest Radius
     return centerOfModules.getDistance(moduleLocationsMeters[0]);
   }
+
+  /**
+   * Get the trackwidth of the swerve modules.
+   *
+   * @return Effective trackwdtih in Meters
+   */
+  public double getTrackwidth()
+  {
+    SwerveModuleConfiguration fr = SwerveMath.getSwerveModule(modules, true, false);
+    SwerveModuleConfiguration fl = SwerveMath.getSwerveModule(modules, true, true);
+    return fr.moduleLocation.getDistance(fl.moduleLocation);
+  }
+
+  /**
+   * Get the tracklength of the swerve modules.
+   *
+   * @return Effective tracklength in Meters
+   */
+  public double getTracklength()
+  {
+    SwerveModuleConfiguration br = SwerveMath.getSwerveModule(modules, false, false);
+    SwerveModuleConfiguration bl = SwerveMath.getSwerveModule(modules, false, true);
+    return br.moduleLocation.getDistance(bl.moduleLocation);
+  }
+
+  /**
+   * Get the {@link DCMotor} corresponding to the first module's configuration.
+   *
+   * @return {@link DCMotor} of the drive motor.
+   */
+  public DCMotor getDriveMotorSim()
+  {
+    SwerveModuleConfiguration fl = SwerveMath.getSwerveModule(modules, true, true);
+    return fl.driveMotor.getSimMotor();
+  }
+
+  /**
+   * Get the {@link DCMotor} corresponding to the first module configuration.
+   *
+   * @return {@link DCMotor} of the angle motor.
+   */
+  public DCMotor getAngleMotorSim()
+  {
+    SwerveModuleConfiguration fl = SwerveMath.getSwerveModule(modules, true, true);
+    return fl.angleMotor.getSimMotor();
+  }
+
+  /**
+   * Get the gyro simulation for the robot.
+   *
+   * @return {@link GyroSimulation} gyro simulation.
+   */
+  public Supplier<GyroSimulation> getGyroSim()
+  {
+    if (imu instanceof Pigeon2Swerve)
+    {
+      return GyroSimulation.getPigeon2();
+    } else if (imu instanceof NavXSwerve)
+    {
+      return GyroSimulation.getNav2X();
+    }
+    return GyroSimulation.getGeneric();
+  }
+
 }

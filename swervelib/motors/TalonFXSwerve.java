@@ -1,12 +1,18 @@
 package swervelib.motors;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.system.plant.DCMotor;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -20,39 +26,39 @@ public class TalonFXSwerve extends SwerveMotor
   /**
    * Wait time for status frames to show up.
    */
-  public static double             STATUS_TIMEOUT_SECONDS  = 0.02;
+  public static double               STATUS_TIMEOUT_SECONDS  = 0.02;
   /**
    * Factory default already occurred.
    */
-  private final boolean            factoryDefaultOccurred  = false;
+  private final boolean              factoryDefaultOccurred  = false;
   /**
    * Whether the absolute encoder is integrated.
    */
-  private final boolean            absoluteEncoder         = false;
+  private final boolean              absoluteEncoder         = false;
   /**
    * Motion magic angle voltage setter.
    */
-  private final MotionMagicVoltage m_angleVoltageSetter    = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage   m_angleVoltageSetter    = new MotionMagicVoltage(0);
   /**
    * Velocity voltage setter for controlling drive motor.
    */
-  private final VelocityVoltage    m_velocityVoltageSetter = new VelocityVoltage(0);
+  private final VelocityVoltage      m_velocityVoltageSetter = new VelocityVoltage(0);
   /**
    * TalonFX motor controller.
    */
-  private final TalonFX motor;
+  private final TalonFX              motor;
   /**
    * Conversion factor for the motor.
    */
-  private double               conversionFactor;
+  private       double               conversionFactor;
   /**
    * Current TalonFX configuration.
    */
-  private TalonFXConfiguration configuration = new TalonFXConfiguration();
+  private       TalonFXConfiguration configuration           = new TalonFXConfiguration();
   /**
    * Current TalonFX Configurator.
    */
-  private TalonFXConfigurator cfg;
+  private       TalonFXConfigurator  cfg;
 
 
   /**
@@ -60,12 +66,14 @@ public class TalonFXSwerve extends SwerveMotor
    *
    * @param motor        Motor to use.
    * @param isDriveMotor Whether this motor is a drive motor.
+   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
    */
-  public TalonFXSwerve(TalonFX motor, boolean isDriveMotor)
+  public TalonFXSwerve(TalonFX motor, boolean isDriveMotor, DCMotor motorType)
   {
     this.isDriveMotor = isDriveMotor;
     this.motor = motor;
     this.cfg = motor.getConfigurator();
+    this.simMotor = motorType;
 
     factoryDefaults();
     clearStickyFaults();
@@ -82,10 +90,11 @@ public class TalonFXSwerve extends SwerveMotor
    * @param id           ID of the TalonFX on the CANBus.
    * @param canbus       CANBus on which the TalonFX is on.
    * @param isDriveMotor Whether the motor is a drive or steering motor.
+   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
    */
-  public TalonFXSwerve(int id, String canbus, boolean isDriveMotor)
+  public TalonFXSwerve(int id, String canbus, boolean isDriveMotor, DCMotor motorType)
   {
-    this(new TalonFX(id, canbus), isDriveMotor);
+    this(new TalonFX(id, canbus), isDriveMotor, motorType);
   }
 
   /**
@@ -93,10 +102,11 @@ public class TalonFXSwerve extends SwerveMotor
    *
    * @param id           ID of the TalonFX on the canbus.
    * @param isDriveMotor Whether the motor is a drive or steering motor.
+   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
    */
-  public TalonFXSwerve(int id, boolean isDriveMotor)
+  public TalonFXSwerve(int id, boolean isDriveMotor, DCMotor motorType)
   {
-    this(new TalonFX(id), isDriveMotor);
+    this(new TalonFX(id), isDriveMotor, motorType);
   }
 
   /**
@@ -181,63 +191,7 @@ public class TalonFXSwerve extends SwerveMotor
     cfg.apply(configuration);
     // Taken from democat's library.
     // https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/Falcon500DriveControllerFactoryBuilder.java#L16
-    configureCANStatusFrames(250);
-  }
-
-  /**
-   * Set the CAN status frames.
-   *
-   * @param CANStatus1 Applied Motor Output, Fault Information, Limit Switch Information
-   */
-  public void configureCANStatusFrames(int CANStatus1)
-  {
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, CANStatus1);
-  }
-
-  /**
-   * Set the CAN status frames.
-   *
-   * @param CANStatus1       Applied Motor Output, Fault Information, Limit Switch Information
-   * @param CANStatus2       Selected Sensor Position (PID 0), Selected Sensor Velocity (PID 0), Brushed Supply Current
-   *                         Measurement, Sticky Fault Information
-   * @param CANStatus3       Quadrature Information
-   * @param CANStatus4       Analog Input, Supply Battery Voltage, Controller Temperature
-   * @param CANStatus8       Pulse Width Information
-   * @param CANStatus10      Motion Profiling/Motion Magic Information
-   * @param CANStatus12      Selected Sensor Position (Aux PID 1), Selected Sensor Velocity (Aux PID 1)
-   * @param CANStatus13      PID0 (Primary PID) Information
-   * @param CANStatus14      PID1 (Auxiliary PID) Information
-   * @param CANStatus21      Integrated Sensor Position (Talon FX), Integrated Sensor Velocity (Talon FX)
-   * @param CANStatusCurrent Brushless Supply Current Measurement, Brushless Stator Current Measurement
-   */
-  public void configureCANStatusFrames(
-      int CANStatus1,
-      int CANStatus2,
-      int CANStatus3,
-      int CANStatus4,
-      int CANStatus8,
-      int CANStatus10,
-      int CANStatus12,
-      int CANStatus13,
-      int CANStatus14,
-      int CANStatus21,
-      int CANStatusCurrent)
-  {
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, CANStatus1);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, CANStatus2);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, CANStatus3);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, CANStatus4);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, CANStatus8);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, CANStatus10);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, CANStatus12);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, CANStatus13);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, CANStatus14);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, CANStatus21);
-    //    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_Brushless_Current,
-    // CANStatusCurrent);
-
-    // TODO: Configure Status Frame 2 thru 21 if necessary
-    // https://v5.docs.ctr-electronics.com/en/stable/ch18_CommonAPI.html#setting-status-frame-periods
+    // configureCANStatusFrames(250);
   }
 
   /**
@@ -290,7 +244,10 @@ public class TalonFXSwerve extends SwerveMotor
   public void setInverted(boolean inverted)
   {
     //    Timer.delay(1);
-    motor.setInverted(inverted);
+    cfg.refresh(configuration.MotorOutput);
+    configuration.MotorOutput.withInverted(
+        inverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive);
+    cfg.apply(configuration.MotorOutput);
   }
 
   /**
@@ -357,7 +314,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public double getVoltage()
   {
-    return motor.getMotorVoltage().waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue();
+    return motor.getMotorVoltage().waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue().in(Volts);
   }
 
   /**
@@ -390,7 +347,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public double getVelocity()
   {
-    return motor.getVelocity().getValue();
+    return motor.getVelocity().getValue().magnitude();
   }
 
   /**
@@ -401,7 +358,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public double getPosition()
   {
-    return motor.getPosition().getValue();
+    return motor.getPosition().getValue().magnitude();
   }
 
   /**
@@ -414,8 +371,7 @@ public class TalonFXSwerve extends SwerveMotor
   {
     if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation)
     {
-      position = position < 0 ? (position % 360) + 360 : position;
-      cfg.setPosition(position / 360);
+      cfg.setPosition(Degrees.of(position).in(Rotations));
     }
   }
 
@@ -441,8 +397,8 @@ public class TalonFXSwerve extends SwerveMotor
   {
     cfg.refresh(configuration.CurrentLimits);
     cfg.apply(
-        configuration.CurrentLimits.withStatorCurrentLimit(currentLimit)
-                                   .withStatorCurrentLimitEnable(true));
+        configuration.CurrentLimits.withSupplyCurrentLimit(currentLimit)
+                                   .withSupplyCurrentLimitEnable(true));
   }
 
   /**
@@ -466,6 +422,21 @@ public class TalonFXSwerve extends SwerveMotor
   public Object getMotor()
   {
     return motor;
+  }
+
+  /**
+   * Get the {@link DCMotor} of the motor class.
+   *
+   * @return {@link DCMotor} of this type.
+   */
+  @Override
+  public DCMotor getSimMotor()
+  {
+    if (simMotor == null)
+    {
+      simMotor = DCMotor.getKrakenX60(1);
+    }
+    return simMotor;
   }
 
   /**

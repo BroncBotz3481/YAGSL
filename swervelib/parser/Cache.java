@@ -1,5 +1,6 @@
 package swervelib.parser;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.function.Supplier;
 
@@ -95,7 +96,7 @@ public class Cache<T>
    */
   public T getValue()
   {
-    if (isStale())
+    if (isStale() || RobotBase.isSimulation())
     {
       update();
     }

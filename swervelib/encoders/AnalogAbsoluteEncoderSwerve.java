@@ -1,8 +1,9 @@
 package swervelib.encoders;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
-import swervelib.telemetry.Alert;
 
 /**
  * Swerve Absolute Encoder for Thrifty Encoders and other analog encoders.
@@ -39,11 +40,11 @@ public class AnalogAbsoluteEncoderSwerve extends SwerveAbsoluteEncoder
     cannotSetOffset = new Alert(
         "Encoders",
         "Cannot Set Absolute Encoder Offset of Analog Encoders Channel #" + encoder.getChannel(),
-        Alert.AlertType.WARNING);
+        AlertType.kWarning);
     inaccurateVelocities = new Alert(
         "Encoders",
         "The Analog Absolute encoder may not report accurate velocities!",
-        Alert.AlertType.WARNING_TRACE);
+        AlertType.kWarning);
   }
 
   /**

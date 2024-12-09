@@ -227,7 +227,7 @@ public class SwerveController
    *
    * @param angularVelocity Angular velocity in radians per second.
    */
-  public void setMaximumAngularVelocity(double angularVelocity)
+  public void setMaximumChassisAngularVelocity(double angularVelocity)
   {
     config.maxAngularVelocity = angularVelocity;
   }

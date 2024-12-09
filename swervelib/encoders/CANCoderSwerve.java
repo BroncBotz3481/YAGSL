@@ -1,15 +1,20 @@
 package swervelib.encoders;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import swervelib.telemetry.Alert;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 /**
  * Swerve Absolute Encoder for CTRE CANCoders.
@@ -65,21 +70,21 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
     magnetFieldLessThanIdeal = new Alert(
         "Encoders",
         "CANCoder " + encoder.getDeviceID() + " magnetic field is less than ideal.",
-        Alert.AlertType.WARNING);
+        AlertType.kWarning);
     readingFaulty = new Alert(
         "Encoders",
         "CANCoder " + encoder.getDeviceID() + " reading was faulty.",
-        Alert.AlertType.WARNING);
+        AlertType.kWarning);
     readingIgnored = new Alert(
         "Encoders",
         "CANCoder " + encoder.getDeviceID() + " reading was faulty, ignoring.",
-        Alert.AlertType.WARNING);
+        AlertType.kWarning);
     cannotSetOffset = new Alert(
         "Encoders",
         "Failure to set CANCoder "
         + encoder.getDeviceID()
         + " Absolute Encoder Offset",
-        Alert.AlertType.WARNING);
+        AlertType.kWarning);
   }
 
   /**
@@ -112,7 +117,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
     MagnetSensorConfigs  magnetSensorConfiguration = new MagnetSensorConfigs();
     cfg.refresh(magnetSensorConfiguration);
     cfg.apply(magnetSensorConfiguration
-                  .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+                  .withAbsoluteSensorDiscontinuityPoint(Rotations.of(1))
                   .withSensorDirection(inverted ? SensorDirectionValue.Clockwise_Positive
                                                 : SensorDirectionValue.CounterClockwise_Positive));
   }
@@ -139,7 +144,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
       readingFaulty.set(false);
     }
 
-    StatusSignal<Double> angle = encoder.getAbsolutePosition();
+    StatusSignal<Angle> angle = encoder.getAbsolutePosition();
 
     // Taken from democat's library.
     // Source: https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/CanCoderFactoryBuilder.java#L51-L74
@@ -160,7 +165,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
       readingIgnored.set(false);
     }
 
-    return angle.getValue() * 360;
+    return angle.getValue().in(Degrees);
   }
 
   /**
@@ -213,6 +218,6 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public double getVelocity()
   {
-    return encoder.getVelocity().getValue() * 360;
+    return encoder.getVelocity().getValue().in(DegreesPerSecond);
   }
 }

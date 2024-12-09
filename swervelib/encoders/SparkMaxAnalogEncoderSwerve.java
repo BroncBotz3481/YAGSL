@@ -1,12 +1,15 @@
 package swervelib.encoders;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkAnalogSensor;
-import com.revrobotics.SparkAnalogSensor.Mode;
+import com.revrobotics.spark.SparkAnalogSensor;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import java.util.function.Supplier;
+import swervelib.motors.SparkMaxBrushedMotorSwerve;
+import swervelib.motors.SparkMaxSwerve;
 import swervelib.motors.SwerveMotor;
-import swervelib.telemetry.Alert;
 
 /**
  * SparkMax absolute encoder, attached through the data port analog pin.
@@ -15,32 +18,37 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
 {
 
   /**
+   * {@link swervelib.motors.SparkMaxSwerve} or {@link swervelib.motors.SparkMaxBrushedMotorSwerve} object.
+   */
+  private final SwerveMotor       sparkMax;
+  /**
    * The {@link SparkAnalogSensor} representing the duty cycle encoder attached to the SparkMax analog port.
    */
-  public  SparkAnalogSensor encoder;
+  public        SparkAnalogSensor encoder;
   /**
    * An {@link Alert} for if there is a failure configuring the encoder.
    */
-  private Alert             failureConfiguring;
+  private       Alert             failureConfiguring;
   /**
    * An {@link Alert} for if the absolute encoder does not support integrated offsets.
    */
-  private Alert             doesNotSupportIntegratedOffsets;
-
+  private       Alert             doesNotSupportIntegratedOffsets;
 
   /**
-   * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link CANSparkMax} motor data
-   * port analog pin.
+   * Create the {@link SparkMaxAnalogEncoderSwerve} object as a analog sensor from the {@link SparkMax} motor data port
+   * analog pin.
    *
    * @param motor      Motor to create the encoder from.
    * @param maxVoltage Maximum voltage for analog input reading.
    */
   public SparkMaxAnalogEncoderSwerve(SwerveMotor motor, double maxVoltage)
   {
-    if (motor.getMotor() instanceof CANSparkMax)
+    if (motor.getMotor() instanceof SparkMax)
     {
-      encoder = ((CANSparkMax) motor.getMotor()).getAnalog(Mode.kAbsolute);
-      encoder.setPositionConversionFactor(360 / maxVoltage);
+      sparkMax = motor;
+      encoder = ((SparkMax) motor.getMotor()).getAnalog();
+      motor.setAbsoluteEncoder(this);
+      sparkMax.configureIntegratedEncoder(360 / maxVoltage);
     } else
     {
       throw new RuntimeException("Motor given to instantiate SparkMaxEncoder is not a CANSparkMax");
@@ -48,11 +56,11 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
     failureConfiguring = new Alert(
         "Encoders",
         "Failure configuring SparkMax Analog Encoder",
-        Alert.AlertType.WARNING_TRACE);
+        AlertType.kWarning);
     doesNotSupportIntegratedOffsets = new Alert(
         "Encoders",
         "SparkMax Analog Sensors do not support integrated offsets",
-        Alert.AlertType.WARNING_TRACE);
+        AlertType.kWarning);
 
   }
 
@@ -99,7 +107,17 @@ public class SparkMaxAnalogEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public void configure(boolean inverted)
   {
-    encoder.setInverted(inverted);
+    if (sparkMax instanceof SparkMaxSwerve)
+    {
+      SparkMaxConfig cfg = ((SparkMaxSwerve) sparkMax).getConfig();
+      cfg.analogSensor.inverted(true);
+      ((SparkMaxSwerve) sparkMax).updateConfig(cfg);
+    } else if (sparkMax instanceof SparkMaxBrushedMotorSwerve)
+    {
+      SparkMaxConfig cfg = ((SparkMaxBrushedMotorSwerve) sparkMax).getConfig();
+      cfg.analogSensor.inverted(true);
+      ((SparkMaxBrushedMotorSwerve) sparkMax).updateConfig(cfg);
+    }
   }
 
   /**

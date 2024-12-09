@@ -1,20 +1,20 @@
 package swervelib;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -37,23 +37,23 @@ public class SwerveDriveTest
   /**
    * Tracks the voltage being applied to a motor
    */
-  private static final MutableMeasure<Voltage>            m_appliedVoltage = mutable(Volts.of(0));
+  private static final MutVoltage         m_appliedVoltage = new MutVoltage(0, 0, Volts);
   /**
    * Tracks the distance travelled of a position motor
    */
-  private static final MutableMeasure<Distance>           m_distance       = mutable(Meters.of(0));
+  private static final MutDistance        m_distance       = new MutDistance(0, 0, Meter);
   /**
    * Tracks the velocity of a positional motor
    */
-  private static final MutableMeasure<Velocity<Distance>> m_velocity       = mutable(MetersPerSecond.of(0));
+  private static final MutLinearVelocity  m_velocity       = new MutLinearVelocity(0, 9, MetersPerSecond);
   /**
    * Tracks the rotations of an angular motor
    */
-  private static final MutableMeasure<Angle>              m_anglePosition  = mutable(Degrees.of(0));
+  private static final MutAngle           m_anglePosition  = new MutAngle(0, 0, Degrees);
   /**
    * Tracks the velocity of an angular motor
    */
-  private static final MutableMeasure<Velocity<Angle>>    m_angVelocity    = mutable(DegreesPerSecond.of(0));
+  private static final MutAngularVelocity m_angVelocity    = new MutAngularVelocity(0, 0, DegreesPerSecond);
 
   /**
    * Set the angle of the modules to a given {@link Rotation2d}
@@ -214,7 +214,7 @@ public class SwerveDriveTest
       Timer.delay(1);
       Rotation2d startingAbsoluteEncoderPosition = Rotation2d.fromDegrees(absoluteEncoder.getAbsolutePosition());
       double driveEncoderPositionRotations = module.getDriveMotor().getPosition() /
-                                             module.configuration.conversionFactors.drive;
+                                             module.configuration.conversionFactors.drive.factor;
       if (automatic)
       {
         module.getAngleMotor().setVoltage(volts);
@@ -230,8 +230,9 @@ public class SwerveDriveTest
             false);
         Timer.delay(60);
       }
-      double couplingRatio = (module.getDriveMotor().getPosition() / module.configuration.conversionFactors.drive) -
-                             driveEncoderPositionRotations;
+      double couplingRatio =
+          (module.getDriveMotor().getPosition() / module.configuration.conversionFactors.drive.factor) -
+          driveEncoderPositionRotations;
       DriverStation.reportWarning(module.configuration.name + " Coupling Ratio: " + couplingRatio, false);
       couplingRatioSum += couplingRatio;
     }
@@ -308,7 +309,7 @@ public class SwerveDriveTest
                                                   SwerveDrive swerveDrive, double maxVolts)
   {
     return new SysIdRoutine(config, new SysIdRoutine.Mechanism(
-        (Measure<Voltage> voltage) -> {
+        (Voltage voltage) -> {
           SwerveDriveTest.centerModules(swerveDrive);
           SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, Math.min(voltage.in(Volts), maxVolts));
         },
@@ -380,7 +381,7 @@ public class SwerveDriveTest
                                                   SwerveDrive swerveDrive)
   {
     return new SysIdRoutine(config, new SysIdRoutine.Mechanism(
-        (Measure<Voltage> voltage) -> {
+        (Voltage voltage) -> {
           SwerveDriveTest.powerAngleMotorsVoltage(swerveDrive, voltage.in(Volts));
           SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, 0);
         },

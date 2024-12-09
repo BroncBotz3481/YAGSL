@@ -18,7 +18,7 @@ public class SwerveControllerConfiguration
   public final double
                           angleJoyStickRadiusDeadband; // Deadband for the minimum hypot for the heading joystick.
   /**
-   * Maximum angular velocity in rad/s
+   * Maximum chassis angular velocity in rad/s
    */
   public       double     maxAngularVelocity;
 

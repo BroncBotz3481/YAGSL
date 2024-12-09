@@ -411,6 +411,10 @@ public class SwerveMath
    */
   public static Translation2d scaleTranslation(Translation2d translation, double scalar)
   {
+    if (Math.hypot(translation.getX(), translation.getY()) <= 1.0E-6)
+    {
+      return translation;
+    }
     return new Translation2d(translation.getNorm() * scalar, translation.getAngle());
   }
 }

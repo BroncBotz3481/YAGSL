@@ -1,7 +1,8 @@
 package swervelib.encoders;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import swervelib.telemetry.Alert;
 
 /**
  * DutyCycle encoders such as "US Digital MA3 with PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
@@ -42,7 +43,7 @@ public class PWMDutyCycleEncoderSwerve extends SwerveAbsoluteEncoder
     inaccurateVelocities = new Alert(
         "Encoders",
         "The PWM Duty Cycle encoder may not report accurate velocities!",
-        Alert.AlertType.WARNING_TRACE);
+        AlertType.kWarning);
 
   }
 
