@@ -1,7 +1,11 @@
 package swervelib.imu;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
@@ -15,15 +19,19 @@ public class ADXRS450Swerve extends SwerveIMU
   /**
    * {@link ADXRS450_Gyro} device to read the current headings from.
    */
-  private final ADXRS450_Gyro imu;
+  private final ADXRS450_Gyro      imu;
+  /**
+   * Mutable {@link AngularVelocity} for readings.
+   */
+  private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
    * Offset for the ADXRS450.
    */
-  private       Rotation3d    offset      = new Rotation3d();
+  private       Rotation3d         offset      = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private       boolean       invertedIMU = false;
+  private       boolean            invertedIMU = false;
 
   /**
    * Construct the ADXRS450 imu and reset default configurations. Publish the gyro to the SmartDashboard.
@@ -108,14 +116,10 @@ public class ADXRS450Swerve extends SwerveIMU
     return Optional.empty();
   }
 
-  /**
-   * Fetch the rotation rate from the IMU in degrees per second. If rotation rate isn't supported returns empty.
-   *
-   * @return {@link Double} of the rotation rate as an {@link Optional}.
-   */
-  public double getRate()
+  @Override
+  public MutAngularVelocity getYawAngularVelocity()
   {
-    return imu.getRate();
+    return yawVel.mut_setMagnitude(imu.getRate());
   }
 
   /**

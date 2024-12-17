@@ -1,9 +1,13 @@
 package swervelib.imu;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
@@ -16,15 +20,19 @@ public class PigeonSwerve extends SwerveIMU
   /**
    * {@link WPI_PigeonIMU} IMU device.
    */
-  private final WPI_PigeonIMU imu;
+  private final WPI_PigeonIMU      imu;
+  /**
+   * Mutable {@link AngularVelocity} for readings.
+   */
+  private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
    * Offset for the {@link WPI_PigeonIMU}.
    */
-  private       Rotation3d    offset      = new Rotation3d();
+  private       Rotation3d         offset      = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private       boolean       invertedIMU = false;
+  private       boolean            invertedIMU = false;
 
   /**
    * Generate the SwerveIMU for {@link WPI_PigeonIMU}.
@@ -115,14 +123,10 @@ public class PigeonSwerve extends SwerveIMU
     return Optional.of(new Translation3d(initial[0], initial[1], initial[2]).times(9.81 / 16384.0));
   }
 
-  /**
-   * Fetch the rotation rate from the IMU in degrees per second. If rotation rate isn't supported returns empty.
-   *
-   * @return {@link Double} of the rotation rate as an {@link Optional}.
-   */
-  public double getRate()
+  @Override
+  public MutAngularVelocity getYawAngularVelocity()
   {
-    return imu.getRate();
+    return yawVel.mut_setMagnitude(imu.getRate());
   }
 
   /**

@@ -67,6 +67,10 @@ public class SparkMaxSwerve extends SwerveMotor
    * Tracker for changes that need to be pushed.
    */
   private       boolean                   cfgUpdated             = false;
+  /**
+   * After the first post-module config update there will be an error thrown to alert to a possible issue.
+   */
+  private boolean startupInitialized = false;
 
 
   /**
@@ -122,7 +126,7 @@ public class SparkMaxSwerve extends SwerveMotor
       {
         return;
       }
-      Timer.delay(Units.Milliseconds.of(10).in(Seconds));
+      Timer.delay(Units.Milliseconds.of(5).in(Seconds));
     }
     DriverStation.reportWarning("Failure configuring motor " + motor.getDeviceId(), true);
   }
@@ -427,7 +431,9 @@ public class SparkMaxSwerve extends SwerveMotor
   @Override
   public void burnFlash()
   {
-    motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    configureSparkMax(() -> {
+      return motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    });
     cfgUpdated = false;
   }
 
@@ -456,7 +462,14 @@ public class SparkMaxSwerve extends SwerveMotor
     if (cfgUpdated)
     {
       burnFlash();
-      Timer.delay(0.1); // Give 100ms to apply changes
+      Timer.delay(0.01); // Give 10ms to apply changes
+      if (startupInitialized)
+      {
+        DriverStation.reportWarning("Applying changes mid-execution not recommended.", true);
+      } else
+      {
+        startupInitialized = true;
+      }
     }
 
     if (isDriveMotor)

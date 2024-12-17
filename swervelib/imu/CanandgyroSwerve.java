@@ -1,8 +1,12 @@
 package swervelib.imu;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import java.util.Optional;
 
 /**
@@ -14,19 +18,23 @@ public class CanandgyroSwerve extends SwerveIMU
   /**
    * Wait time for status frames to show up.
    */
-  public static double     STATUS_TIMEOUT_SECONDS = 0.04;
+  public static double             STATUS_TIMEOUT_SECONDS = 0.04;
   /**
    * Boron {@link Canandgyro} by Redux Robotics.
    */
-  private final Canandgyro imu;
+  private final Canandgyro         imu;
+  /**
+   * Mutable {@link AngularVelocity} for readings.
+   */
+  private final MutAngularVelocity yawVel                 = new MutAngularVelocity(0, 0, RotationsPerSecond);
   /**
    * Offset for the Boron {@link Canandgyro}.
    */
-  private       Rotation3d offset                 = new Rotation3d();
+  private       Rotation3d         offset                 = new Rotation3d();
   /**
    * Inversion for the gyro
    */
-  private       boolean    invertedIMU            = false;
+  private       boolean            invertedIMU            = false;
 
   /**
    * Generate the SwerveIMU for {@link Canandgyro}.
@@ -112,14 +120,10 @@ public class CanandgyroSwerve extends SwerveIMU
     return Optional.of(new Translation3d(imu.getAccelerationFrame().getValue()).times(9.81 / 16384.0));
   }
 
-  /**
-   * Fetch the rotation rate from the IMU in degrees per second. If rotation rate isn't supported returns empty.
-   *
-   * @return {@link Double} of the rotation rate as an {@link Optional}.
-   */
-  public double getRate()
+  @Override
+  public MutAngularVelocity getYawAngularVelocity()
   {
-    return imu.getAngularVelocityYaw();
+    return yawVel.mut_setMagnitude(imu.getAngularVelocityYaw());
   }
 
   /**

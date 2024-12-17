@@ -195,6 +195,10 @@ public class DeviceJson
       case "talonsrx":
         return new TalonSRXSwerve(id, isDriveMotor, DCMotor.getCIM(1));
       case "sparkmax_brushed":
+        if (canbus == null)
+        {
+          canbus = "";
+        }
         switch (canbus)
         {
           case "greyhill_63r256":

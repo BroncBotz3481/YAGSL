@@ -19,6 +19,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -75,6 +76,10 @@ public class SparkFlexSwerve extends SwerveMotor
    * Tracker for changes that need to be pushed.
    */
   private       boolean                   cfgUpdated             = false;
+  /**
+   * After the first post-module config update there will be an error thrown to alert to a possible issue.
+   */
+  private boolean startupInitialized = false;
 
 
   /**
@@ -135,7 +140,7 @@ public class SparkFlexSwerve extends SwerveMotor
       {
         return;
       }
-      Timer.delay(Units.Milliseconds.of(10).in(Seconds));
+      Timer.delay(Units.Milliseconds.of(5).in(Seconds));
     }
     failureConfiguring.set(true);
   }
@@ -420,7 +425,9 @@ public class SparkFlexSwerve extends SwerveMotor
   @Override
   public void burnFlash()
   {
-    motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    configureSparkFlex(() -> {
+      return motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    });
     cfgUpdated = false;
   }
 
@@ -449,7 +456,14 @@ public class SparkFlexSwerve extends SwerveMotor
     if (cfgUpdated)
     {
       burnFlash();
-      Timer.delay(0.1); // Give 100ms to apply changes
+      Timer.delay(0.01); // Give 10ms to apply changes
+      if (startupInitialized)
+      {
+        DriverStation.reportWarning("Applying changes mid-execution not recommended.", true);
+      } else
+      {
+        startupInitialized = true;
+      }
     }
 
     if (isDriveMotor)
