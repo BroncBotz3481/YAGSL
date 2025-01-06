@@ -52,11 +52,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
@@ -243,7 +246,7 @@ public class SwerveDrive
                                                                               .withRobotMass(Kilograms.of(config.physicalCharacteristics.robotMassKg))
                                                                               .withCustomModuleTranslations(config.moduleLocationsMeters)
                                                                               .withGyro(config.getGyroSim())
-                                                                              .withSwerveModule(() -> new SwerveModuleSimulation(
+                                                                              .withSwerveModule(new SwerveModuleSimulationConfig(
                                                                                   config.getDriveMotorSim(),
                                                                                   config.getAngleMotorSim(),
                                                                                   config.physicalCharacteristics.conversionFactor.drive.gearRatio,
@@ -254,7 +257,8 @@ public class SwerveDrive
                                                                                       config.physicalCharacteristics.conversionFactor.drive.diameter /
                                                                                       2),
                                                                                   KilogramSquareMeters.of(0.02),
-                                                                                  config.physicalCharacteristics.wheelGripCoefficientOfFriction));
+                                                                                  config.physicalCharacteristics.wheelGripCoefficientOfFriction)
+                                                                                               );
 
       mapleSimDrive = new SwerveDriveSimulation(simulationConfig, startingPose);
 
@@ -452,39 +456,38 @@ public class SwerveDrive
 
   /**
    * Tertiary method of controlling the drive base given velocity in both field oriented and robot oriented at the same
-   * time. The inputs are added together so this is not intneded to be used to give the driver both methods of control.
+   * time. The inputs are added together so this is not intended to be used to give the driver both methods of control.
    *
    * @param fieldOrientedVelocity The field oriented velocties to use
    * @param robotOrientedVelocity The robot oriented velocties to use
    */
-  public void driveFieldOrientedandRobotOriented(ChassisSpeeds fieldOrientedVelocity,
+  public void driveFieldOrientedAndRobotOriented(ChassisSpeeds fieldOrientedVelocity,
                                                  ChassisSpeeds robotOrientedVelocity)
   {
-    fieldOrientedVelocity.toRobotRelativeSpeeds(getOdometryHeading());
-    drive(fieldOrientedVelocity.plus(robotOrientedVelocity));
+
+    drive(ChassisSpeeds.fromFieldRelativeSpeeds(fieldOrientedVelocity, getOdometryHeading())
+                       .plus(robotOrientedVelocity));
   }
 
   /**
    * Secondary method of controlling the drive base given velocity and adjusting it for field oriented use.
    *
-   * @param velocity Velocity of the robot desired.
+   * @param fieldRelativeSpeeds Velocity of the robot desired.
    */
-  public void driveFieldOriented(ChassisSpeeds velocity)
+  public void driveFieldOriented(ChassisSpeeds fieldRelativeSpeeds)
   {
-    velocity.toRobotRelativeSpeeds(getOdometryHeading());
-    drive(velocity);
+    drive(ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, getOdometryHeading()));
   }
 
   /**
    * Secondary method of controlling the drive base given velocity and adjusting it for field oriented use.
    *
-   * @param velocity               Velocity of the robot desired.
+   * @param fieldRelativeSpeeds    Velocity of the robot desired.
    * @param centerOfRotationMeters The center of rotation in meters, 0 is the center of the robot.
    */
-  public void driveFieldOriented(ChassisSpeeds velocity, Translation2d centerOfRotationMeters)
+  public void driveFieldOriented(ChassisSpeeds fieldRelativeSpeeds, Translation2d centerOfRotationMeters)
   {
-    velocity.toRobotRelativeSpeeds(getOdometryHeading());
-    drive(velocity, centerOfRotationMeters);
+    drive(ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, getOdometryHeading()), centerOfRotationMeters);
   }
 
   /**
@@ -535,7 +538,7 @@ public class SwerveDrive
     ChassisSpeeds velocity = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
     if (fieldRelative)
     {
-      velocity.toRobotRelativeSpeeds(getOdometryHeading());
+      velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
     }
     drive(velocity, isOpenLoop, centerOfRotationMeters);
   }
@@ -564,7 +567,7 @@ public class SwerveDrive
 
     if (fieldRelative)
     {
-      velocity.toRobotRelativeSpeeds(getOdometryHeading());
+      ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
     }
     drive(velocity, isOpenLoop, new Translation2d());
   }
@@ -730,7 +733,6 @@ public class SwerveDrive
   /**
    * Drive the robot using the {@link SwerveModuleState}, it is recommended to have
    * {@link SwerveDrive#setCosineCompensator(boolean)} set to false for this.<br/>
-   * <p>
    *
    * @param robotRelativeVelocity Robot relative {@link ChassisSpeeds}
    * @param states                Corresponding {@link SwerveModuleState} to use (not checked against the
@@ -844,8 +846,10 @@ public class SwerveDrive
     // but not the reverse.  However, because this transform is a simple rotation, negating the
     // angle given as the robot angle reverses the direction of rotation, and the conversion is reversed.
     ChassisSpeeds robotRelativeSpeeds = kinematics.toChassisSpeeds(getStates());
-    robotRelativeSpeeds.toFieldRelativeSpeeds(getOdometryHeading());//.unaryMinus());
-    return robotRelativeSpeeds;
+    return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getOdometryHeading());
+    // Might need to be this instead
+    //return ChassisSpeeds.fromFieldRelativeSpeeds(
+    //        kinematics.toChassisSpeeds(getStates()), getOdometryHeading().unaryMinus());
   }
 
   /**
@@ -874,8 +878,7 @@ public class SwerveDrive
       mapleSimDrive.setSimulationWorldPose(pose);
     }
     odometryLock.unlock();
-    ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
-    robotRelativeSpeeds.toFieldRelativeSpeeds(getYaw());
+    ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(new ChassisSpeeds(0, 0, 0), getYaw());
     kinematics.toSwerveModuleStates(robotRelativeSpeeds);
 
   }
@@ -1408,8 +1411,8 @@ public class SwerveDrive
   /**
    * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction in teleop
    *
-   * @param enable    Enable chassis velocity correction, which will use {@link ChassisSpeeds#discretize(double)} with
-   *                  the following.
+   * @param enable    Enable chassis velocity correction, which will use
+   *                  {@link ChassisSpeeds#discretize(ChassisSpeeds, double)}} with the following.
    * @param dtSeconds The duration of the timestep the speeds should be applied for.
    */
   public void setChassisDiscretization(boolean enable, double dtSeconds)
@@ -1425,10 +1428,10 @@ public class SwerveDrive
    * Sets the Chassis discretization seconds as well as enableing/disabling the Chassis velocity correction in teleop
    * and/or auto
    *
-   * @param useInTeleop Enable chassis velocity correction, which will use {@link ChassisSpeeds#discretize(double)} with
-   *                    the following in teleop.
-   * @param useInAuto   Enable chassis velocity correction, which will use {@link ChassisSpeeds#discretize(double)} with
-   *                    the following in auto.
+   * @param useInTeleop Enable chassis velocity correction, which will use
+   *                    {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following in teleop.
+   * @param useInAuto   Enable chassis velocity correction, which will use
+   *                    {@link ChassisSpeeds#discretize(ChassisSpeeds, double)} with the following in auto.
    * @param dtSeconds   The duration of the timestep the speeds should be applied for.
    */
   public void setChassisDiscretization(boolean useInTeleop, boolean useInAuto, double dtSeconds)
@@ -1476,8 +1479,10 @@ public class SwerveDrive
     var angularVelocity = new Rotation2d(imu.getYawAngularVelocity().in(RadiansPerSecond) * angularVelocityCoefficient);
     if (angularVelocity.getRadians() != 0.0)
     {
-      robotRelativeVelocity.toFieldRelativeSpeeds(getOdometryHeading());
-      robotRelativeVelocity.toRobotRelativeSpeeds(getOdometryHeading().plus(angularVelocity));
+      ChassisSpeeds fieldRelativeVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeVelocity,
+                                                                                  getOdometryHeading());
+      robotRelativeVelocity = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeVelocity,
+                                                                    getOdometryHeading().plus(angularVelocity));
     }
     return robotRelativeVelocity;
   }
@@ -1503,7 +1508,7 @@ public class SwerveDrive
     // https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5
     if (uesChassisDiscretize)
     {
-      robotRelativeVelocity.discretize(discretizationdtSeconds);
+      robotRelativeVelocity = ChassisSpeeds.discretize(robotRelativeVelocity, discretizationdtSeconds);
     }
 
     return robotRelativeVelocity;

@@ -237,21 +237,21 @@ public class SwerveModule
                                      moduleNumber,
                                      AlertType.kWarning);
 
-    rawAbsoluteAnglePublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    rawAbsoluteAnglePublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Raw Absolute Encoder").publish();
-    adjAbsoluteAnglePublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    adjAbsoluteAnglePublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Adjusted Absolute Encoder").publish();
-    absoluteEncoderIssuePublisher = NetworkTableInstance.getDefault().getBooleanTopic(
+    absoluteEncoderIssuePublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getBooleanTopic(
         "swerve/modules/" + configuration.name + "/Absolute Encoder Read Issue").publish();
-    rawAnglePublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    rawAnglePublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Raw Angle Encoder").publish();
-    rawDriveEncoderPublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    rawDriveEncoderPublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Raw Drive Encoder").publish();
-    rawDriveVelocityPublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    rawDriveVelocityPublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Raw Drive Velocity").publish();
-    speedSetpointPublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    speedSetpointPublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Speed Setpoint").publish();
-    angleSetpointPublisher = NetworkTableInstance.getDefault().getDoubleTopic(
+    angleSetpointPublisher = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(
         "swerve/modules/" + configuration.name + "/Angle Setpoint").publish();
   }
 
@@ -423,7 +423,10 @@ public class SwerveModule
     LinearVelocity curVelocity = MetersPerSecond.of(lastState.speedMetersPerSecond);
     desiredState.speedMetersPerSecond = nextVelocity.magnitude();
 
-    setDesiredState(desiredState, isOpenLoop, driveMotorFeedforward.calculate(nextVelocity).magnitude());
+    setDesiredState(desiredState,
+                    isOpenLoop,
+                    driveMotorFeedforward.calculateWithVelocities(curVelocity.in(MetersPerSecond),
+                                                                  nextVelocity.in(MetersPerSecond)));
   }
 
   /**
@@ -441,7 +444,7 @@ public class SwerveModule
     if (isOpenLoop)
     {
       double percentOutput = desiredState.speedMetersPerSecond / maxDriveVelocity.in(MetersPerSecond);
-      driveMotor.set(percentOutput);
+      driveMotor.setVoltage(percentOutput * 12);
     } else
     {
       driveMotor.setReference(desiredState.speedMetersPerSecond, driveFeedforwardVoltage);
@@ -823,8 +826,9 @@ public class SwerveModule
    * Configure the {@link SwerveModule#simModule} with the MapleSim
    * {@link org.ironmaple.simulation.drivesims.SwerveModuleSimulation}
    *
-   * @param swerveModuleSimulation MapleSim {@link org.ironmaple.simulation.drivesims.SwerveModuleSimulation} to
-   *                               configure with.
+   * @param swerveModuleSimulation  MapleSim {@link org.ironmaple.simulation.drivesims.SwerveModuleSimulation} to
+   *                                configure with.
+   * @param physicalCharacteristics {@link SwerveModulePhysicalCharacteristics} that represent the swerve drive.
    */
   public void configureModuleSimulation(
       org.ironmaple.simulation.drivesims.SwerveModuleSimulation swerveModuleSimulation,

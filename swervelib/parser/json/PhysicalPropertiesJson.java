@@ -1,6 +1,8 @@
 package swervelib.parser.json;
 
-import edu.wpi.first.units.Units;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.Pounds;
+
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import swervelib.parser.SwerveModulePhysicalCharacteristics;
@@ -80,7 +82,7 @@ public class PhysicalPropertiesJson
         friction.drive,
         friction.angle,
         steerRotationalInertia,
-        Units.Pounds.of(robotMass).in(Units.Kilogram));
+        Pounds.of(robotMass).in(Kilogram));
   }
 }
 

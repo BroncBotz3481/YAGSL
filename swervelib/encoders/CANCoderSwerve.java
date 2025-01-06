@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -27,11 +28,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   /**
    * Wait time for status frames to show up.
    */
-  public static double STATUS_TIMEOUT_SECONDS = Milliseconds.of(10).in(Seconds);
-  /**
-   * CANCoder with WPILib sendable and support.
-   */
-  public        CANcoder                        encoder;
+  public static double                          STATUS_TIMEOUT_SECONDS = Milliseconds.of(10).in(Seconds);
   /**
    * An {@link Alert} for if the CANCoder magnet field is less than ideal.
    */
@@ -60,6 +57,10 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
    * Angular velocity of the {@link CANcoder}.
    */
   private final StatusSignal<AngularVelocity>   velocity;
+  /**
+   * CANCoder with WPILib sendable and support.
+   */
+  public        CANcoder                        encoder;
   /**
    * {@link CANcoder} Configurator objet for this class.
    */

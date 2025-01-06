@@ -20,6 +20,7 @@ public class SwerveModuleSimulation
    * Configure the maple sim module
    *
    * @param simModule the {@link org.ironmaple.simulation.drivesims.SwerveModuleSimulation} object for simulation
+   * @param physicalCharacteristics Physical characteristics of the swerve drive from the JSON or built.
    */
   public void configureSimModule(org.ironmaple.simulation.drivesims.SwerveModuleSimulation simModule,
                                  SwerveModulePhysicalCharacteristics physicalCharacteristics)

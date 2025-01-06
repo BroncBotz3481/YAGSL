@@ -1,5 +1,6 @@
 package swervelib.motors;
 
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -8,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,7 +18,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,7 +42,7 @@ public class SparkFlexSwerve extends SwerveMotor
    */
   public        RelativeEncoder           encoder;
   /**
-   * Absolute encoder attached to the SparkMax (if exists)
+   * Absolute encoder attached to the SparkFlex (if exists)
    */
   public        SwerveAbsoluteEncoder     absoluteEncoder;
   /**
@@ -72,14 +73,6 @@ public class SparkFlexSwerve extends SwerveMotor
    * Configuration object for {@link SparkFlex} motor.
    */
   private       SparkFlexConfig           cfg                    = new SparkFlexConfig();
-  /**
-   * Tracker for changes that need to be pushed.
-   */
-  private       boolean                   cfgUpdated             = false;
-  /**
-   * After the first post-module config update there will be an error thrown to alert to a possible issue.
-   */
-  private boolean startupInitialized = false;
 
 
   /**
@@ -99,10 +92,9 @@ public class SparkFlexSwerve extends SwerveMotor
     encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
     cfg.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder); // Configure feedback of the PID controller as the integrated encoder.
-    cfgUpdated = true;
 
     // Spin off configurations in a different thread.
-    // configureSparkMax(() -> motor.setCANTimeout(0)); // Commented out because it prevents feedback.
+    // configureSparkFlex(() -> motor.setCANTimeout(0)); // Commented out because it prevents feedback.
     failureConfiguring = new Alert("Motors",
                                    "Failure configuring motor " +
                                    motor.getDeviceId(),
@@ -118,7 +110,7 @@ public class SparkFlexSwerve extends SwerveMotor
   /**
    * Initialize the {@link SwerveMotor} as a {@link SparkFlex} connected to a Brushless Motor.
    *
-   * @param id           CAN ID of the SparkMax.
+   * @param id           CAN ID of the SparkFlex.
    * @param isDriveMotor Is the motor being initialized a drive motor?
    * @param motorType    {@link DCMotor} which the {@link SparkFlex} is attached to.
    */
@@ -140,7 +132,7 @@ public class SparkFlexSwerve extends SwerveMotor
       {
         return;
       }
-      Timer.delay(Units.Milliseconds.of(5).in(Seconds));
+      Timer.delay(Milliseconds.of(5).in(Seconds));
     }
     failureConfiguring.set(true);
   }
@@ -148,7 +140,7 @@ public class SparkFlexSwerve extends SwerveMotor
   /**
    * Get the current configuration of the {@link SparkFlex}
    *
-   * @return {@link SparkMaxConfig}
+   * @return {@link SparkFlexConfig}
    */
   public SparkFlexConfig getConfig()
   {
@@ -162,9 +154,12 @@ public class SparkFlexSwerve extends SwerveMotor
    */
   public void updateConfig(SparkFlexConfig cfgGiven)
   {
+    if (!DriverStation.isDisabled())
+    {
+      throw new RuntimeException("Configuration changes cannot be applied while the robot is enabled.");
+    }
     cfg.apply(cfgGiven);
     configureSparkFlex(() -> motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
-    cfgUpdated = false;
   }
 
   /**
@@ -176,7 +171,6 @@ public class SparkFlexSwerve extends SwerveMotor
   public void setVoltageCompensation(double nominalVoltage)
   {
     cfg.voltageCompensation(nominalVoltage);
-    cfgUpdated = true;
   }
 
   /**
@@ -190,7 +184,6 @@ public class SparkFlexSwerve extends SwerveMotor
   {
 
     cfg.smartCurrentLimit(currentLimit);
-    cfgUpdated = true;
   }
 
   /**
@@ -203,7 +196,6 @@ public class SparkFlexSwerve extends SwerveMotor
   {
     cfg.closedLoopRampRate(rampRate)
        .openLoopRampRate(rampRate);
-    cfgUpdated = true;
   }
 
   /**
@@ -274,14 +266,12 @@ public class SparkFlexSwerve extends SwerveMotor
     {
       absoluteEncoder = null;
       cfg.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-      cfgUpdated = true;
 
       velocity = this.encoder::getVelocity;
       position = this.encoder::getPosition;
     } else if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
     {
       cfg.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-      cfgUpdated = true;
       absoluteEncoderOffsetWarning.set(true);
       absoluteEncoder = encoder;
 
@@ -361,7 +351,6 @@ public class SparkFlexSwerve extends SwerveMotor
             .velocityConversionFactor(positionConversionFactor / 60);
       }
     }
-    cfgUpdated = true;
 
   }
 
@@ -376,7 +365,6 @@ public class SparkFlexSwerve extends SwerveMotor
     cfg.closedLoop.pidf(config.p, config.i, config.d, config.f)
                   .iZone(config.iz)
                   .outputRange(config.output.min, config.output.max);
-    cfgUpdated = true;
   }
 
   /**
@@ -391,7 +379,6 @@ public class SparkFlexSwerve extends SwerveMotor
     cfg.closedLoop
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(minInput, maxInput);
-    cfgUpdated = true;
 
   }
 
@@ -404,7 +391,6 @@ public class SparkFlexSwerve extends SwerveMotor
   public void setMotorBrake(boolean isBrakeMode)
   {
     cfg.idleMode(isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
-    cfgUpdated = true;
   }
 
   /**
@@ -416,7 +402,6 @@ public class SparkFlexSwerve extends SwerveMotor
   public void setInverted(boolean inverted)
   {
     cfg.inverted(inverted);
-    cfgUpdated = true;
   }
 
   /**
@@ -425,10 +410,13 @@ public class SparkFlexSwerve extends SwerveMotor
   @Override
   public void burnFlash()
   {
+    if (!DriverStation.isDisabled())
+    {
+      throw new RuntimeException("Config updates cannot be applied while the robot is Enabled!");
+    }
     configureSparkFlex(() -> {
       return motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     });
-    cfgUpdated = false;
   }
 
   /**
@@ -451,20 +439,6 @@ public class SparkFlexSwerve extends SwerveMotor
   @Override
   public void setReference(double setpoint, double feedforward)
   {
-    int pidSlot = 0;
-
-    if (cfgUpdated)
-    {
-      burnFlash();
-      Timer.delay(0.01); // Give 10ms to apply changes
-      if (startupInitialized)
-      {
-        DriverStation.reportWarning("Applying changes mid-execution not recommended.", true);
-      } else
-      {
-        startupInitialized = true;
-      }
-    }
 
     if (isDriveMotor)
     {
@@ -472,7 +446,7 @@ public class SparkFlexSwerve extends SwerveMotor
                              pid.setReference(
                                  setpoint,
                                  ControlType.kVelocity,
-                                 pidSlot,
+                                 ClosedLoopSlot.kSlot0,
                                  feedforward));
     } else
     {
@@ -480,7 +454,7 @@ public class SparkFlexSwerve extends SwerveMotor
                              pid.setReference(
                                  setpoint,
                                  ControlType.kPosition,
-                                 pidSlot,
+                                 ClosedLoopSlot.kSlot0,
                                  feedforward));
       if (SwerveDriveTelemetry.isSimulation)
       {

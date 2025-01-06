@@ -2,8 +2,8 @@ package swervelib.imu;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+
 import java.util.Optional;
 
 /**
@@ -59,9 +59,9 @@ public abstract class SwerveIMU
   public abstract Optional<Translation3d> getAccel();
 
   /**
-   * Fetch the rotation rate from the IMU as {@link AngularVelocity}
+   * Fetch the rotation rate from the IMU as {@link MutAngularVelocity}
    *
-   * @return {@link AngularVelocity} of the rotation rate.
+   * @return {@link MutAngularVelocity} of the rotation rate.
    */
   public abstract MutAngularVelocity getYawAngularVelocity();
 
