@@ -567,7 +567,7 @@ public class SwerveDrive
 
     if (fieldRelative)
     {
-      ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
+      velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
     }
     drive(velocity, isOpenLoop, new Translation2d());
   }
