@@ -73,7 +73,7 @@ public class SwerveModuleConfiguration
    * @param driveMotor              Drive {@link SwerveMotor}.
    * @param angleMotor              Angle {@link SwerveMotor}
    * @param absoluteEncoder         Absolute encoder {@link SwerveAbsoluteEncoder}.
-   * @param angleOffset             Absolute angle offset to 0.
+   * @param angleOffset             Absolute angle offset in degrees to 0.
    * @param absoluteEncoderInverted Absolute encoder inverted.
    * @param angleMotorInverted      State of inversion of the angle motor.
    * @param driveMotorInverted      Drive motor inverted.
@@ -127,7 +127,7 @@ public class SwerveModuleConfiguration
    * @param angleMotor              Angle {@link SwerveMotor}
    * @param conversionFactors       Conversion factors for angle/azimuth motors drive factors.
    * @param absoluteEncoder         Absolute encoder {@link SwerveAbsoluteEncoder}.
-   * @param angleOffset             Absolute angle offset to 0.
+   * @param angleOffset             Absolute angle offset in degrees to 0.
    * @param xMeters                 Module location in meters from the center horizontally.
    * @param yMeters                 Module location in meters from center vertically.
    * @param anglePIDF               Angle PIDF configuration.
