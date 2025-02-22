@@ -20,7 +20,7 @@ public class ADIS16448Swerve extends SwerveIMU
    */
   private final ADIS16448_IMU      imu;
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
@@ -40,6 +40,11 @@ public class ADIS16448Swerve extends SwerveIMU
     imu = new ADIS16448_IMU();
     factoryDefault();
     SmartDashboard.putData(imu);
+  }
+
+  @Override
+  public void close() {
+    imu.close();
   }
 
   /**

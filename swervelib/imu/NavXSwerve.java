@@ -18,7 +18,7 @@ public class NavXSwerve extends SwerveIMU
 {
 
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
@@ -60,6 +60,10 @@ public class NavXSwerve extends SwerveIMU
     }
   }
 
+  @Override
+  public void close() {
+    imu.close();
+  }
 
   /**
    * Reset offset to current gyro reading. Does not call NavX({@link AHRS#reset()}) because it has been reported to be

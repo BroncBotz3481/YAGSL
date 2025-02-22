@@ -429,7 +429,7 @@ public class SwerveDriveTelemetry
       updateSwerveTelemetrySettings();
     }
     measuredChassisSpeeds[0] = measuredChassisSpeedsObj.vxMetersPerSecond;
-    measuredChassisSpeeds[1] = measuredChassisSpeedsObj.vxMetersPerSecond;
+    measuredChassisSpeeds[1] = measuredChassisSpeedsObj.vyMetersPerSecond;
     measuredChassisSpeeds[2] = Math.toDegrees(measuredChassisSpeedsObj.omegaRadiansPerSecond);
 
     desiredChassisSpeeds[0] = desiredChassisSpeedsObj.vxMetersPerSecond;

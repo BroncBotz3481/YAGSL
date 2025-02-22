@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import java.util.function.Supplier;
 import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
  * Class to perform tests on the swerve drive.
@@ -101,7 +104,7 @@ public class SwerveDriveTest
    * Power the drive motors for the swerve drive to a set voltage.
    *
    * @param swerveDrive {@link SwerveDrive} to control.
-   * @param volts       DutyCycle percentage of voltage to send to drive motors.
+   * @param volts       Voltage to send to drive motors.
    */
   public static void powerDriveMotorsVoltage(SwerveDrive swerveDrive, double volts)
   {
@@ -133,6 +136,60 @@ public class SwerveDriveTest
   public static void centerModules(SwerveDrive swerveDrive)
   {
     angleModules(swerveDrive, Rotation2d.fromDegrees(0));
+  }
+
+  /**
+   * Set the modules to their rotary position to allow running sysid and spinning the robot
+   *
+   * @param swerveDrive Swerve Drive to control.
+   */
+  public static void setModulesToRotaryPosition(SwerveDrive swerveDrive)
+  {
+    SwerveModuleState[] rotaryStates = swerveDrive.kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 1));
+    for (int i = 0; i < swerveDrive.getModules().length; i++)
+    {
+      swerveDrive.getModules()[i].getAngleMotor().setReference(rotaryStates[i].angle.getDegrees(), 0);
+    }
+  }
+
+  /**
+   * Set the sim modules to center to 0 and power them to drive in a voltage. Calling this function in sim is equivalent
+   * to calling {@link #centerModules(SwerveDrive)} and {@link #powerDriveMotorsVoltage(SwerveDrive, double)} on a real
+   * robot.
+   *
+   * @param swerveDrive      {@link SwerveDrive} to control.
+   * @param volts            Voltage to send to drive motors.
+   * @param testWithSpinning - Whether to make the robot spin in place instead of driving in a straight line, true to
+   *                         make the robot spin, false to make the robot drive in straight line
+   */
+  public static void runDriveMotorsCharacterizationOnSimModules(SwerveDrive swerveDrive, double volts,
+                                                                boolean testWithSpinning)
+  {
+    SwerveModuleState[] rotaryStates = swerveDrive.kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 1));
+    for (int i = 0; i < swerveDrive.getModules().length; i++)
+    {
+      swerveDrive.getModules()[i].getSimModule().runDriveMotorCharacterization(
+          testWithSpinning
+          ? rotaryStates[i].angle
+          : Rotation2d.kZero,
+          volts);
+    }
+  }
+
+  /**
+   * Set the sim modules to center to 0 and power them to drive in a voltage. Calling this function in sim is equivalent
+   * to calling {@link #centerModules(SwerveDrive)} and {@link #powerDriveMotorsVoltage(SwerveDrive, double)} on a real
+   * robot.
+   *
+   * @param swerveDrive {@link SwerveDrive} to control.
+   * @param volts       Voltage to send to angle motors.
+   */
+  public static void runAngleMotorsCharacterizationOnSimModules(SwerveDrive swerveDrive, double volts)
+  {
+    for (SwerveModule module : swerveDrive.getModules())
+    {
+      module.getSimModule().runAngleMotorCharacterization(volts);
+    }
   }
 
   /**
@@ -299,19 +356,35 @@ public class SwerveDriveTest
   /**
    * Sets up the SysId runner and logger for the drive motors
    *
-   * @param config          - The SysIdRoutine.Config to use
-   * @param swerveSubsystem - the subsystem to add to requirements
-   * @param swerveDrive     - the SwerveDrive from which to access motor info
-   * @param maxVolts        - The maximum voltage that should be applied to the drive motors.
+   * @param config           - The SysIdRoutine.Config to use
+   * @param swerveSubsystem  - the subsystem to add to requirements
+   * @param swerveDrive      - the SwerveDrive from which to access motor info
+   * @param maxVolts         - The maximum voltage that should be applied to the drive motors.
+   * @param testWithSpinning - Whether to make the robot spin in place instead of driving in a straight line, true to
+   *                         make the robot spin, false to make the robot drive in straight line
    * @return A SysIdRoutine runner
    */
   public static SysIdRoutine setDriveSysIdRoutine(Config config, SubsystemBase swerveSubsystem,
-                                                  SwerveDrive swerveDrive, double maxVolts)
+                                                  SwerveDrive swerveDrive, double maxVolts, boolean testWithSpinning)
   {
     return new SysIdRoutine(config, new SysIdRoutine.Mechanism(
         (Voltage voltage) -> {
-          SwerveDriveTest.centerModules(swerveDrive);
-          SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, Math.min(voltage.in(Volts), maxVolts));
+          if (!SwerveDriveTelemetry.isSimulation)
+          {
+            if (testWithSpinning)
+            {
+              SwerveDriveTest.setModulesToRotaryPosition(swerveDrive);
+            } else
+            {
+              SwerveDriveTest.centerModules(swerveDrive);
+            }
+            SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, Math.min(voltage.in(Volts), maxVolts));
+          } else
+          {
+            SwerveDriveTest.runDriveMotorsCharacterizationOnSimModules(swerveDrive,
+                                                                       voltage.in(Volts),
+                                                                       testWithSpinning);
+          }
         },
         log -> {
           for (SwerveModule module : swerveDrive.getModules())
@@ -382,8 +455,14 @@ public class SwerveDriveTest
   {
     return new SysIdRoutine(config, new SysIdRoutine.Mechanism(
         (Voltage voltage) -> {
-          SwerveDriveTest.powerAngleMotorsVoltage(swerveDrive, voltage.in(Volts));
-          SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, 0);
+          if (!SwerveDriveTelemetry.isSimulation)
+          {
+            SwerveDriveTest.powerAngleMotorsVoltage(swerveDrive, voltage.in(Volts));
+            SwerveDriveTest.powerDriveMotorsVoltage(swerveDrive, 0);
+          } else
+          {
+            SwerveDriveTest.runAngleMotorsCharacterizationOnSimModules(swerveDrive, voltage.in(Volts));
+          }
         },
         log -> {
           for (SwerveModule module : swerveDrive.getModules())

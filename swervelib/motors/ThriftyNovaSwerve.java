@@ -27,6 +27,14 @@ public class ThriftyNovaSwerve extends SwerveMotor
 {
 
   /**
+   * {@link DCMotor} for simulation and calculations.
+   */
+  private final DCMotor       simMotor;
+  /**
+   * Closed-loop PID controller.
+   */
+  public        PIDController pid;
+  /**
    * ThriftyNova Instance.
    */
   private       ThriftyNova   motor;
@@ -34,10 +42,6 @@ public class ThriftyNovaSwerve extends SwerveMotor
    * The Encoder type being used
    */
   private       EncoderType   encoderType;
-  /**
-   * Closed-loop PID controller.
-   */
-  public        PIDController pid;
   /**
    * Factory default already occurred.
    */
@@ -58,10 +62,6 @@ public class ThriftyNovaSwerve extends SwerveMotor
    * The position conversion factor for the encoder
    */
   private       double        velocityConversionFactor = 1.0 / 60.0;
-  /**
-   * {@link DCMotor} for simulation and calculations.
-   */
-  private final DCMotor       simMotor;
 
   /**
    * Initialize the swerve motor.
@@ -104,6 +104,16 @@ public class ThriftyNovaSwerve extends SwerveMotor
   {
     this(new ThriftyNova(id), isDriveMotor, motor);
   }
+
+  @Override
+  public void close() {
+    try {
+    motor.close();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 
   /**
    * Set factory defaults on the motor controller.
@@ -222,6 +232,15 @@ public class ThriftyNovaSwerve extends SwerveMotor
    */
   @Override
   public void configurePIDWrapping(double minInput, double maxInput)
+  {
+    // Do nothing
+  }
+
+  /**
+   * Disable PID Wrapping on the motor.
+   */
+  @Override
+  public void disablePIDWrapping()
   {
     // Do nothing
   }
@@ -416,7 +435,7 @@ public class ThriftyNovaSwerve extends SwerveMotor
    * @return connected absolute encoder state.
    */
   @Override
-  public boolean isAttachedAbsoluteEncoder()
+  public boolean usingExternalFeedbackSensor()
   {
     return EncoderType.ABS == encoderType;
   }

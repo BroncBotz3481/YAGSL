@@ -20,7 +20,7 @@ public class AnalogGyroSwerve extends SwerveIMU
    */
   private final AnalogGyro         imu;
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
@@ -47,6 +47,11 @@ public class AnalogGyroSwerve extends SwerveIMU
     imu = new AnalogGyro(channel);
     factoryDefault();
     SmartDashboard.putData(imu);
+  }
+
+  @Override
+  public void close() {
+    imu.close();
   }
 
   /**

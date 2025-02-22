@@ -45,6 +45,15 @@ public class TalonSRXEncoderSwerve extends SwerveAbsoluteEncoder
   }
 
   @Override
+  public void close()
+  {
+    // TalonSRX encoder gets closed with the motor
+    // I don't think an encoder getting closed should 
+    // close the entire motor so i will keep this empty
+    // sparkFlex.close();
+  }
+
+  @Override
   public void factoryDefault()
   {
     // Handled in TalonSRXSwerve

@@ -1,6 +1,5 @@
 package swervelib.encoders;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
@@ -13,7 +12,6 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -28,7 +26,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   /**
    * Wait time for status frames to show up.
    */
-  public static double                          STATUS_TIMEOUT_SECONDS = Milliseconds.of(10).in(Seconds);
+  public static double STATUS_TIMEOUT_SECONDS = Milliseconds.of(1).in(Seconds);
   /**
    * An {@link Alert} for if the CANCoder magnet field is less than ideal.
    */
@@ -114,6 +112,12 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
         AlertType.kWarning);
   }
 
+  @Override
+  public void close()
+  {
+    encoder.close();
+  }
+
   /**
    * Reset the encoder to factory defaults.
    */
@@ -158,6 +162,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
   {
     readingError = false;
     MagnetHealthValue strength = magnetHealth.refresh().getValue();
+    angle.refresh();
 
     magnetFieldLessThanIdeal.set(strength != MagnetHealthValue.Magnet_Green);
     if (strength == MagnetHealthValue.Magnet_Invalid || strength == MagnetHealthValue.Magnet_Red)
@@ -169,8 +174,6 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
     {
       readingFaulty.set(false);
     }
-
-    angle.refresh();
 
     // Taken from democat's library.
     // Source: https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/CanCoderFactoryBuilder.java#L51-L74
@@ -190,8 +193,8 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
     {
       readingIgnored.set(false);
     }
-
-    return angle.getValue().in(Degrees);
+    // Convert from Rotations to Degrees.
+    return angle.getValueAsDouble() * 360;
   }
 
   /**

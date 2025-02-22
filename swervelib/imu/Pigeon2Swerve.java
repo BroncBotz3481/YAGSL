@@ -23,41 +23,41 @@ public class Pigeon2Swerve extends SwerveIMU
   /**
    * Wait time for status frames to show up.
    */
-  public static double             STATUS_TIMEOUT_SECONDS = 0.04;
+  public static double              STATUS_TIMEOUT_SECONDS = 0.04;
   /**
    * {@link Pigeon2} IMU device.
    */
-  private final Pigeon2            imu;
+  private final Pigeon2             imu;
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
-  private final MutAngularVelocity yawVel                 = new MutAngularVelocity(0, 0, DegreesPerSecond);
-
-  /**
-   * Offset for the {@link Pigeon2}.
-   */
-  private Rotation3d          offset      = new Rotation3d();
-  /**
-   * Inversion for the gyro
-   */
-  private boolean             invertedIMU = false;
-  /**
-   * {@link Pigeon2} configurator.
-   */
-  private Pigeon2Configurator cfg;
-
+  private final MutAngularVelocity  yawVel                 = new MutAngularVelocity(0,
+                                                                                    0,
+                                                                                    DegreesPerSecond);
   /**
    * X Acceleration supplier
    */
-  private Supplier<StatusSignal<LinearAcceleration>> xAcc;
+  private final Supplier<StatusSignal<LinearAcceleration>> xAcc;
   /**
    * Y Accelleration supplier.
    */
-  private Supplier<StatusSignal<LinearAcceleration>> yAcc;
+  private final Supplier<StatusSignal<LinearAcceleration>> yAcc;
   /**
    * Z Acceleration supplier.
    */
-  private Supplier<StatusSignal<LinearAcceleration>> zAcc;
+  private final Supplier<StatusSignal<LinearAcceleration>> zAcc;
+  /**
+   * Offset for the {@link Pigeon2}.
+   */
+  private       Rotation3d          offset                 = new Rotation3d();
+  /**
+   * Inversion for the gyro
+   */
+  private       boolean             invertedIMU            = false;
+  /**
+   * {@link Pigeon2} configurator.
+   */
+  private       Pigeon2Configurator cfg;
 
   /**
    * Generate the SwerveIMU for {@link Pigeon2}.
@@ -84,6 +84,12 @@ public class Pigeon2Swerve extends SwerveIMU
   {
     this(canid, "");
   }
+
+  @Override
+  public void close() {
+    imu.close();
+  }
+
 
   /**
    * Reset {@link Pigeon2} to factory default.
@@ -159,15 +165,15 @@ public class Pigeon2Swerve extends SwerveIMU
   @Override
   public Optional<Translation3d> getAccel()
   {
-    // TODO: Implement later.
-
-    return Optional.empty();
+    return Optional.of(new Translation3d(xAcc.get().getValueAsDouble(),
+                                         yAcc.get().getValueAsDouble(),
+                                         zAcc.get().getValueAsDouble()));
   }
 
   @Override
   public MutAngularVelocity getYawAngularVelocity()
   {
-    return yawVel.mut_replace(imu.getAngularVelocityZWorld().waitForUpdate(STATUS_TIMEOUT_SECONDS).getValue());
+    return yawVel.mut_replace(imu.getAngularVelocityZWorld().refresh().getValue());
   }
 
   /**

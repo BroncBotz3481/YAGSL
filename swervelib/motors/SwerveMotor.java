@@ -7,8 +7,11 @@ import swervelib.parser.PIDFConfig;
 /**
  * Swerve motor abstraction which defines a standard interface for motors within a swerve module.
  */
-public abstract class SwerveMotor
+public abstract class SwerveMotor implements AutoCloseable
 {
+
+  @Override
+  public abstract void close();
 
   /**
    * The maximum amount of times the swerve motor will attempt to configure a motor if failures occur.
@@ -64,6 +67,11 @@ public abstract class SwerveMotor
    * @param maxInput Maximum PID input.
    */
   public abstract void configurePIDWrapping(double minInput, double maxInput);
+
+  /**
+   * Disable PID Wrapping on the motor.
+   */
+  public abstract void disablePIDWrapping();
 
   /**
    * Set the idle mode.
@@ -191,5 +199,5 @@ public abstract class SwerveMotor
    *
    * @return connected absolute encoder state.
    */
-  public abstract boolean isAttachedAbsoluteEncoder();
+  public abstract boolean usingExternalFeedbackSensor();
 }

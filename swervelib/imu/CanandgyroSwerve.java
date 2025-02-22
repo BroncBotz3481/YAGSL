@@ -6,7 +6,6 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.MutAngularVelocity;
-
 import java.util.Optional;
 
 /**
@@ -24,7 +23,7 @@ public class CanandgyroSwerve extends SwerveIMU
    */
   private final Canandgyro         imu;
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel                 = new MutAngularVelocity(0, 0, RotationsPerSecond);
   /**
@@ -44,6 +43,12 @@ public class CanandgyroSwerve extends SwerveIMU
   public CanandgyroSwerve(int canid)
   {
     imu = new Canandgyro(canid);
+  }
+
+  @Override
+  public void close()
+  {
+    imu.close();
   }
 
   /**

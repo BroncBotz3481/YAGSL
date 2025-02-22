@@ -6,13 +6,13 @@ import static swervelib.telemetry.SwerveDriveTelemetry.serialCommsIssueWarning;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.studica.frc.AHRS.NavXComType;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import swervelib.encoders.AnalogAbsoluteEncoderSwerve;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.encoders.CanAndMagSwerve;
-import swervelib.encoders.PWMDutyCycleEncoderSwerve;
+import swervelib.encoders.DIODutyCycleEncoderSwerve;
+import swervelib.encoders.SparkFlexEncoderSwerve;
 import swervelib.encoders.SparkMaxAnalogEncoderSwerve;
 import swervelib.encoders.SparkMaxEncoderSwerve;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -26,12 +26,14 @@ import swervelib.imu.CanandgyroSwerve;
 import swervelib.imu.NavXSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.PigeonSwerve;
+import swervelib.imu.PigeonViaTalonSRXSwerve;
 import swervelib.imu.SwerveIMU;
 import swervelib.motors.SparkFlexSwerve;
 import swervelib.motors.SparkMaxBrushedMotorSwerve;
 import swervelib.motors.SparkMaxBrushedMotorSwerve.Type;
 import swervelib.motors.SparkMaxSwerve;
 import swervelib.motors.SwerveMotor;
+import swervelib.motors.TalonFXSSwerve;
 import swervelib.motors.TalonFXSwerve;
 import swervelib.motors.TalonSRXSwerve;
 import swervelib.motors.ThriftyNovaSwerve;
@@ -81,6 +83,11 @@ public class DeviceJson
         return new SparkMaxAnalogEncoderSwerve(motor, 3.3);
       case "sparkmax_analog5v":
         return new SparkMaxAnalogEncoderSwerve(motor, 5);
+      case "sparkflex_integrated":
+      case "sparkflex_attached":
+      case "sparkflex_canandmag":
+      case "sparkflex_canandcoder":
+        return new SparkFlexEncoderSwerve(motor, 360);
       case "canandcoder_can":
       case "canandmag_can":
         return new CanAndMagSwerve(id);
@@ -89,13 +96,16 @@ public class DeviceJson
       case "throughbore":
       case "am_mag":
       case "dutycycle":
-        return new PWMDutyCycleEncoderSwerve(id);
+        return new DIODutyCycleEncoderSwerve(id);
       case "thrifty":
       case "ma3":
       case "analog":
         return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
         return new CANCoderSwerve(id, canbus != null ? canbus : "");
+      case "srxmag_standalone":
+        return new TalonSRXEncoderSwerve(new TalonSRXSwerve(id, false, DCMotor.getCIM(1)),
+                                         FeedbackDevice.PulseWidthEncodedPosition);
       case "talonsrx_pwm":
         return new TalonSRXEncoderSwerve(motor, FeedbackDevice.PulseWidthEncodedPosition);
       case "talonsrx_analog":
@@ -151,6 +161,8 @@ public class DeviceJson
         return new NavXSwerve(NavXComType.kMXP_UART);
       case "pigeon":
         return new PigeonSwerve(id);
+      case "pigeon_via_talonsrx":
+        return new PigeonViaTalonSRXSwerve(id);
       case "pigeon2":
         return new Pigeon2Swerve(id, canbus != null ? canbus : "");
       default:
@@ -172,10 +184,22 @@ public class DeviceJson
     }
     switch (type)
     {
+      case "talonfxs_neo":
+        return new TalonFXSSwerve(id, canbus != null ? canbus : "", isDriveMotor, DCMotor.getNEO(1));
+      case "talonfxs_neo550":
+        return new TalonFXSSwerve(id, canbus != null ? canbus : "", isDriveMotor, DCMotor.getNeo550(1));
+      case "talonfxs_vortex":
+        return new TalonFXSSwerve(id, canbus != null ? canbus : "", isDriveMotor, DCMotor.getNeoVortex(1));
+      case "talonfxs_minion":
+        throw new UnsupportedOperationException("Cannot create minion combination yet"); //new TalonFXSSwerve(id, canbus != null ? canbus : "", isDriveMotor, DCMotor.getNeoVortex(1));
       case "sparkmax_neo":
       case "neo":
       case "sparkmax":
         return new SparkMaxSwerve(id, isDriveMotor, DCMotor.getNEO(1));
+      case "sparkmax_vortex":
+        return new SparkMaxSwerve(id, isDriveMotor, DCMotor.getNeoVortex(1));
+      case "sparkmax_minion":
+        throw new UnsupportedOperationException("Cannot create minion combination yet");
       case "sparkmax_neo550":
       case "neo550":
         return new SparkMaxSwerve(id, isDriveMotor, DCMotor.getNeo550(1));
@@ -187,6 +211,8 @@ public class DeviceJson
         return new SparkFlexSwerve(id, isDriveMotor, DCMotor.getNEO(1));
       case "sparkflex_neo550":
         return new SparkFlexSwerve(id, isDriveMotor, DCMotor.getNeo550(1));
+      case "sparkflex_minion":
+        throw new UnsupportedOperationException("Cannot create minion combination yet");
       case "falcon500":
       case "falcon":
         return new TalonFXSwerve(id, canbus != null ? canbus : "", isDriveMotor, DCMotor.getFalcon500(1));
@@ -230,6 +256,10 @@ public class DeviceJson
         return new ThriftyNovaSwerve(id, isDriveMotor, DCMotor.getNEO(1));
       case "nova_neo550":
         return new ThriftyNovaSwerve(id, isDriveMotor, DCMotor.getNeo550(1));
+      case "nova_vortex":
+        return new ThriftyNovaSwerve(id, isDriveMotor, DCMotor.getNeoVortex(1));
+      case "nova_minion":
+        throw new UnsupportedOperationException("Cannot create minion combination");//return new ThriftyNovaSwerve(id, isDriveMotor, DCMotor.getMinion(1));
       default:
         throw new RuntimeException(type + " is not a recognized motor type.");
     }

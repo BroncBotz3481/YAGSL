@@ -4,11 +4,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -18,57 +18,57 @@ import swervelib.parser.PIDFConfig;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
- * {@link com.ctre.phoenix6.hardware.TalonFX} Swerve Motor. Made by Team 1466 WebbRobotics.
+ * {@link TalonFXS} Swerve Motor. Made by Team 1466 WebbRobotics.
  */
-public class TalonFXSwerve extends SwerveMotor
+public class TalonFXSSwerve extends SwerveMotor
 {
 
   /**
    * Wait time for status frames to show up.
    */
-  public static double               STATUS_TIMEOUT_SECONDS  = 0.02;
+  public static double                STATUS_TIMEOUT_SECONDS  = 0.02;
   /**
    * Factory default already occurred.
    */
-  private final boolean              factoryDefaultOccurred  = false;
+  private final boolean               factoryDefaultOccurred  = false;
   /**
    * Whether the absolute encoder is integrated.
    */
-  private final boolean              absoluteEncoder         = false;
+  private final boolean               absoluteEncoder         = false;
   /**
    * Motion magic angle voltage setter.
    */
-  private final MotionMagicVoltage   m_angleVoltageSetter    = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage    m_angleVoltageSetter    = new MotionMagicVoltage(0);
   /**
    * Velocity voltage setter for controlling drive motor.
    */
-  private final VelocityVoltage      m_velocityVoltageSetter = new VelocityVoltage(0);
+  private final VelocityVoltage       m_velocityVoltageSetter = new VelocityVoltage(0);
   /**
-   * TalonFX motor controller.
+   * TalonFXS motor controller.
    */
-  private final TalonFX              motor;
+  private final TalonFXS              motor;
   /**
    * Conversion factor for the motor.
    */
-  private       double               conversionFactor;
+  private       double                conversionFactor;
   /**
-   * Current TalonFX configuration.
+   * Current TalonFXS configuration.
    */
-  private       TalonFXConfiguration configuration           = new TalonFXConfiguration();
+  private       TalonFXSConfiguration configuration           = new TalonFXSConfiguration();
   /**
-   * Current TalonFX Configurator.
+   * Current TalonFXS Configurator.
    */
-  private       TalonFXConfigurator  cfg;
+  private       TalonFXSConfigurator  cfg;
 
 
   /**
-   * Constructor for TalonFX swerve motor.
+   * Constructor for TalonFXS swerve motor.
    *
    * @param motor        Motor to use.
    * @param isDriveMotor Whether this motor is a drive motor.
-   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
+   * @param motorType    {@link DCMotor} which the {@link TalonFXS} is attached to.
    */
-  public TalonFXSwerve(TalonFX motor, boolean isDriveMotor, DCMotor motorType)
+  public TalonFXSSwerve(TalonFXS motor, boolean isDriveMotor, DCMotor motorType)
   {
     this.isDriveMotor = isDriveMotor;
     this.motor = motor;
@@ -78,35 +78,31 @@ public class TalonFXSwerve extends SwerveMotor
     factoryDefaults();
     clearStickyFaults();
 
-    //    if (SwerveDriveTelemetry.isSimulation)
-    //    {
-    ////      PhysicsSim.getInstance().addTalonFX(motor, .25, 6800);
-    //    }
   }
 
   /**
-   * Construct the TalonFX swerve motor given the ID and CANBus.
+   * Construct the TalonFXS swerve motor given the ID and CANBus.
    *
-   * @param id           ID of the TalonFX on the CANBus.
-   * @param canbus       CANBus on which the TalonFX is on.
+   * @param id           ID of the TalonFXS on the CANBus.
+   * @param canbus       CANBus on which the TalonFXS is on.
    * @param isDriveMotor Whether the motor is a drive or steering motor.
-   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
+   * @param motorType    {@link DCMotor} which the {@link TalonFXS} is attached to.
    */
-  public TalonFXSwerve(int id, String canbus, boolean isDriveMotor, DCMotor motorType)
+  public TalonFXSSwerve(int id, String canbus, boolean isDriveMotor, DCMotor motorType)
   {
-    this(new TalonFX(id, canbus), isDriveMotor, motorType);
+    this(new TalonFXS(id, canbus), isDriveMotor, motorType);
   }
 
   /**
-   * Construct the TalonFX swerve motor given the ID.
+   * Construct the TalonFXS swerve motor given the ID.
    *
-   * @param id           ID of the TalonFX on the canbus.
+   * @param id           ID of the TalonFXS on the canbus.
    * @param isDriveMotor Whether the motor is a drive or steering motor.
-   * @param motorType    {@link DCMotor} which the {@link TalonFX} is attached to.
+   * @param motorType    {@link DCMotor} which the {@link TalonFXS} is attached to.
    */
-  public TalonFXSwerve(int id, boolean isDriveMotor, DCMotor motorType)
+  public TalonFXSSwerve(int id, boolean isDriveMotor, DCMotor motorType)
   {
-    this(new TalonFX(id), isDriveMotor, motorType);
+    this(new TalonFXS(id), isDriveMotor, motorType);
   }
 
   /**
@@ -126,16 +122,10 @@ public class TalonFXSwerve extends SwerveMotor
       m_velocityVoltageSetter.UpdateFreqHz = 0;
       //      motor.configFactoryDefault();
       //      motor.setSensorPhase(true);
-      //      motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
+      //      motor.configSelectedFeedbackSensor(TalonFXSFeedbackDevice.IntegratedSensor, 0, 30);
       //      motor.configNeutralDeadband(0.001);
     }
   }
-
-  @Override
-  public void close() {
-    motor.close();
-  }
-
 
   /**
    * Clear the sticky faults on the motor controller.
@@ -191,8 +181,10 @@ public class TalonFXSwerve extends SwerveMotor
                                  .withMotionMagicExpo_kV(0.12 * positionConversionFactor)
                                  .withMotionMagicExpo_kA(0.1);
 
+    /*
     configuration.Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
                           .withSensorToMechanismRatio(positionConversionFactor);
+     */
 
     cfg.apply(configuration);
   }
@@ -462,5 +454,14 @@ public class TalonFXSwerve extends SwerveMotor
   public boolean usingExternalFeedbackSensor()
   {
     return absoluteEncoder;
+  }
+
+  /**
+   * Closes handles for unit testing.
+   */
+  @Override
+  public void close()
+  {
+    motor.close();
   }
 }

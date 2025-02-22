@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -52,14 +51,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
-
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.imu.Pigeon2Swerve;
 import swervelib.imu.SwerveIMU;
@@ -75,7 +71,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 /**
  * Swerve Drive class representing and controlling the swerve drive.
  */
-public class SwerveDrive
+public class SwerveDrive implements AutoCloseable
 {
 
   /**
@@ -118,16 +114,20 @@ public class SwerveDrive
    */
   private final DoublePublisher     rawIMUPublisher
                                                                                     = NetworkTableInstance.getDefault()
+                                                                                                          .getTable(
+                                                                                                              "SmartDashboard")
                                                                                                           .getDoubleTopic(
-                                                                                                              "swerve/Raw IMU Yaw")
+                                                                                                              "swerve/imu/raw")
                                                                                                           .publish();
   /**
    * NT4 Publisher for the IMU reading adjusted by offset and inversion.
    */
   private final DoublePublisher     adjustedIMUPublisher
                                                                                     = NetworkTableInstance.getDefault()
+                                                                                                          .getTable(
+                                                                                                              "SmartDashboard")
                                                                                                           .getDoubleTopic(
-                                                                                                              "swerve/Adjusted IMU Yaw")
+                                                                                                              "swerve/imu/adjusted")
                                                                                                           .publish();
   /**
    * Field object.
@@ -224,7 +224,9 @@ public class SwerveDrive
       SwerveDriveConfiguration config, SwerveControllerConfiguration controllerConfig, double maxSpeedMPS,
       Pose2d startingPose)
   {
-    this.maxChassisSpeedMPS = maxSpeedMPS;
+    this.attainableMaxTranslationalSpeedMetersPerSecond = this.maxChassisSpeedMPS = maxSpeedMPS;
+    this.attainableMaxRotationalVelocityRadiansPerSecond = Math.PI *
+                                                           2; // Defaulting to something reasonable for most robots
     swerveDriveConfiguration = config;
     swerveController = new SwerveController(controllerConfig);
     // Create Kinematics from swerve module locations.
@@ -247,17 +249,17 @@ public class SwerveDrive
                                                                               .withCustomModuleTranslations(config.moduleLocationsMeters)
                                                                               .withGyro(config.getGyroSim())
                                                                               .withSwerveModule(new SwerveModuleSimulationConfig(
-                                                                                  config.getDriveMotorSim(),
-                                                                                  config.getAngleMotorSim(),
-                                                                                  config.physicalCharacteristics.conversionFactor.drive.gearRatio,
-                                                                                  config.physicalCharacteristics.conversionFactor.angle.gearRatio,
-                                                                                  Volts.of(config.physicalCharacteristics.driveFrictionVoltage),
-                                                                                  Volts.of(config.physicalCharacteristics.angleFrictionVoltage),
-                                                                                  Inches.of(
-                                                                                      config.physicalCharacteristics.conversionFactor.drive.diameter /
-                                                                                      2),
-                                                                                  KilogramSquareMeters.of(0.02),
-                                                                                  config.physicalCharacteristics.wheelGripCoefficientOfFriction)
+                                                                                                    config.getDriveMotorSim(),
+                                                                                                    config.getAngleMotorSim(),
+                                                                                                    config.physicalCharacteristics.conversionFactor.drive.gearRatio,
+                                                                                                    config.physicalCharacteristics.conversionFactor.angle.gearRatio,
+                                                                                                    Volts.of(config.physicalCharacteristics.driveFrictionVoltage),
+                                                                                                    Volts.of(config.physicalCharacteristics.angleFrictionVoltage),
+                                                                                                    Inches.of(
+                                                                                                        config.physicalCharacteristics.conversionFactor.drive.diameter /
+                                                                                                        2),
+                                                                                                    KilogramSquareMeters.of(0.02),
+                                                                                                    config.physicalCharacteristics.wheelGripCoefficientOfFriction)
                                                                                                );
 
       mapleSimDrive = new SwerveDriveSimulation(simulationConfig, startingPose);
@@ -330,6 +332,16 @@ public class SwerveDrive
     checkIfTunerXCompatible();
 
     HAL.report(kResourceType_RobotDrive, kRobotDriveSwerve_YAGSL);
+  }
+
+  @Override
+  public void close() {
+    imu.close();
+    tunerXRecommendation.close();
+
+    for (var module : swerveModules) {
+      module.close();
+    }
   }
 
   /**
@@ -567,7 +579,7 @@ public class SwerveDrive
 
     if (fieldRelative)
     {
-      ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
+      velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getOdometryHeading());
     }
     drive(velocity, isOpenLoop, new Translation2d());
   }
@@ -619,31 +631,46 @@ public class SwerveDrive
   }
 
   /**
-   * Set the maximum speeds for desaturation.
+   * Set the maximum attainable speeds for desaturation.
    *
    * @param attainableMaxTranslationalSpeedMetersPerSecond  The absolute max speed that your robot can reach while
    *                                                        translating in meters per second.
    * @param attainableMaxRotationalVelocityRadiansPerSecond The absolute max speed the robot can reach while rotating in
    *                                                        radians per second.
    */
-  public void setMaximumSpeeds(
+  public void setMaximumAttainableSpeeds(
       double attainableMaxTranslationalSpeedMetersPerSecond,
       double attainableMaxRotationalVelocityRadiansPerSecond)
   {
     this.attainableMaxTranslationalSpeedMetersPerSecond = attainableMaxTranslationalSpeedMetersPerSecond;
     this.attainableMaxRotationalVelocityRadiansPerSecond = attainableMaxRotationalVelocityRadiansPerSecond;
-    this.swerveController.config.maxAngularVelocity = attainableMaxRotationalVelocityRadiansPerSecond;
+  }
+
+  /**
+   * Set the maximum allowable speeds for desaturation.
+   *
+   * @param maxTranslationalSpeedMetersPerSecond  The allowable max speed that your robot should reach while translating
+   *                                              in meters per second.
+   * @param maxRotationalVelocityRadiansPerSecond The allowable max speed the robot should reach while rotating in
+   *                                              radians per second.
+   */
+  public void setMaximumAllowableSpeeds(
+      double maxTranslationalSpeedMetersPerSecond,
+      double maxRotationalVelocityRadiansPerSecond)
+  {
+    this.maxChassisSpeedMPS = maxTranslationalSpeedMetersPerSecond;
+    this.swerveController.config.maxAngularVelocity = maxRotationalVelocityRadiansPerSecond;
   }
 
   /**
    * Get the maximum velocity from {@link SwerveDrive#attainableMaxTranslationalSpeedMetersPerSecond} or
-   * {@link SwerveDrive#maxChassisSpeedMPS} whichever is higher.
+   * {@link SwerveDrive#maxChassisSpeedMPS} whichever is the lower limit on the robot's speed.
    *
-   * @return Maximum speed in meters/second.
+   * @return Minimum speed in meters/second of physically attainable and user allowable limits.
    */
   public double getMaximumChassisVelocity()
   {
-    return Math.max(this.attainableMaxTranslationalSpeedMetersPerSecond, maxChassisSpeedMPS);
+    return Math.min(this.attainableMaxTranslationalSpeedMetersPerSecond, maxChassisSpeedMPS);
   }
 
   /**
@@ -651,9 +678,9 @@ public class SwerveDrive
    *
    * @return {@link LinearVelocity} representing the maximum drive speed of a module.
    */
-  public LinearVelocity getMaximumModuleDriveVelocity()
+  public double getMaximumModuleDriveVelocity()
   {
-    return swerveModules[0].getMaxVelocity();
+    return swerveModules[0].getMaxDriveVelocityMetersPerSecond();
   }
 
   /**
@@ -668,13 +695,13 @@ public class SwerveDrive
 
   /**
    * Get the maximum angular velocity, either {@link SwerveDrive#attainableMaxRotationalVelocityRadiansPerSecond} or
-   * {@link SwerveControllerConfiguration#maxAngularVelocity}.
+   * {@link SwerveControllerConfiguration#maxAngularVelocity}, whichever is the lower limit on the robot's speed.
    *
-   * @return Maximum angular velocity in radians per second.
+   * @return Minimum angular velocity in radians per second of physically attainable and user allowable limits.
    */
   public double getMaximumChassisAngularVelocity()
   {
-    return Math.max(this.attainableMaxRotationalVelocityRadiansPerSecond, swerveController.config.maxAngularVelocity);
+    return Math.min(this.attainableMaxRotationalVelocityRadiansPerSecond, swerveController.config.maxAngularVelocity);
   }
 
   /**
@@ -688,8 +715,9 @@ public class SwerveDrive
                                   boolean isOpenLoop)
   {
     // Desaturates wheel speeds
-    double maxModuleSpeedMPS = getMaximumModuleDriveVelocity().in(MetersPerSecond);
-    if (attainableMaxTranslationalSpeedMetersPerSecond != 0 || attainableMaxRotationalVelocityRadiansPerSecond != 0)
+    double maxModuleSpeedMPS = getMaximumModuleDriveVelocity();
+    if ((attainableMaxTranslationalSpeedMetersPerSecond != 0 || attainableMaxRotationalVelocityRadiansPerSecond != 0) &&
+        attainableMaxTranslationalSpeedMetersPerSecond != maxChassisSpeedMPS)
     {
       SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, desiredChassisSpeed,
                                                   maxModuleSpeedMPS,
@@ -719,7 +747,7 @@ public class SwerveDrive
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop)
   {
     SwerveDriveTelemetry.startCtrlCycle();
-    double maxModuleSpeedMPS = getMaximumModuleDriveVelocity().in(MetersPerSecond);
+    double maxModuleSpeedMPS = getMaximumModuleDriveVelocity();
     desiredStates = kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates));
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxModuleSpeedMPS);
 
@@ -748,6 +776,9 @@ public class SwerveDrive
     }
     for (SwerveModule module : swerveModules)
     {
+      module.applyStateOptimizations(states[module.moduleNumber]);
+      module.applyAntiJitter(states[module.moduleNumber], false);
+      
       // from the module configuration, obtain necessary information to calculate feed-forward
       // Warning: Will not work well if motor is not what we are expecting.
       // Warning: Should replace module.getDriveMotor().simMotor with expected motor type first.
@@ -1128,7 +1159,7 @@ public class SwerveDrive
   {
     SwerveDriveTelemetry.startOdomCycle();
     odometryLock.lock();
-    invalidateCache();
+//    invalidateCache();
     try
     {
       // Update odometry
@@ -1255,7 +1286,7 @@ public class SwerveDrive
    *                                 {@link Timer#getFPGATimestamp()} or similar sources.
    * @param visionMeasurementStdDevs Vision measurement standard deviation that will be sent to the
    *                                 {@link SwerveDrivePoseEstimator}.The standard deviation of the vision measurement,
-   *                                 for best accuracy calculate the standard deviation at 2 or more  points and fit a
+   *                                 for best accuracy calculate the standard deviation at 2 or more points and fit a
    *                                 line to it with the calculated optimal standard deviation. (Units should be meters
    *                                 per pixel). By optimizing this you can get * vision accurate to inches instead of
    *                                 feet.
@@ -1356,9 +1387,33 @@ public class SwerveDrive
   }
 
   /**
+   * Set the motor controller closed loop feedback device to the defined external absolute encoder, with the given
+   * offset from the supplied configuration, overwriting any native offset.
+   */
+  public void useExternalFeedbackSensor()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.useExternalFeedbackSensor();
+    }
+  }
+
+  /**
+   * Set the motor controller closed loop feedback device to the internal encoder instead of the absolute encoder.
+   */
+  public void useInternalFeedbackSensor()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.useInternalFeedbackSensor();
+    }
+  }
+
+  /**
    * Pushes the Absolute Encoder offsets to the Encoder or Motor Controller, depending on type. Also removes the
    * internal offsets to prevent double offsetting.
    */
+  @Deprecated
   public void pushOffsetsToEncoders()
   {
     for (SwerveModule module : swerveModules)
@@ -1370,11 +1425,26 @@ public class SwerveDrive
   /**
    * Restores Internal YAGSL Encoder offsets and sets the Encoder stored offset back to 0
    */
+  @Deprecated
   public void restoreInternalOffset()
   {
     for (SwerveModule module : swerveModules)
     {
       module.restoreInternalOffset();
+    }
+  }
+
+  /**
+   * Set module optimization to be utilized or not. Sometimes it is desirable to be enabled for debugging purposes
+   * only.
+   *
+   * @param enabled Optimization enabled state.
+   */
+  public void setModuleStateOptimization(boolean enabled)
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.setModuleStateOptimization(enabled);
     }
   }
 

@@ -21,7 +21,7 @@ public class PigeonSwerve extends SwerveIMU
    */
   private final WPI_PigeonIMU      imu;
   /**
-   * Mutable {@link AngularVelocity} for readings.
+   * Mutable {@link MutAngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
@@ -44,6 +44,12 @@ public class PigeonSwerve extends SwerveIMU
     offset = new Rotation3d();
     SmartDashboard.putData(imu);
   }
+
+  @Override
+  public void close() {
+    imu.close();
+  }
+
 
   /**
    * Reset IMU to factory default.

@@ -63,12 +63,11 @@ public class PhysicalPropertiesJson
     if (conversionFactor.drive != 0 && conversionFactor.angle != 0 && conversionFactors.isDriveEmpty() &&
         conversionFactors.isAngleEmpty())
     {
-      new Alert("Configuration",
+      throw new RuntimeException(
                 "\n'conversionFactor': {'drive': " + conversionFactor.drive + ", 'angle': " + conversionFactor.angle +
                 "} \nis deprecated, please use\n" +
                 "'conversionFactors': {'drive': {'factor': " + conversionFactor.drive + "}, 'angle': {'factor': " +
-                conversionFactor.angle + "} }",
-                AlertType.kError).set(true);
+                conversionFactor.angle + "} }");
     }
 
     return new SwerveModulePhysicalCharacteristics(

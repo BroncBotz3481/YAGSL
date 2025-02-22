@@ -95,7 +95,7 @@ public class SwerveMath
         optimalVoltage
         / calculateMaxAcceleration(wheelGripCoefficientOfFriction);
     /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
-    return new SimpleMotorFeedforward(0, kv, ka);
+    return new SimpleMotorFeedforward(0, kv, 0);
   }
 
   /**

@@ -1,5 +1,6 @@
 package swervelib.parser;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,17 +58,21 @@ public class SwerveParser
     checkDirectory(directory);
     swerveDriveJson =
         new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .readValue(new File(directory, "swervedrive.json"), SwerveDriveJson.class);
     controllerPropertiesJson =
         new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .readValue(
                 new File(directory, "controllerproperties.json"), ControllerPropertiesJson.class);
     pidfPropertiesJson =
         new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .readValue(
                 new File(directory, "modules/pidfproperties.json"), PIDFPropertiesJson.class);
     physicalPropertiesJson =
         new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .readValue(
                 new File(directory, "modules/physicalproperties.json"),
                 PhysicalPropertiesJson.class);
@@ -77,7 +82,9 @@ public class SwerveParser
       moduleConfigs.put(swerveDriveJson.modules[i], i);
       File moduleFile = new File(directory, "modules/" + swerveDriveJson.modules[i]);
       assert moduleFile.exists();
-      moduleJsons[i] = new ObjectMapper().readValue(moduleFile, ModuleJson.class);
+      moduleJsons[i] = new ObjectMapper()
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+          .readValue(moduleFile, ModuleJson.class);
     }
   }
 

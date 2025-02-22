@@ -2,30 +2,39 @@ package swervelib.imu;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 /**
- * IMU Swerve class for the {@link ADIS16470_IMU} device.
+ * SwerveIMU interface for the {@link WPI_PigeonIMU}.
  */
-public class ADIS16470Swerve extends SwerveIMU
+public class PigeonViaTalonSRXSwerve extends SwerveIMU
 {
 
+
   /**
-   * {@link ADIS16470_IMU} device to read the current headings from.
+   * {@link TalonSRX} TalonSRX the IMU is attached to.
    */
-  private final ADIS16470_IMU      imu;
+  private final WPI_TalonSRX talon;
+
   /**
-   * Mutable {@link MutAngularVelocity} for readings.
+   * {@link WPI_PigeonIMU} IMU device.
+   */
+  private final WPI_PigeonIMU      imu;
+  /**
+   * Mutable {@link AngularVelocity} for readings.
    */
   private final MutAngularVelocity yawVel      = new MutAngularVelocity(0, 0, DegreesPerSecond);
   /**
-   * Offset for the ADIS16470.
+   * Offset for the {@link WPI_PigeonIMU}.
    */
   private       Rotation3d         offset      = new Rotation3d();
   /**
@@ -34,19 +43,22 @@ public class ADIS16470Swerve extends SwerveIMU
   private       boolean            invertedIMU = false;
 
   /**
-   * Construct the ADIS16470 imu and reset default configurations. Publish the gyro to the SmartDashboard.
+   * Generate the SwerveIMU for {@link WPI_PigeonIMU} attached to a {@link TalonSRX}.
+   *
+   * @param canid CAN ID for the {@link TalonSRX} the {@link WPI_PigeonIMU} is attached to, does not support CANBus.
    */
-  public ADIS16470Swerve()
+  public PigeonViaTalonSRXSwerve(int canid)
   {
-    imu = new ADIS16470_IMU();
+    talon = new WPI_TalonSRX(canid);
+    imu = new WPI_PigeonIMU(talon);
     offset = new Rotation3d();
-    factoryDefault();
     SmartDashboard.putData(imu);
   }
 
   @Override
   public void close() {
     imu.close();
+    talon.close();
   }
 
   /**
@@ -55,8 +67,7 @@ public class ADIS16470Swerve extends SwerveIMU
   @Override
   public void factoryDefault()
   {
-    offset = new Rotation3d(0, 0, 0);
-    imu.calibrate();
+    imu.configFactoryDefault();
   }
 
   /**
@@ -65,7 +76,7 @@ public class ADIS16470Swerve extends SwerveIMU
   @Override
   public void clearStickyFaults()
   {
-    // Do nothing.
+    imu.clearStickyFaults();
   }
 
   /**
@@ -93,9 +104,12 @@ public class ADIS16470Swerve extends SwerveIMU
    *
    * @return {@link Rotation3d} from the IMU.
    */
+  @Override
   public Rotation3d getRawRotation3d()
   {
-    Rotation3d reading = new Rotation3d(0, 0, Math.toRadians(-imu.getAngle(IMUAxis.kYaw)));
+    double[] wxyz = new double[4];
+    imu.get6dQuaternion(wxyz);
+    Rotation3d reading = new Rotation3d(new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]));
     return invertedIMU ? reading.unaryMinus() : reading;
   }
 
@@ -119,7 +133,9 @@ public class ADIS16470Swerve extends SwerveIMU
   @Override
   public Optional<Translation3d> getAccel()
   {
-    return Optional.of(new Translation3d(imu.getAccelX(), imu.getAccelY(), imu.getAccelZ()));
+    short[] initial = new short[3];
+    imu.getBiasedAccelerometer(initial);
+    return Optional.of(new Translation3d(initial[0], initial[1], initial[2]).times(9.81 / 16384.0));
   }
 
   @Override
@@ -129,7 +145,7 @@ public class ADIS16470Swerve extends SwerveIMU
   }
 
   /**
-   * Get the instantiated IMU object.
+   * Get the instantiated {@link WPI_PigeonIMU} IMU object.
    *
    * @return IMU object.
    */
@@ -138,4 +154,5 @@ public class ADIS16470Swerve extends SwerveIMU
   {
     return imu;
   }
+
 }

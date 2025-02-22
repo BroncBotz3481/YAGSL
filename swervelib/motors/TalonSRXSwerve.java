@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.encoders.TalonSRXEncoderSwerve;
 import swervelib.math.SwerveMath;
 import swervelib.parser.PIDFConfig;
 import swervelib.parser.json.modules.ConversionFactorsJson;
@@ -31,7 +32,7 @@ public class TalonSRXSwerve extends SwerveMotor
   /**
    * Whether the absolute encoder is integrated.
    */
-  private final boolean               absoluteEncoder          = false;
+  private       boolean               absoluteEncoder          = false;
   /**
    * TalonSRX motor controller.
    */
@@ -84,6 +85,11 @@ public class TalonSRXSwerve extends SwerveMotor
     this(new WPI_TalonSRX(id), isDriveMotor, motorType);
   }
 
+  @Override
+  public void close() {
+    motor.close();
+  }
+
   /**
    * Configure the factory defaults.
    */
@@ -114,6 +120,7 @@ public class TalonSRXSwerve extends SwerveMotor
   @Override
   public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder)
   {
+    absoluteEncoder = encoder instanceof TalonSRXEncoderSwerve;
     // Do not support.
     return this;
   }
@@ -213,6 +220,15 @@ public class TalonSRXSwerve extends SwerveMotor
    */
   @Override
   public void configurePIDWrapping(double minInput, double maxInput)
+  {
+    // Do nothing
+  }
+
+  /**
+   * Disable PID Wrapping on the motor.
+   */
+  @Override
+  public void disablePIDWrapping()
   {
     // Do nothing
   }
@@ -468,7 +484,7 @@ public class TalonSRXSwerve extends SwerveMotor
    * @return connected absolute encoder state.
    */
   @Override
-  public boolean isAttachedAbsoluteEncoder()
+  public boolean usingExternalFeedbackSensor()
   {
     return absoluteEncoder;
   }

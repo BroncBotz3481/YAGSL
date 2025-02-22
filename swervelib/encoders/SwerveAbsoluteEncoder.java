@@ -3,8 +3,14 @@ package swervelib.encoders;
 /**
  * Swerve abstraction class to define a standard interface with absolute encoders for swerve modules..
  */
-public abstract class SwerveAbsoluteEncoder
+public abstract class SwerveAbsoluteEncoder implements AutoCloseable
 {
+
+  // This is a bit weird because some encoders are closable 
+  // while some get closed with the motor controller
+  // so for some encoders this will be an empty function
+  @Override
+  public abstract void close();
 
   /**
    * The maximum amount of times the swerve encoder will attempt to configure itself if failures occur.
