@@ -206,6 +206,18 @@ public class SparkMaxEncoderSwerve extends SwerveAbsoluteEncoder
   @Override
   public boolean setAbsoluteEncoderOffset(double offset)
   {
+    if (sparkMax instanceof SparkMaxSwerve)
+    {
+      SparkMaxConfig cfg = ((SparkMaxSwerve) sparkMax).getConfig();
+      cfg.absoluteEncoder.zeroOffset(offset);
+      ((SparkMaxSwerve) sparkMax).updateConfig(cfg);
+      return true;
+    } else if (sparkMax instanceof SparkMaxBrushedMotorSwerve)
+    {
+      SparkMaxConfig cfg = ((SparkMaxBrushedMotorSwerve) sparkMax).getConfig();
+      cfg.absoluteEncoder.zeroOffset(offset);
+      ((SparkMaxBrushedMotorSwerve) sparkMax).updateConfig(cfg);
+    }
     return false;
   }
 
