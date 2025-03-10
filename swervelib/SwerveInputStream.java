@@ -67,6 +67,10 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
    */
   private       Optional<DoubleSupplier>        controllerHeadingY            = Optional.empty();
   /**
+   * Direct heading supplier as Rotation2d.
+   */
+  private       Optional<Supplier<Rotation2d>>  headingSupplier               = Optional.empty();
+  /**
    * Axis deadband for the controller.
    */
   private       Optional<Double>                axisDeadband                  = Optional.empty();
@@ -221,6 +225,7 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
     newStream.controllerOmega = controllerOmega;
     newStream.controllerHeadingX = controllerHeadingX;
     newStream.controllerHeadingY = controllerHeadingY;
+    newStream.headingSupplier = headingSupplier;
     newStream.axisDeadband = axisDeadband;
     newStream.translationAxisScale = translationAxisScale;
     newStream.omegaAxisScale = omegaAxisScale;
@@ -461,6 +466,21 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
   {
     controllerHeadingX = Optional.of(headingX);
     controllerHeadingY = Optional.of(headingY);
+    headingSupplier = Optional.empty(); // Clear any direct heading supplier
+    return this;
+  }
+  
+  /**
+   * Add direct heading supplier for Heading based control.
+   *
+   * @param heading Supplier that provides the desired heading as Rotation2d
+   * @return self
+   */
+  public SwerveInputStream withHeading(Supplier<Rotation2d> heading)
+  {
+    headingSupplier = Optional.of(heading);
+    controllerHeadingX = Optional.empty(); // Clear controller axes
+    controllerHeadingY = Optional.empty(); // Clear controller axes
     return this;
   }
 
@@ -637,13 +657,13 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
       }
     } else if (headingEnabled.isPresent() && headingEnabled.get().getAsBoolean())
     {
-      if (controllerHeadingX.isPresent() && controllerHeadingY.isPresent())
+      if (headingSupplier.isPresent() || (controllerHeadingX.isPresent() && controllerHeadingY.isPresent()))
       {
         return SwerveInputMode.HEADING;
       } else
       {
         DriverStation.reportError(
-            "Attempting to enter HEADING mode without heading axis, please use SwerveInputStream.withControllerHeadingAxis to add heading axis!",
+            "Attempting to enter HEADING mode without heading information, please use SwerveInputStream.withHeading or SwerveInputStream.withControllerHeadingAxis!",
             false);
       }
     } else if (controllerOmega.isEmpty())
@@ -906,7 +926,18 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
       }
       case HEADING ->
       {
-        omegaRadiansPerSecond = swerveController.headingCalculate(swerveDrive.getOdometryHeading().getRadians(),
+        if (headingSupplier.isPresent()) {
+          // Use direct heading supplier
+          Rotation2d targetHeading = applyHeadingOffset(
+                                        applyAllianceAwareRotation(
+                                          headingSupplier.get().get()));
+                                          
+          omegaRadiansPerSecond = swerveController.headingCalculate(
+              swerveDrive.getOdometryHeading().getRadians(),
+              targetHeading.getRadians());
+        } else {
+          // Use controller joystick inputs
+          omegaRadiansPerSecond = swerveController.headingCalculate(swerveDrive.getOdometryHeading().getRadians(),
                                                                   applyHeadingOffset(
                                                                       applyAllianceAwareRotation(
                                                                           Rotation2d.fromRadians(
@@ -916,11 +947,12 @@ public class SwerveInputStream implements Supplier<ChassisSpeeds>
                                                                                   controllerHeadingY.get()
                                                                                                     .getAsDouble())))).getRadians());
 
-        // Prevent rotation if controller heading inputs are not past axisDeadband
-        if (Math.abs(controllerHeadingX.get().getAsDouble()) + Math.abs(controllerHeadingY.get().getAsDouble()) <
-            axisDeadband.get())
-        {
-          omegaRadiansPerSecond = 0;
+          // Prevent rotation if controller heading inputs are not past axisDeadband
+          if (Math.abs(controllerHeadingX.get().getAsDouble()) + Math.abs(controllerHeadingY.get().getAsDouble()) <
+              axisDeadband.get())
+          {
+            omegaRadiansPerSecond = 0;
+          }
         }
 
         speeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
