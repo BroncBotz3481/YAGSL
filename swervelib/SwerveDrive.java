@@ -272,7 +272,6 @@ public class SwerveDrive implements AutoCloseable
 
       // register the drivetrain simulation
       SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive);
-
       simIMU = new SwerveIMUSimulation(mapleSimDrive.getGyroSimulation());
       imuReadingCache = new Cache<>(simIMU::getGyroRotation3d, 5L);
     } else
@@ -289,8 +288,11 @@ public class SwerveDrive implements AutoCloseable
             getYaw(),
             getModulePositions(),
             startingPose); // x,y,heading in radians; Vision measurement std dev, higher=less weight
-
-    zeroGyro();
+//
+//    Rotation3d currentGyro = imuReadingCache.getValue();
+//    double offset = currentGyro.getZ() +
+//                    startingPose.getRotation().getRadians();
+//    setGyroOffset(new Rotation3d(currentGyro.getX(), currentGyro.getY(), offset));
 
     // Initialize Telemetry
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.POSE.ordinal())
@@ -335,11 +337,13 @@ public class SwerveDrive implements AutoCloseable
   }
 
   @Override
-  public void close() {
+  public void close()
+  {
     imu.close();
     tunerXRecommendation.close();
 
-    for (var module : swerveModules) {
+    for (var module : swerveModules)
+    {
       module.close();
     }
   }
@@ -393,7 +397,10 @@ public class SwerveDrive implements AutoCloseable
   public void setOdometryPeriod(double period)
   {
     odometryThread.stop();
-    SimulatedArena.overrideSimulationTimings(Seconds.of(period), 1);
+    if (SwerveDriveTelemetry.isSimulation)
+    {
+      SimulatedArena.overrideSimulationTimings(Seconds.of(period), 1);
+    }
     odometryThread.startPeriodic(period);
   }
 
@@ -403,7 +410,10 @@ public class SwerveDrive implements AutoCloseable
   public void stopOdometryThread()
   {
     odometryThread.stop();
-    SimulatedArena.overrideSimulationTimings(Seconds.of(TimedRobot.kDefaultPeriod), 5);
+    if (SwerveDriveTelemetry.isSimulation)
+    {
+      SimulatedArena.overrideSimulationTimings(Seconds.of(TimedRobot.kDefaultPeriod), 5);
+    }
   }
 
   /**
@@ -778,7 +788,7 @@ public class SwerveDrive implements AutoCloseable
     {
       module.applyStateOptimizations(states[module.moduleNumber]);
       module.applyAntiJitter(states[module.moduleNumber], false);
-      
+
       // from the module configuration, obtain necessary information to calculate feed-forward
       // Warning: Will not work well if motor is not what we are expecting.
       // Warning: Should replace module.getDriveMotor().simMotor with expected motor type first.
@@ -898,7 +908,7 @@ public class SwerveDrive implements AutoCloseable
    * method. However, if either gyro angle or module position is reset, this must be called in order for odometry to
    * keep working.
    *
-   * @param pose The pose to set the odometry to
+   * @param pose The pose to set the odometry to. Field relative, blue-origin where 0deg is facing towards RED alliance.
    */
   public void resetOdometry(Pose2d pose)
   {
@@ -987,7 +997,7 @@ public class SwerveDrive implements AutoCloseable
   }
 
   /**
-   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0 (red alliance station).
    */
   public void zeroGyro()
   {
